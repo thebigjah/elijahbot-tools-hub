@@ -4,199 +4,426 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tools by Elijah Purcell · Purcell Ventures</title>
-<meta name="description" content="27 free single-file tools — faith, productivity, business diagnostics, decision journaling, scripture memorization, and more. Built in public.">
-<meta property="og:title" content="Tools by Elijah Purcell">
-<meta property="og:description" content="27 free single-file tools across faith, productivity, business, and personal growth. Built in public.">
+<meta name="description" content="A working library of 22 single-file tools for faith, focus, and small-business clarity. Free. Built one weekend at a time.">
+<meta property="og:title" content="Tools — Elijah Purcell">
+<meta property="og:description" content="A working library of 22 single-file tools. Faith, focus, small-business clarity. Free.">
 <meta property="og:type" content="website">
+<meta property="og:image" content="https://elijahbot-tools-hub.vercel.app/icons/icon-512.png">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22 fill=%22%23c2a173%22>P</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22 fill=%22%23c8a96a%22 font-family=%22serif%22>P</text></svg>">
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="EBTools">
-<meta name="theme-color" content="#0a0a14">
+<meta name="theme-color" content="#0d0b08">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,400;9..144,500;9..144,700;9..144,900&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <script src="/lock.js"></script>
 <style>
-:root { color-scheme: dark; }
+:root {
+  color-scheme: dark;
+  --bg: #0d0b08;
+  --bg-2: #15110b;
+  --ink: #ece4d3;
+  --ink-dim: #98897a;
+  --ink-faint: #524a3e;
+  --gold: #c8a96a;
+  --gold-deep: #8a6a3a;
+  --rule: rgba(200, 169, 106, 0.15);
+  --rule-strong: rgba(200, 169, 106, 0.35);
+  --serif: 'Fraunces', 'EB Garamond', Georgia, serif;
+  --mono: 'JetBrains Mono', 'IBM Plex Mono', 'Menlo', monospace;
+  --sans: 'Inter', -apple-system, system-ui, sans-serif;
+}
 * { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
-  font-family: -apple-system, system-ui, 'Segoe UI', sans-serif;
-  background: #0a0a14;
-  color: #e8e8ea;
+  font-family: var(--sans);
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(200, 169, 106, 0.06), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(200, 169, 106, 0.03), transparent 70%);
+  color: var(--ink);
   margin: 0;
   padding: 0;
-  line-height: 1.5;
-}
-.container { max-width: 1100px; margin: 0 auto; padding: 3rem 1.5rem 6rem; }
-header { margin-bottom: 2rem; }
-h1 {
-  font-size: 2rem;
-  margin: 0 0 0.4rem;
-  background: linear-gradient(180deg, #fff 0%, #c2a173 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 700;
-}
-.tagline { color: #aaa; font-size: 1.05rem; margin: 0 0 0.6rem; }
-.byline { color: #666; font-size: 0.88rem; margin: 0; }
-.byline a { color: #c2a173; text-decoration: none; }
-.byline a:hover { text-decoration: underline; }
-
-.stats {
-  display: flex;
-  gap: 1.2rem;
-  margin: 1.5rem 0 2.5rem;
-  font-size: 0.85rem;
-  color: #888;
-  flex-wrap: wrap;
-}
-.stats span {
-  background: #14141f;
-  border: 1px solid #2a2a3a;
-  padding: 5px 12px;
-  border-radius: 20px;
+  line-height: 1.6;
+  font-feature-settings: 'ss01', 'cv11';
+  min-height: 100vh;
 }
 
-h2 {
-  font-size: 0.95rem;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  color: #c2a173;
-  margin: 2.5rem 0 1rem;
-  font-weight: 600;
-  border-bottom: 1px solid #2a2a3a;
-  padding-bottom: 0.5rem;
+/* Subtle grain overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
 }
 
-.tools {
+.container {
+  position: relative;
+  z-index: 2;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 5rem 2rem 8rem;
+}
+
+/* === Header — asymmetric editorial === */
+.masthead {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 0.9rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: end;
+  margin-bottom: 5rem;
+  padding-bottom: 3rem;
+  border-bottom: 1px solid var(--rule);
+}
+.masthead-left {
+  position: relative;
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 1.5rem;
+}
+.eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 28px;
+  height: 1px;
+  background: var(--gold);
+  vertical-align: middle;
+  margin-right: 10px;
+}
+h1 {
+  font-family: var(--serif);
+  font-variation-settings: 'opsz' 144, 'wght' 500, 'SOFT' 50;
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.025em;
+  margin: 0 0 1.25rem;
+  color: var(--ink);
+}
+h1 .accent {
+  font-style: italic;
+  font-variation-settings: 'opsz' 144, 'wght' 400, 'SOFT' 100;
+  color: var(--gold);
+}
+.dek {
+  font-family: var(--serif);
+  font-variation-settings: 'opsz' 36, 'wght' 400;
+  font-size: 1.2rem;
+  line-height: 1.5;
+  color: var(--ink-dim);
+  font-style: italic;
+  max-width: 32ch;
+  margin: 0;
+}
+.masthead-right {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  line-height: 1.8;
+  color: var(--ink-faint);
+}
+.masthead-right dt {
+  display: inline;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.66rem;
+}
+.masthead-right dd {
+  display: inline;
+  margin: 0 0 0 8px;
+  color: var(--ink-dim);
+}
+.masthead-right .row { display: block; margin-bottom: 6px; }
+
+/* === Note card === */
+.note {
+  border-left: 2px solid var(--gold);
+  padding: 1rem 0 1rem 1.5rem;
+  margin: 3rem 0 4rem;
+  max-width: 36rem;
+}
+.note h3 {
+  font-family: var(--serif);
+  font-variation-settings: 'opsz' 36, 'wght' 500;
+  font-size: 1.05rem;
+  margin: 0 0 0.4rem;
+  color: var(--ink);
+  font-style: italic;
+}
+.note p {
+  font-family: var(--sans);
+  font-size: 0.92rem;
+  color: var(--ink-dim);
+  margin: 0;
+}
+.note a { color: var(--gold); text-decoration: none; border-bottom: 1px solid var(--rule-strong); }
+.note a:hover { color: var(--ink); border-bottom-color: var(--gold); }
+
+/* === Section headers — like a manuscript with chapter numerals === */
+.section { margin: 5rem 0 2rem; }
+.section-head {
+  display: grid;
+  grid-template-columns: 6rem 1fr;
+  gap: 2rem;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+.section-numeral {
+  font-family: var(--serif);
+  font-variation-settings: 'opsz' 144, 'wght' 400;
+  font-size: 4rem;
+  color: var(--gold-deep);
+  line-height: 1;
+  font-style: italic;
+  text-align: right;
+}
+.section-title {
+  font-family: var(--serif);
+  font-variation-settings: 'opsz' 72, 'wght' 500;
+  font-size: 1.8rem;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.3rem;
+  color: var(--ink);
+}
+.section-blurb {
+  font-family: var(--sans);
+  font-size: 0.88rem;
+  color: var(--ink-dim);
+  margin: 0;
+  max-width: 50ch;
+}
+
+/* === Tool tiles — magazine-feel === */
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
 }
 .tool {
-  background: #14141f;
-  border: 1px solid #2a2a3a;
-  border-radius: 10px;
-  padding: 1rem 1.1rem;
+  background: var(--bg);
+  padding: 1.2rem 1.3rem 1.3rem;
   text-decoration: none;
   color: inherit;
-  transition: border-color 0.15s, transform 0.15s;
   display: block;
+  position: relative;
+  transition: background 0.22s ease, color 0.22s ease;
+  border-left: 3px solid transparent;
 }
 .tool:hover {
-  border-color: #c2a173;
-  transform: translateY(-2px);
+  background: var(--bg-2);
+  border-left-color: var(--gold);
 }
-.tool h3 {
-  margin: 0 0 0.35rem;
-  font-size: 1rem;
-  color: #fff;
-  font-weight: 600;
+.tool h4 {
+  font-family: var(--serif);
+  font-variation-settings: 'opsz' 36, 'wght' 500;
+  font-size: 1.05rem;
+  margin: 0 0 0.3rem;
+  color: var(--ink);
+  letter-spacing: -0.005em;
 }
+.tool:hover h4 { color: var(--gold); }
 .tool p {
-  margin: 0;
-  color: #aaa;
-  font-size: 0.85rem;
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  color: var(--ink-dim);
   line-height: 1.45;
+  margin: 0;
+}
+.tool-meta {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  color: var(--ink-faint);
+  margin-top: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 .tool .arrow {
-  float: right;
-  color: #666;
-  font-size: 1.1rem;
+  position: absolute;
+  top: 1.2rem;
+  right: 1.3rem;
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  transition: color 0.2s ease, transform 0.2s ease;
 }
-.tool:hover .arrow { color: #c2a173; }
+.tool:hover .arrow { color: var(--gold); transform: translateX(2px); }
 
+/* === Footer === */
 footer {
-  margin-top: 4rem;
-  padding-top: 2rem;
-  border-top: 1px solid #2a2a3a;
-  color: #666;
-  font-size: 0.85rem;
+  margin-top: 6rem;
+  padding-top: 3rem;
+  border-top: 1px solid var(--rule);
+  color: var(--ink-faint);
+  font-size: 0.84rem;
+  font-family: var(--sans);
 }
-footer a { color: #c2a173; text-decoration: none; }
-footer a:hover { text-decoration: underline; }
+footer p { margin: 0 0 1rem; max-width: 60ch; line-height: 1.6; }
+footer a { color: var(--gold); text-decoration: none; }
+footer a:hover { color: var(--ink); }
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 3rem;
+  margin-top: 2rem;
+}
+.colophon {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+  line-height: 1.8;
+  letter-spacing: 0.06em;
+}
+.colophon strong { color: var(--gold); font-weight: 500; }
+
+/* === Responsive === */
+@media (max-width: 720px) {
+  .container { padding: 3rem 1.25rem 5rem; }
+  .masthead { grid-template-columns: 1fr; gap: 2rem; margin-bottom: 3rem; padding-bottom: 2rem; }
+  .masthead-right { font-size: 0.7rem; }
+  .section-head { grid-template-columns: 3rem 1fr; gap: 1rem; }
+  .section-numeral { font-size: 2.5rem; text-align: right; }
+  .section-title { font-size: 1.4rem; }
+  .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+  h1 { font-size: 3rem; }
+}
 </style>
 </head>
 <body>
 <div class="container">
-<header>
-<h1>Tools by Elijah Purcell</h1>
-<p class="tagline">Single-file utilities — faith, productivity, business, growth. Free forever. Built in public.</p>
-<p class="byline">By <a href="https://purcellventures.co" target="_blank">Purcell Ventures</a> · 18, pre-med at the University of Alabama (Fall 2026) · <a href="https://github.com/thebigjah" target="_blank">github.com/thebigjah</a></p>
+
+<header class="masthead">
+  <div class="masthead-left">
+    <p class="eyebrow">A working library</p>
+    <h1>Small tools, <span class="accent">made carefully</span>.</h1>
+    <p class="dek">Free single-file utilities for faith, focus, and small-business clarity — built one weekend at a time.</p>
+  </div>
+  <dl class="masthead-right">
+    <div class="row"><dt>Author</dt><dd>Elijah Purcell</dd></div>
+    <div class="row"><dt>For</dt><dd>Purcell Ventures LLC</dd></div>
+    <div class="row"><dt>Count</dt><dd>22 tools shipped</dd></div>
+    <div class="row"><dt>Cost</dt><dd>$0 forever</dd></div>
+    <div class="row"><dt>Accounts</dt><dd>none required</dd></div>
+    <div class="row"><dt>Tracking</dt><dd>none</dd></div>
+    <div class="row"><dt>Hosting</dt><dd>Vercel · static</dd></div>
+  </dl>
 </header>
 
-<div class="stats">
-<span>22 tools</span>
-<span>0 accounts required</span>
-<span>$0 forever</span>
-<span>No tracking</span>
-<span>Works offline (most)</span>
+<div class="note">
+  <h3>Looking for Echo, Hangout, Momentum, Rival, Era, or Prayer Walk?</h3>
+  <p>Those live in the <strong style="color:var(--ink)">ElijahBot master app</strong>, not on this website. The master app is private — installable APK, password-protected, distributed to Elijah and close-friend testers only. <a href="https://github.com/thebigjah/elijahbot-app">View on GitHub</a></p>
 </div>
 
-<div style="background: #14141f; border: 1px solid #c2a173; border-radius: 12px; padding: 1.1rem 1.3rem; margin: 1rem 0 2rem;">
-  <h3 style="margin: 0 0 0.4rem; font-size: 1rem; color: #c2a173;">Looking for Echo, Hangout, Momentum, Rival, Era, or Prayer Walk?</h3>
-  <p style="margin: 0; font-size: 0.88rem; color: #aaa;">Those live in the <strong style="color: #fff;">ElijahBot master app</strong>, not on this website. The master app is private — installed via APK, password-protected, distributed to Elijah + close-friend testers only. <a href="https://github.com/thebigjah/elijahbot-app" target="_blank" style="color: #c2a173;">repo</a></p>
-</div>
+<section class="section">
+  <div class="section-head">
+    <div class="section-numeral">I</div>
+    <div>
+      <h2 class="section-title">Faith &amp; discipline</h2>
+      <p class="section-blurb">Tools that hold the rhythm of a Christian life. Daily readings, weekly memorization, end-of-day reflection.</p>
+    </div>
+  </div>
+  <div class="tools-grid">
+    <a class="tool" href="/verse-vault/"><span class="arrow">→</span><h4>Verse Vault</h4><p>Scripture memorization with a five-level progressive-hide system.</p><div class="tool-meta">localStorage · offline</div></a>
+    <a class="tool" href="/prayer-journal/"><span class="arrow">→</span><h4>Prayer Journal</h4><p>ACTS framework. Logs requests. Answered-prayer view for hard days.</p><div class="tool-meta">localStorage · offline</div></a>
+    <a class="tool" href="/examen/"><span class="arrow">→</span><h4>Examen</h4><p>The 500-year-old Jesuit end-of-day prayer, in five movements.</p><div class="tool-meta">localStorage · offline</div></a>
+    <a class="tool" href="/counter-argument/"><span class="arrow">→</span><h4>Counter</h4><p>Apologetics practice. Twelve hard objections, your answer first, then expert reveal.</p><div class="tool-meta">localStorage · offline</div></a>
+    <a class="tool" href="/worship-set/"><span class="arrow">→</span><h4>Worship Set</h4><p>Plan a Sunday set. Title, key, BPM, scripture segue. Drag to reorder.</p><div class="tool-meta">localStorage · offline</div></a>
+    <a class="tool" href="/sermon-notes/"><span class="arrow">→</span><h4>Sermon Notes</h4><p>Sunday capture with church and preacher autocomplete. Markdown export.</p><div class="tool-meta">localStorage · offline</div></a>
+    <a class="tool" href="/solomon/"><span class="arrow">→</span><h4>Solomon</h4><p>Daily wisdom rotation. Proverbs, Lewis, Aurelius, Frankl.</p><div class="tool-meta">no state · offline</div></a>
+    <a class="tool" href="/calvinism-test/"><span class="arrow">→</span><h4>Calvinism Test</h4><p>TULIP self-assessment. Where you land. Scripture from both sides.</p><div class="tool-meta">localStorage · offline</div></a>
+  </div>
+</section>
 
-<h2>Faith + Discipline</h2>
-<div class="tools">
-<a class="tool" href="/verse-vault/"><span class="arrow">→</span><h3>Verse Vault</h3><p>Scripture memorization with a 5-level progressive-hide system. 5 min/day. 10 verses memorized in a month.</p></a>
-<a class="tool" href="/prayer-journal/"><span class="arrow">→</span><h3>Prayer Journal</h3><p>ACTS framework prayer log with an "Answered" view for the days you wonder if anything's happening.</p></a>
-<a class="tool" href="/examen/"><span class="arrow">→</span><h3>Examen</h3><p>The 500-year Jesuit end-of-day prayer in 5 movements: gratitude, light, review, repair, hope.</p></a>
-<a class="tool" href="/counter-argument/"><span class="arrow">→</span><h3>Counter</h3><p>Apologetics practice. 12 hard objections, you write your response, then see 4 expert paraphrases. Discipline first.</p></a>
-<a class="tool" href="/worship-set/"><span class="arrow">→</span><h3>Worship Set</h3><p>Plan a Sunday set — title, key, BPM, scripture segue, notes. Drag to reorder. Save to library.</p></a>
-<a class="tool" href="/sermon-notes/"><span class="arrow">→</span><h3>Sermon Notes</h3><p>Sunday note capture with church + preacher autocomplete + stats panel + Markdown export.</p></a>
-<a class="tool" href="/solomon/"><span class="arrow">→</span><h3>Solomon</h3><p>Daily wisdom rotation. 50+ quotes from Proverbs, Lewis, Aurelius, Frankl. Deterministic per day.</p></a>
-<a class="tool" href="/calvinism-test/"><span class="arrow">→</span><h3>Calvinism Test</h3><p>TULIP self-assessment. Where you land on the 5 points, with scripture from both sides + reading recs.</p></a>
-</div>
+<section class="section">
+  <div class="section-head">
+    <div class="section-numeral">II</div>
+    <div>
+      <h2 class="section-title">Productivity &amp; growth</h2>
+      <p class="section-blurb">Tools for keeping yourself honest. Decision logs, friendship maintenance, sealed letters to your future self.</p>
+    </div>
+  </div>
+  <div class="tools-grid">
+    <a class="tool" href="/decision-journal/"><span class="arrow">→</span><h4>Decision Journal</h4><p>Annie Duke style calibration. Log decisions, review later, see your drift.</p><div class="tool-meta">localStorage · offline</div></a>
+    <a class="tool" href="/brag-doc/"><span class="arrow">→</span><h4>Brag Doc</h4><p>Log wins and kind words. A "dark day" shuffler for when the inner critic wins.</p><div class="tool-meta">localStorage · offline</div></a>
+    <a class="tool" href="/friendship-map/"><span class="arrow">→</span><h4>Friendship Map</h4><p>Quiet personal CRM. Four tiers. Surfaces who you've gone too long without.</p><div class="tool-meta">localStorage · offline</div></a>
+    <a class="tool" href="/future-self/"><span class="arrow">→</span><h4>Future Self</h4><p>Write sealed letters. The app holds them locked until your release date.</p><div class="tool-meta">localStorage · offline</div></a>
+    <a class="tool" href="/reading-log/"><span class="arrow">→</span><h4>Reading Log</h4><p>Personal Goodreads. Five-star ratings, stats by author and month.</p><div class="tool-meta">localStorage · offline</div></a>
+    <a class="tool" href="/weekly-skill/"><span class="arrow">→</span><h4>Weekly Skill</h4><p>Forty-two curated skills, one per ISO week. Card flourishes, calligraphy, Psalm 23.</p><div class="tool-meta">localStorage · offline</div></a>
+    <a class="tool" href="/wisdom-prep/"><span class="arrow">→</span><h4>Wisdom Prep</h4><p>Five-minute preparation for a mentor conversation. Specific question, real questions.</p><div class="tool-meta">no state · offline</div></a>
+  </div>
+</section>
 
-<h2>Productivity + Personal Growth</h2>
-<div class="tools">
-<a class="tool" href="/decision-journal/"><span class="arrow">→</span><h3>Decision Journal</h3><p>Log decisions with confidence levels. Review later. Calibration table shows where your judgment drifts.</p></a>
-<a class="tool" href="/brag-doc/"><span class="arrow">→</span><h3>Brag Doc</h3><p>Log wins + kind words + milestones. "Dark Day" mode shuffles your wins when the inner critic wins.</p></a>
-<a class="tool" href="/friendship-map/"><span class="arrow">→</span><h3>Friendship Map</h3><p>Quiet personal CRM. 4 tiers, surfaces overdue people. No social features, no shaming.</p></a>
-<a class="tool" href="/future-self/"><span class="arrow">→</span><h3>Future Self</h3><p>Write a sealed letter, pick a release date. The app holds it locked until then.</p></a>
-<a class="tool" href="/reading-log/"><span class="arrow">→</span><h3>Reading Log</h3><p>Personal Goodreads. 5-star ratings, started/finished dates, stats by author and month.</p></a>
-<a class="tool" href="/weekly-skill/"><span class="arrow">→</span><h3>Weekly Skill</h3><p>42 curated skills, one per ISO week. Card flourishes, knots, juggling, calligraphy, scripture memorization.</p></a>
-<a class="tool" href="/wisdom-prep/"><span class="arrow">→</span><h3>Wisdom Prep</h3><p>5-min prep tool for a mentor conversation. Specific question, 7 customized prompts, closing move.</p></a>
-</div>
+<section class="section">
+  <div class="section-head">
+    <div class="section-numeral">III</div>
+    <div>
+      <h2 class="section-title">Business diagnostics</h2>
+      <p class="section-blurb">Lead-gen tools for small business owners feeling behind on AI. Real numbers, no hype.</p>
+    </div>
+  </div>
+  <div class="tools-grid">
+    <a class="tool" href="/ai-readiness-test/"><span class="arrow">→</span><h4>AI Readiness Test</h4><p>Ten questions. Places you in one of four tiers. Three calibrated next steps.</p><div class="tool-meta">no state · 5 min</div></a>
+    <a class="tool" href="/ai-cost-calculator/"><span class="arrow">→</span><h4>AI Cost Calculator</h4><p>Interactive ROI. Hours saved per week to monthly dollars, with payback.</p><div class="tool-meta">no state · 3 min</div></a>
+    <a class="tool" href="/ai-will/"><span class="arrow">→</span><h4>AI Will</h4><p>Thirty-minute business-continuity interview for elderly small business owners.</p><div class="tool-meta">localStorage · printable</div></a>
+  </div>
+</section>
 
-<h2>Business Diagnostics + Lead-Gen</h2>
-<div class="tools">
-<a class="tool" href="/ai-readiness-test/"><span class="arrow">→</span><h3>AI Readiness Test</h3><p>10-question diagnostic for SMB owners. Places you in one of 4 tiers, gives 3 calibrated next steps.</p></a>
-<a class="tool" href="/ai-cost-calculator/"><span class="arrow">→</span><h3>AI Cost Calculator</h3><p>Interactive ROI calc. Real dollar numbers, payback timeline, breaks the "AI is too expensive" objection.</p></a>
-<a class="tool" href="/ai-will/"><span class="arrow">→</span><h3>AI Will</h3><p>30-min interview producing a printable business-continuity doc for elderly small business owners.</p></a>
-</div>
+<section class="section">
+  <div class="section-head">
+    <div class="section-numeral">IV</div>
+    <div>
+      <h2 class="section-title">University planning</h2>
+      <p class="section-blurb">For Bama Bound through freshman year. Pack lists, countdowns, printable day sheets.</p>
+    </div>
+  </div>
+  <div class="tools-grid">
+    <a class="tool" href="/milestone/"><span class="arrow">→</span><h4>Milestone</h4><p>Visual countdown grid. Twenty real upcoming dates. Color-coded urgency.</p><div class="tool-meta">localStorage · offline</div></a>
+    <a class="tool" href="/dorm-pack/"><span class="arrow">→</span><h4>Dorm Pack</h4><p>UA move-in checklist. 130+ items. Twin XL bedding, gameday crimson.</p><div class="tool-meta">localStorage · offline</div></a>
+    <a class="tool" href="/day-sheet/"><span class="arrow">→</span><h4>Day Sheet</h4><p>Single-page printable daily planner. Top three, hour blocks, rotating scripture.</p><div class="tool-meta">no state · printable</div></a>
+  </div>
+</section>
 
-<h2>UA + Life Planning</h2>
-<div class="tools">
-<a class="tool" href="/milestone/"><span class="arrow">→</span><h3>Milestone</h3><p>Visual countdown grid for upcoming events. Color-coded by urgency. Pre-seeded with my real dates.</p></a>
-<a class="tool" href="/dorm-pack/"><span class="arrow">→</span><h3>Dorm Pack</h3><p>130+ college move-in items across 12 categories. UA-specific (twin XL, shower shoes, gameday gear).</p></a>
-<a class="tool" href="/day-sheet/"><span class="arrow">→</span><h3>Day Sheet</h3><p>Single-page printable daily planner. Top 3 priorities, gratitudes, hour blocks, rotating scripture.</p></a>
-</div>
-
-
-<h2>Cryptography</h2>
-<div class="tools">
-<a class="tool" href="/cipher-lab/"><span class="arrow">→</span><h3>Cipher Lab</h3><p>6 classical ciphers — Caesar, Atbash, Vigenère, ROT13, Bacon, Rail Fence. Plus a chained puzzle-hunt builder.</p></a>
-</div>
-
-<h2>Companion Apps (separate install)</h2>
-<p style="font-size: 0.82rem; color: #888; margin: -0.5rem 0 0.8rem;">These need backend / native code so they can't be bundled into the PWA, but they're part of the same suite.</p>
-<div class="tools">
-<a class="tool" href="https://elijahbot-refresh.vercel.app" target="_blank" rel="noopener"><span class="arrow">↗</span><h3>ElijahBot Refresh</h3><p>Personal accountability + scheduling chatbot. Habit tracking, daily journal, Claude conversation that pushes back when you flake. Live on Vercel · Google sign-in required.</p></a>
-<a class="tool" href="https://expo.dev/artifacts/eas/aT5ufmwQVBGzKhotw12GKs.apk" target="_blank" rel="noopener"><span class="arrow">↗</span><h3>Prayer Walk Mobile</h3><p>GPS-tracked prayer walks with recency-colored heatmap. Native Expo app. Tap to download the latest APK (Android only · iOS pending).</p></a>
-<a class="tool" href="https://coverage-bice.vercel.app" target="_blank" rel="noopener"><span class="arrow">↗</span><h3>Prayer Walk (web sandbox)</h3><p>Browser-accessible version of Prayer Walk. Works on iOS Safari (location-on). Lower fidelity than the mobile app but no install needed.</p></a>
-<a class="tool" href="https://purcellventures.co" target="_blank" rel="noopener"><span class="arrow">↗</span><h3>Purcell Ventures (the business)</h3><p>Front door. 4 service divisions, 3 courses, ROI calculator, contact. The hub where consulting flows back to.</p></a>
-</div>
+<section class="section">
+  <div class="section-head">
+    <div class="section-numeral">V</div>
+    <div>
+      <h2 class="section-title">Cryptography &amp; play</h2>
+      <p class="section-blurb">The fun kind. Built for a Cicada-3301-inspired recruitment puzzle that won't be linked from here.</p>
+    </div>
+  </div>
+  <div class="tools-grid">
+    <a class="tool" href="/cipher-lab/"><span class="arrow">→</span><h4>Cipher Lab</h4><p>Six classical ciphers — Caesar, Atbash, Vigenère, ROT13, Bacon, Rail Fence. Plus a chained puzzle-hunt builder.</p><div class="tool-meta">no state · workbench</div></a>
+  </div>
+</section>
 
 <footer>
-<p>All 27 tools are free, single-file static HTML with no tracking, no accounts, no backend, no fees. They store data only in your browser's localStorage.</p>
-<p>Built by <a href="https://purcellventures.co">Elijah Purcell</a> with <a href="https://claude.ai/code" target="_blank">Claude Code</a>. Open source at <a href="https://github.com/thebigjah" target="_blank">github.com/thebigjah</a>.</p>
-<p style="margin-top: 1.5rem; opacity: 0.6;">Want one of these tools customized for your business or church? <a href="https://purcellventures.co">Purcell Ventures</a> builds custom tools and consults on AI implementation for small organizations.</p>
+  <div class="footer-grid">
+    <p>Each tool here is one HTML file. No build step. No tracking. No account. Data lives in your browser, on your device, under your control. Most work offline once loaded. They were built because I wanted them and didn't want to wait for someone else to build them.</p>
+    <div class="colophon">
+      <strong>Colophon</strong><br/>
+      Set in Fraunces<br/>
+      and JetBrains Mono.<br/>
+      Built with Claude Code.<br/>
+      <br/>
+      <a href="https://github.com/thebigjah">GitHub</a> ·
+      <a href="https://purcellventures.co">Purcell Ventures</a>
+    </div>
+  </div>
 </footer>
+
 </div>
 <script>
 if ('serviceWorker' in navigator) {
@@ -205,7 +432,6 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
-<!-- Vercel Web Analytics — free, no signup, GDPR-safe. Dashboard at Vercel project Analytics tab. -->
 <script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
