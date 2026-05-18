@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1a1611">
+<title>Stage Fright · pre-call voice check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#f4ede0;
+  --ink-dim:#a89c87;
+  --ink-faint:#6d6353;
+  --bg:#1a1611;
+  --bg-panel:#221d16;
+  --bg-elev:#2a241c;
+  --accent:#d4a865;
+  --accent-warm:#c97a4b;
+  --good:#7da97d;
+  --warn:#c97a4b;
+  --bad:#b85959;
+  --rule:#3a3328;
+  --serif:'Fraunces',Georgia,serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-weight:400;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;line-height:1.5}
+header{padding:32px 24px 18px;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px}
+h1{font-family:var(--serif);font-weight:300;font-size:42px;line-height:1.02;letter-spacing:-0.025em;margin:0;font-variation-settings:"opsz" 144}
+h1 em{font-style:italic;color:var(--accent);font-weight:400}
+.tagline{font-family:var(--serif);font-size:16px;color:var(--ink-dim);margin-top:12px;max-width:540px;font-style:italic;font-weight:300}
+main{max-width:680px;margin:0 auto;padding:32px 24px}
+.section-label{display:flex;align-items:baseline;gap:12px;margin:32px 0 14px}
+.section-num{font-family:var(--mono);font-size:11px;color:var(--accent-warm);letter-spacing:0.2em}
+.section-h{font-family:var(--serif);font-weight:400;font-size:18px;letter-spacing:0.01em;color:var(--ink)}
+.section-sub{font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-left:auto}
+
+.record-zone{
+  background:var(--bg-panel);
+  border:1px solid var(--rule);
+  border-radius:12px;
+  padding:32px 24px;
+  text-align:center;
+}
+.rec-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:140px;height:140px;border-radius:50%;
+  background:var(--bg-elev);
+  border:2px solid var(--accent);
+  color:var(--accent);
+  font-family:var(--mono);font-size:13px;letter-spacing:0.1em;text-transform:uppercase;
+  cursor:pointer;
+  transition:all .2s;
+  font-weight:500;
+}
+.rec-btn.recording{background:var(--bad);border-color:var(--bad);color:var(--ink);animation:pulse 1.5s infinite}
+.rec-btn:hover:not(.recording){background:var(--accent);color:var(--bg)}
+.rec-btn:disabled{opacity:.4;cursor:not-allowed}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.rec-status{font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin-top:18px;letter-spacing:0.05em}
+.rec-meter{
+  margin-top:18px;
+  height:6px;
+  background:var(--bg-elev);
+  border-radius:3px;
+  overflow:hidden;
+  max-width:300px;
+  margin-left:auto;margin-right:auto;
+}
+.rec-meter-fill{
+  height:100%;
+  background:linear-gradient(90deg, var(--accent), var(--accent-warm));
+  width:0%;
+  transition:width .1s;
+}
+.prompt{
+  font-family:var(--serif);font-style:italic;font-weight:300;
+  font-size:18px;color:var(--ink-dim);
+  margin-top:24px;line-height:1.6;
+  padding:0 12px;
+}
+
+.baseline-card{
+  background:var(--bg-panel);
+  border:1px solid var(--rule);
+  border-radius:8px;
+  padding:18px 22px;
+  margin-top:16px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+}
+.baseline-info{flex:1;min-width:200px}
+.baseline-label{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:4px}
+.baseline-stats{font-family:var(--serif);font-size:15px;color:var(--ink-dim)}
+.baseline-stats strong{color:var(--accent);font-weight:500}
+.btn-sm{
+  font-family:var(--mono);font-size:11px;
+  background:transparent;border:1px solid var(--rule);
+  color:var(--ink-dim);padding:8px 14px;border-radius:14px;cursor:pointer;
+  transition:all .15s;
+  text-decoration:none;display:inline-block;
+}
+.btn-sm:hover{border-color:var(--accent-warm);color:var(--accent-warm)}
+
+.results{margin-top:20px;display:none}
+.results.show{display:block}
+.metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:8px}
+@media(max-width:560px){.metric-grid{grid-template-columns:1fr}}
+.metric{
+  background:var(--bg-panel);
+  border:1px solid var(--rule);
+  border-radius:8px;
+  padding:14px 16px;
+}
+.metric-name{font-family:var(--mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px}
+.metric-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-family:var(--serif)}
+.metric-value{font-size:22px;font-weight:400;color:var(--ink);font-variation-settings:"opsz" 144}
+.metric-delta{font-family:var(--mono);font-size:12px}
+.metric-delta.good{color:var(--good)}
+.metric-delta.warn{color:var(--warn)}
+.metric-delta.bad{color:var(--bad)}
+.metric-baseline{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);margin-top:6px}
+
+.diagnoses{margin-top:24px}
+.diagnosis{
+  background:var(--bg-elev);
+  border-left:3px solid var(--accent);
+  border-radius:0 6px 6px 0;
+  padding:14px 18px;
+  margin-bottom:10px;
+}
+.diagnosis.alert{border-left-color:var(--accent-warm)}
+.diagnosis.calm{border-left-color:var(--good)}
+.diagnosis-title{font-family:var(--serif);font-size:15px;font-weight:500;color:var(--ink);margin-bottom:6px;letter-spacing:-0.01em}
+.diagnosis-body{font-family:var(--mono);font-size:12px;color:var(--ink-dim);line-height:1.55}
+
+.transcript-toggle{margin-top:24px;text-align:center}
+.transcript{
+  margin-top:16px;
+  background:var(--bg-elev);
+  border:1px dashed var(--rule);
+  border-radius:6px;
+  padding:16px 18px;
+  font-family:var(--serif);font-style:italic;font-weight:300;
+  font-size:14px;color:var(--ink-dim);line-height:1.6;
+  display:none;
+}
+.transcript.show{display:block}
+
+footer{padding:24px;border-top:1px solid var(--rule);text-align:center;font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-top:48px}
+footer a{color:var(--ink-dim);text-decoration:none;border-bottom:1px dotted var(--rule)}
+footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
+.unsupported{background:var(--bg-elev);border:1px solid var(--bad);border-radius:6px;padding:16px;font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin-top:24px;line-height:1.6}
+.unsupported strong{color:var(--bad)}
+@media(max-width:560px){
+  header{padding:24px 20px 14px}
+  main{padding:24px 20px}
+  h1{font-size:30px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Stage Fright · v0.05</div>
+  <h1>Mirror your <em>voice</em></h1>
+  <p class="tagline">Speak into the mic for 20 seconds. Stage Fright tells you how you sound vs. your calm baseline — and what to do about it.</p>
+</header>
+
+<main>
+
+<div class="section-label">
+  <span class="section-num">I.</span>
+  <span class="section-h">Record 20 seconds</span>
+  <span class="section-sub" id="mode-indicator">tap to start</span>
+</div>
+
+<div class="record-zone">
+  <button class="rec-btn" id="rec-btn" onclick="toggleRecord()">Tap to record</button>
+  <div class="rec-meter"><div class="rec-meter-fill" id="meter"></div></div>
+  <div class="rec-status" id="status">Allow mic access. Speak about what you're about to do.</div>
+  <div class="prompt" id="prompt">
+    "I'm about to <span style="color:var(--accent);font-style:normal">[describe the call/meeting/talk]</span>. Here's what I want to happen. Here's what I'm worried about."
+  </div>
+</div>
+
+<div class="baseline-card" id="baseline-card" style="display:none">
+  <div class="baseline-info">
+    <div class="baseline-label">Calm baseline</div>
+    <div class="baseline-stats" id="baseline-stats">—</div>
+  </div>
+  <button class="btn-sm" onclick="resetBaseline()">Reset baseline</button>
+</div>
+
+<div class="section-label">
+  <span class="section-num">II.</span>
+  <span class="section-h">What I found</span>
+  <span class="section-sub" id="results-mode"></span>
+</div>
+
+<div class="results" id="results">
+  <div class="metric-grid" id="metric-grid"></div>
+  <div class="diagnoses" id="diagnoses"></div>
+  <div class="transcript-toggle">
+    <button class="btn-sm" onclick="toggleTranscript()">Show transcript</button>
+  </div>
+  <div class="transcript" id="transcript"></div>
+</div>
+
+<div class="unsupported" id="unsupported" style="display:none">
+  <strong>Speech recognition unavailable.</strong><br>
+  Your browser doesn't support the SpeechRecognition API. Use Chrome (mobile or desktop) or Edge for the v0.05 demo. Audio-only metrics still work.
+</div>
+
+</main>
+
+<footer>
+  <a href="https://elijahbot-tools-hub.vercel.app">All tools →</a>
+</footer>
+
+<script>
+// ============================================================================
+// CONFIG + STORAGE
+// ============================================================================
+const STORE_KEY = 'stage-fright-v0';
+const RECORD_SECONDS = 20;
+const FILLERS = ['um','uh','er','ah','like','you know','i mean','sort of','kind of','basically'];
+
+function loadStore(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); }catch(e){ return {}; } }
+function saveStore(s){ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }
+
+// ============================================================================
+// STATE
+// ============================================================================
+let mediaRecorder = null;
+let audioChunks = [];
+let audioContext = null;
+let analyser = null;
+let dataArray = null;
+let micStream = null;
+let recognition = null;
+let transcript = '';
+let isRecording = false;
+let recordStart = 0;
+let recordTimer = null;
+let recordEnd = null;
+let volumeSamples = [];
+let volumeFrame = null;
+
+// ============================================================================
+// SPEECH RECOGNITION SETUP
+// ============================================================================
+const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+const speechSupported = !!SpeechRec;
+if(!speechSupported){
+  document.getElementById('unsupported').style.display = 'block';
+}
+
+function setupRecognition(){
+  if(!speechSupported) return null;
+  const r = new SpeechRec();
+  r.continuous = true;
+  r.interimResults = true;
+  r.lang = 'en-US';
+  let finalTranscript = '';
+  r.onresult = (e)=>{
+    let interim = '';
+    for(let i=e.resultIndex; i<e.results.length; i++){
+      if(e.results[i].isFinal){
+        finalTranscript += e.results[i][0].transcript + ' ';
+      } else {
+        interim += e.results[i][0].transcript;
+      }
+    }
+    transcript = finalTranscript + interim;
+  };
+  r.onerror = (e)=>{ console.warn('speech err', e); };
+  return r;
+}
+
+// ============================================================================
+// RECORD
+// ============================================================================
+async function toggleRecord(){
+  if(isRecording){ stopRecording(); return; }
+  await startRecording();
+}
+
+async function startRecording(){
+  try{
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch(e){
+    document.getElementById('status').textContent = 'Mic permission denied. Reload to try again.';
+    return;
+  }
+
+  audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const source = audioContext.createMediaStreamSource(micStream);
+  analyser = audioContext.createAnalyser();
+  analyser.fftSize = 1024;
+  source.connect(analyser);
+  dataArray = new Uint8Array(analyser.fftSize);
+  volumeSamples = [];
+
+  transcript = '';
+  recognition = setupRecognition();
+  if(recognition){
+    try{ recognition.start(); } catch(e){ /* may already be running */ }
+  }
+
+  isRecording = true;
+  recordStart = Date.now();
+  document.getElementById('rec-btn').classList.add('recording');
+  document.getElementById('rec-btn').textContent = 'STOP';
+  document.getElementById('status').textContent = 'Listening… speak naturally for 20 seconds.';
+  document.getElementById('results').classList.remove('show');
+
+  // sample volume + meter
+  function tick(){
+    if(!isRecording) return;
+    analyser.getByteTimeDomainData(dataArray);
+    let sum = 0;
+    for(let i=0; i<dataArray.length; i++){
+      const v = (dataArray[i] - 128)/128;
+      sum += v*v;
+    }
+    const rms = Math.sqrt(sum / dataArray.length);
+    volumeSamples.push(rms);
+    document.getElementById('meter').style.width = Math.min(100, rms*350) + '%';
+    const elapsed = (Date.now() - recordStart) / 1000;
+    document.getElementById('mode-indicator').textContent = `recording · ${elapsed.toFixed(1)}s / ${RECORD_SECONDS}s`;
+    volumeFrame = requestAnimationFrame(tick);
+  }
+  tick();
+
+  // auto-stop at 20s
+  recordTimer = setTimeout(()=>{ if(isRecording) stopRecording(); }, RECORD_SECONDS * 1000);
+}
+
+function stopRecording(){
+  if(!isRecording) return;
+  isRecording = false;
+  recordEnd = Date.now();
+  clearTimeout(recordTimer);
+  cancelAnimationFrame(volumeFrame);
+
+  if(recognition){ try{ recognition.stop(); }catch(e){} }
+  if(micStream){ micStream.getTracks().forEach(t=>t.stop()); }
+  if(audioContext){ audioContext.close(); }
+
+  document.getElementById('rec-btn').classList.remove('recording');
+  document.getElementById('rec-btn').textContent = 'Tap to record';
+  document.getElementById('meter').style.width = '0%';
+  document.getElementById('status').textContent = 'Analyzing…';
+  document.getElementById('mode-indicator').textContent = 'analyzing';
+
+  // wait briefly for any final interim transcripts
+  setTimeout(analyze, 800);
+}
+
+// ============================================================================
+// ANALYZE
+// ============================================================================
+function analyze(){
+  const durationSec = (recordEnd - recordStart) / 1000;
+  const trimmedTranscript = transcript.trim().replace(/\s+/g,' ');
+  const words = trimmedTranscript.split(/\s+/).filter(Boolean);
+  const wordCount = words.length;
+  const wpm = wordCount > 0 ? (wordCount / durationSec) * 60 : 0;
+
+  // filler count (case-insensitive, word-boundary)
+  const lower = ' ' + trimmedTranscript.toLowerCase() + ' ';
+  let fillerCount = 0;
+  FILLERS.forEach(f=>{
+    const re = new RegExp('(?:^|[^a-z])' + f.replace(/ /g, '\\s+') + '(?=[^a-z]|$)', 'gi');
+    const m = lower.match(re);
+    if(m) fillerCount += m.length;
+  });
+  const fillerRate = wordCount > 0 ? (fillerCount / wordCount) * 100 : 0;
+
+  // volume variance (coefficient of variation)
+  let volMean = 0;
+  for(const v of volumeSamples) volMean += v;
+  volMean = volMean / Math.max(1, volumeSamples.length);
+  let volVar = 0;
+  for(const v of volumeSamples) volVar += (v - volMean)*(v - volMean);
+  volVar = Math.sqrt(volVar / Math.max(1, volumeSamples.length));
+  const volCV = volMean > 0 ? (volVar / volMean) : 0;
+
+  const metrics = { wpm, fillerCount, fillerRate, volMean, volCV, wordCount, durationSec };
+
+  // is this the baseline?
+  const store = loadStore();
+  if(!store.baseline){
+    store.baseline = { ...metrics, savedAt: Date.now() };
+    saveStore(store);
+    renderBaselineSaved(metrics);
+    return;
+  }
+
+  renderResults(metrics, store.baseline);
+}
+
+// ============================================================================
+// RENDER
+// ============================================================================
+function renderBaselineSaved(m){
+  document.getElementById('status').textContent = 'Calm baseline saved. Now record any time before a high-stakes call to compare.';
+  document.getElementById('mode-indicator').textContent = 'baseline saved';
+  document.getElementById('results-mode').textContent = 'baseline';
+  document.getElementById('results').classList.add('show');
+  showBaselineCard();
+  document.getElementById('metric-grid').innerHTML = metricsHtml(m, null);
+  document.getElementById('diagnoses').innerHTML =
+    '<div class="diagnosis calm"><div class="diagnosis-title">Your baseline is saved.</div>' +
+    '<div class="diagnosis-body">Stage Fright will compare every future recording against this. ' +
+    'Rerecord the baseline anytime if it feels off — ideally during a calm moment, not right after coffee or before bed.</div></div>';
+  document.getElementById('transcript').textContent = transcript || '(no transcript captured)';
+}
+
+function showBaselineCard(){
+  const store = loadStore();
+  if(!store.baseline) return;
+  document.getElementById('baseline-card').style.display = 'flex';
+  document.getElementById('baseline-stats').innerHTML =
+    'Saved <strong>' + new Date(store.baseline.savedAt).toLocaleDateString() + '</strong> · ' +
+    '<strong>' + Math.round(store.baseline.wpm) + '</strong> wpm · ' +
+    '<strong>' + store.baseline.fillerCount + '</strong> fillers · ' +
+    'volume CV <strong>' + store.baseline.volCV.toFixed(2) + '</strong>';
+}
+
+function renderResults(m, base){
+  document.getElementById('status').textContent = 'Compared to your calm baseline:';
+  document.getElementById('mode-indicator').textContent = 'compared to baseline';
+  document.getElementById('results-mode').textContent = 'vs. baseline';
+  document.getElementById('results').classList.add('show');
+  showBaselineCard();
+  document.getElementById('metric-grid').innerHTML = metricsHtml(m, base);
+  document.getElementById('diagnoses').innerHTML = diagnosesHtml(m, base);
+  document.getElementById('transcript').textContent = transcript || '(no transcript captured)';
+}
+
+function metricsHtml(m, base){
+  const cards = [
+    {
+      name: 'Words per min',
+      value: Math.round(m.wpm),
+      baseline: base ? Math.round(base.wpm) : null,
+      delta: base ? ((m.wpm - base.wpm)/base.wpm)*100 : null,
+      unit: ' wpm',
+      flipDelta: false,
+    },
+    {
+      name: 'Fillers',
+      value: m.fillerCount,
+      baseline: base ? base.fillerCount : null,
+      delta: base ? (m.fillerCount - base.fillerCount) : null,
+      unit: '',
+      flipDelta: true,
+      absoluteDelta: true,
+    },
+    {
+      name: 'Volume variance',
+      value: m.volCV.toFixed(2),
+      baseline: base ? base.volCV.toFixed(2) : null,
+      delta: base && base.volCV > 0 ? ((m.volCV - base.volCV)/base.volCV)*100 : null,
+      unit: '',
+      flipDelta: false,
+    },
+    {
+      name: 'Filler rate',
+      value: m.fillerRate.toFixed(1) + '%',
+      baseline: base ? base.fillerRate.toFixed(1) + '%' : null,
+      delta: base ? (m.fillerRate - base.fillerRate) : null,
+      unit: 'pp',
+      flipDelta: true,
+      absoluteDelta: true,
+    },
+  ];
+  return cards.map(c=>{
+    let deltaStr = '';
+    let deltaClass = '';
+    if(c.delta !== null){
+      const sign = c.delta >= 0 ? '+' : '';
+      if(c.absoluteDelta){
+        deltaStr = sign + c.delta.toFixed(1) + c.unit;
+      } else {
+        deltaStr = sign + c.delta.toFixed(0) + '%';
+      }
+      const magnitude = Math.abs(c.delta);
+      const threshold = c.absoluteDelta ? 2 : 15;
+      const big = c.absoluteDelta ? 5 : 30;
+      if(magnitude < threshold) deltaClass = 'good';
+      else if(magnitude < big) deltaClass = 'warn';
+      else deltaClass = 'bad';
+      // flip if higher is bad (fillers, filler rate)
+      if(c.flipDelta && c.delta < 0){ deltaClass = 'good'; }
+      if(c.flipDelta && c.delta >= big){ deltaClass = 'bad'; }
+    }
+    return `<div class="metric">
+      <div class="metric-name">${c.name}</div>
+      <div class="metric-row">
+        <span class="metric-value">${c.value}</span>
+        ${deltaStr ? `<span class="metric-delta ${deltaClass}">${deltaStr}</span>` : ''}
+      </div>
+      ${c.baseline !== null ? `<div class="metric-baseline">baseline: ${c.baseline}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function diagnosesHtml(m, base){
+  const issues = [];
+
+  // WPM elevated?
+  if(base && base.wpm > 0){
+    const wpmDelta = ((m.wpm - base.wpm) / base.wpm) * 100;
+    if(wpmDelta > 25){
+      issues.push({
+        type: 'alert',
+        title: `You're speaking ${Math.round(wpmDelta)}% faster than calm.`,
+        body: `Your nervous system is in pace-up mode. Before the call: 4-7-8 breath (in 4, hold 7, out 8) × 3 cycles. During: deliberately end every other sentence with a 1-beat pause. Slower talking literally slows your heart rate.`,
+      });
+    } else if(wpmDelta < -20){
+      issues.push({
+        type: 'alert',
+        title: `You're speaking ${Math.abs(Math.round(wpmDelta))}% slower than calm.`,
+        body: `Could be fatigue, low energy, or pre-call dread. If it's dread: stand up. Do 10 jumping jacks. Drink water. The body has to wake before the voice will.`,
+      });
+    }
+  }
+
+  // Filler density
+  if(m.fillerRate > 8){
+    issues.push({
+      type: 'alert',
+      title: `Filler density is ${m.fillerRate.toFixed(1)}% (you'd want under 5%).`,
+      body: `Fillers are mostly a thinking-out-loud habit. Two fixes: (1) replace "um" with a deliberate silent pause — the listener fills it with respect, not anxiety. (2) Before the call, write your one-sentence answer to "what is the point of this call?" Read it twice. Fewer fillers when the spine is clear.`,
+    });
+  } else if(m.fillerRate > 4 && base && m.fillerRate > base.fillerRate * 1.5){
+    issues.push({
+      type: 'alert',
+      title: `Filler rate is ${m.fillerRate.toFixed(1)}% — elevated vs. your baseline of ${base.fillerRate.toFixed(1)}%.`,
+      body: `You're searching mid-sentence. Likely cause: you haven't decided what to say yet. Write your two opening sentences. Say them out loud once. Then come back here.`,
+    });
+  }
+
+  // Volume variance — high CV = anxious modulation, low CV = monotone
+  if(base && base.volCV > 0){
+    const cvDelta = m.volCV / base.volCV;
+    if(cvDelta > 1.6){
+      issues.push({
+        type: 'alert',
+        title: 'Your volume is swinging more than usual.',
+        body: 'Could be nerves making you over-emphasize then trail off. Try the "newscaster level": pick a comfortable middle volume, stay within ±20% of it for the first minute of the call. Steadiness reads as competence.',
+      });
+    } else if(cvDelta < 0.5){
+      issues.push({
+        type: 'alert',
+        title: 'Your volume is flatter than usual — sounding monotone.',
+        body: "If you're going into a real conversation, monotone reads as disengaged. Quick fix: smile briefly before you speak (the voice picks it up). Or read three sentences out loud with deliberately varied pitch right before the call.",
+      });
+    }
+  }
+
+  // Volume too low?
+  if(m.volMean < 0.02){
+    issues.push({
+      type: 'alert',
+      title: 'Volume is quite low.',
+      body: 'Check your mic position (4-6 inches from mouth) and that the right mic is selected in browser settings. If volume is right and you still sound quiet: you might be physically tight. Roll shoulders. Open mouth wider. Project from diaphragm.',
+    });
+  }
+
+  // Word count check — too few words means we don't have signal
+  if(m.wordCount < 15){
+    issues.push({
+      type: 'alert',
+      title: `Only ${m.wordCount} words captured — not much signal.`,
+      body: 'Either you held back, or the mic missed you, or speech recognition stalled. Try again — aim for steady speech across the full 20 seconds. The more you talk, the more accurate the analysis.',
+    });
+  }
+
+  // If everything's normal, give a calm signal
+  if(!issues.length){
+    return '<div class="diagnosis calm">' +
+      '<div class="diagnosis-title">Your voice is in calm range.</div>' +
+      '<div class="diagnosis-body">No flags compared to your baseline. Your nervous system is reading green. Go.</div>' +
+    '</div>';
+  }
+
+  return issues.map(d => `<div class="diagnosis ${d.type}">
+    <div class="diagnosis-title">${d.title}</div>
+    <div class="diagnosis-body">${d.body}</div>
+  </div>`).join('');
+}
+
+function toggleTranscript(){
+  const t = document.getElementById('transcript');
+  t.classList.toggle('show');
+  event.target.textContent = t.classList.contains('show') ? 'Hide transcript' : 'Show transcript';
+}
+
+function resetBaseline(){
+  if(!confirm('Reset your calm baseline? You will need to record a fresh calm sample before the next pre-call check works.')) return;
+  const store = loadStore();
+  delete store.baseline;
+  saveStore(store);
+  document.getElementById('baseline-card').style.display = 'none';
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('status').textContent = 'Baseline cleared. Record a calm sample to set a new one.';
+}
+
+// ============================================================================
+// INIT
+// ============================================================================
+const initStore = loadStore();
+if(initStore.baseline){
+  showBaselineCard();
+  document.getElementById('status').textContent = 'Baseline saved. Record now to compare your current state.';
+} else {
+  document.getElementById('status').textContent = 'No baseline yet. Your first recording will become your calm baseline — try when you feel settled.';
+}
+
+if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+  document.getElementById('rec-btn').disabled = true;
+  document.getElementById('status').textContent = 'Microphone API unavailable in this browser. Use Chrome/Edge.';
+}
+</script>
+
+</body>
+</html>
