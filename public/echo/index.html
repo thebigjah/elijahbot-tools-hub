@@ -1,0 +1,1034 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Echo — Capture a life story before it's gone</title>
+<meta name="description" content="A guided interview tool for capturing the life story of an elderly or dying loved one. 60 curated questions across 9 chapters. Output is a printable Wikipedia-style life document.">
+<meta property="og:title" content="Echo — Capture a life story before it's gone">
+<meta property="og:description" content="60 curated questions. Voice recording. Photos. Prints a Wikipedia-style life document. Free.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://thebigjah.github.io/echo/">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#0a0604">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+<style>
+  :root {
+    --bg: #0a0604;
+    --bg-2: #16110b;
+    --card: #1b1510;
+    --border: #2e2820;
+    --border-light: #3a342a;
+    --text: #f5f0e0;
+    --text-muted: #b6a98e;
+    --text-light: #847b69;
+    --accent: #c2a173;
+    --accent-bright: #e8b968;
+    --intrusion: #e54a28;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.55;
+  }
+  body { min-height: 100vh; padding: 0 0 80px; }
+  .serif { font-family: 'Cinzel', Georgia, serif; }
+  .lora { font-family: 'Lora', Georgia, serif; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 48px 24px; }
+  h1.title { font-family: 'Cinzel', Georgia, serif; font-size: clamp(36px, 5vw, 56px); font-weight: 700; margin: 0 0 12px; line-height: 1.05; }
+  .kicker { font-size: 12px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin-bottom: 18px; }
+  p.lead { font-size: 18px; color: var(--text-muted); max-width: 640px; line-height: 1.65; margin: 0 0 28px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 24px; }
+  .chapter-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
+  .chapter-num { font-size: 11px; font-weight: 700; letter-spacing: .14em; color: var(--accent); text-transform: uppercase; }
+  .chapter-title { font-family: 'Cinzel', Georgia, serif; font-size: 24px; color: var(--text); margin: 0; }
+  .chapter-sub { font-size: 14px; color: var(--text-light); }
+  label.q-label { display: block; font-size: 15px; color: var(--text); margin: 16px 0 8px; font-weight: 500; }
+  label.q-label .q-hint { display: block; font-size: 13px; color: var(--text-light); font-weight: 400; margin-top: 2px; }
+  textarea {
+    width: 100%; min-height: 70px; padding: 12px 14px;
+    background: var(--bg-2); color: var(--text);
+    border: 1px solid var(--border-light); border-radius: 8px;
+    font-family: 'Lora', Georgia, serif; font-size: 16px; line-height: 1.55;
+    outline: none; resize: vertical;
+  }
+  textarea:focus { border-color: var(--accent); }
+  input[type=text] {
+    width: 100%; padding: 12px 14px;
+    background: var(--bg-2); color: var(--text);
+    border: 1px solid var(--border-light); border-radius: 8px;
+    font-family: 'Lora', Georgia, serif; font-size: 16px;
+    outline: none;
+  }
+  input[type=text]:focus { border-color: var(--accent); }
+  .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .meta-grid label { display: block; font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 6px; }
+  .btn {
+    appearance: none; border: none; cursor: pointer;
+    padding: 14px 28px; border-radius: 8px;
+    font-family: inherit; font-size: 15px; font-weight: 700; letter-spacing: .04em;
+    transition: transform 80ms ease, background 120ms ease;
+  }
+  .btn:active { transform: translateY(1px) scale(.99); }
+  .btn-primary { background: var(--accent); color: var(--bg); }
+  .btn-ghost   { background: transparent; color: var(--text); border: 1px solid var(--border-light); }
+  .actions { display: flex; gap: 12px; flex-wrap: wrap; margin: 36px 0 20px; }
+  .progress { background: var(--bg-2); border: 1px solid var(--border); border-radius: 999px; height: 8px; overflow: hidden; margin: 16px 0 28px; }
+  .progress > div { height: 100%; background: var(--accent); transition: width 160ms ease; }
+  .progress-text { font-size: 12px; color: var(--text-light); letter-spacing: .06em; text-align: right; margin-bottom: 16px; }
+
+  /* Output: Wikipedia-style print layout */
+  .output { background: #fff; color: #14110b; padding: 0; margin-top: 40px; border-radius: 0; }
+  .output .article { padding: 56px clamp(28px, 6vw, 80px); font-family: 'Lora', Georgia, serif; font-size: 17px; line-height: 1.7; }
+  .output h1 { font-family: 'Cinzel', Georgia, serif; font-size: 48px; margin: 0 0 4px; line-height: 1.05; }
+  .output .dates { font-size: 16px; color: #5d564a; margin-bottom: 24px; font-style: italic; }
+  .output h2 { font-family: 'Cinzel', Georgia, serif; font-size: 26px; margin: 36px 0 8px; padding-bottom: 6px; border-bottom: 2px solid #b9aa7a; }
+  .output h3 { font-family: 'Cinzel', Georgia, serif; font-size: 18px; margin: 24px 0 4px; color: #6b5e3f; }
+  .output p { margin: 8px 0 14px; }
+  .output blockquote { border-left: 3px solid #b9aa7a; padding-left: 18px; margin: 16px 0; font-style: italic; color: #3a3328; }
+  .output .footer { margin-top: 36px; padding-top: 18px; border-top: 1px solid #ddd; font-size: 12px; color: #888; }
+  .output-actions { display: flex; gap: 10px; flex-wrap: wrap; padding: 20px 24px; background: #ecebe5; }
+
+  @media print {
+    body { background: #fff !important; color: #14110b !important; padding: 0; }
+    .wrap > *:not(.output) { display: none !important; }
+    .output { box-shadow: none; }
+    .output-actions { display: none; }
+    .output .article { padding: 0; }
+  }
+  .footer-note { font-size: 13px; color: var(--text-light); text-align: center; margin-top: 40px; }
+  .footer-note a { color: var(--accent); text-decoration: none; }
+
+  .q-row { position: relative; }
+  .q-tools {
+    position: absolute; top: 16px; right: 0;
+    display: flex; gap: 6px;
+  }
+  .q-tool {
+    background: transparent; border: 1px solid var(--border-light);
+    color: var(--text-light); border-radius: 6px;
+    width: 28px; height: 28px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 14px; cursor: pointer; padding: 0;
+    transition: all 120ms;
+  }
+  .q-tool:hover { color: var(--accent); border-color: var(--accent); }
+  .q-tool.on { color: var(--accent-bright); border-color: var(--accent-bright); background: rgba(232,185,104,0.08); }
+  .q-skipped textarea { opacity: 0.35; }
+  .q-skipped label.q-label { opacity: 0.5; }
+  .save-toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--card); border: 1px solid var(--accent);
+    color: var(--accent-bright);
+    padding: 10px 18px; border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+    opacity: 0; transform: translateY(8px);
+    transition: opacity 200ms, transform 200ms;
+    pointer-events: none; z-index: 200;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  }
+  .save-toast.show { opacity: 1; transform: translateY(0); }
+  .add-question {
+    display: block; width: 100%;
+    margin-top: 18px; padding: 12px;
+    background: transparent; border: 1px dashed var(--border-light);
+    color: var(--text-muted); border-radius: 8px;
+    font-family: inherit; font-size: 13px; cursor: pointer;
+  }
+  .add-question:hover { border-color: var(--accent); color: var(--accent); }
+  .custom-tag { display: inline-block; font-size: 9px; color: var(--accent); margin-left: 6px; padding: 1px 6px; border: 1px solid var(--accent); border-radius: 4px; vertical-align: middle; }
+  .audio-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 8px; padding: 8px 12px;
+    background: var(--bg-2); border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+  .rec-btn {
+    width: 36px; height: 36px; border-radius: 18px;
+    background: var(--accent); color: var(--bg);
+    border: none; cursor: pointer; display: inline-flex;
+    align-items: center; justify-content: center;
+    font-size: 16px; transition: background 120ms, transform 80ms;
+  }
+  .rec-btn:hover { background: var(--accent-bright); }
+  .rec-btn:active { transform: scale(0.96); }
+  .rec-btn.recording { background: var(--intrusion); animation: rec-pulse 1.2s infinite; }
+  @keyframes rec-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+  .audio-meta { font-size: 12px; color: var(--text-light); flex: 1; }
+  .audio-row audio { height: 28px; max-width: 240px; flex: 1; }
+  .audio-dl { background: transparent; border: 1px solid var(--border-light); color: var(--text-muted); border-radius: 4px; padding: 4px 8px; font-size: 11px; cursor: pointer; }
+  .audio-dl:hover { color: var(--accent); border-color: var(--accent); }
+  .photo-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+  .photo-thumb { width: 70px; height: 70px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-light); cursor: pointer; }
+  .photo-input-label { background: transparent; border: 1px dashed var(--border-light); color: var(--text-muted); border-radius: 6px; padding: 6px 14px; font-size: 12px; cursor: pointer; transition: all 120ms; }
+  .photo-input-label:hover { border-color: var(--accent); color: var(--accent); }
+  .photo-input-label input { display: none; }
+  .photo-remove { background: rgba(229,74,40,0.15); border: 1px solid var(--intrusion); color: #ffb8a4; border-radius: 4px; padding: 2px 6px; font-size: 10px; cursor: pointer; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <p class="kicker">Capture a life before it's gone</p>
+  <h1 class="title">Echo.</h1>
+  <p class="lead">
+    Most lives don't get written down. A guided interview, asked patiently across a few sittings, becomes a Wikipedia-style document the family can hold forever. Bring this to someone old. Read the questions aloud. Type their answers. Print the result.
+  </p>
+
+  <div class="card">
+    <h2 class="chapter-title serif" style="margin: 0 0 14px;">About this person</h2>
+    <div class="meta-grid">
+      <div>
+        <label>Their full name</label>
+        <input id="m-name" type="text" placeholder="e.g. Mary Catherine Wallace" />
+      </div>
+      <div>
+        <label>Nickname / what people call them</label>
+        <input id="m-nick" type="text" placeholder="e.g. Kiki" />
+      </div>
+      <div>
+        <label>Born (year or full date)</label>
+        <input id="m-born" type="text" placeholder="e.g. 1948" />
+      </div>
+      <div>
+        <label>Place of birth</label>
+        <input id="m-bornplace" type="text" placeholder="e.g. Birmingham, AL" />
+      </div>
+      <div>
+        <label>Your relationship to them</label>
+        <input id="m-rel" type="text" placeholder="e.g. her grandson Elijah" />
+      </div>
+      <div>
+        <label>Date of this interview</label>
+        <input id="m-date" type="text" placeholder="auto: today" />
+      </div>
+    </div>
+  </div>
+
+  <div class="progress-text"><span id="progress-text-val">0 of 0 questions answered</span></div>
+  <div class="progress"><div id="progress-bar" style="width:0%"></div></div>
+
+  <div id="chapters"></div>
+
+  <div class="actions">
+    <button class="btn btn-primary" id="btn-generate">Generate the life story →</button>
+    <button class="btn btn-ghost" id="btn-export-md">Export as Markdown</button>
+    <button class="btn btn-ghost" id="btn-export-zip">Export FULL archive (story + photos + audio)</button>
+    <button class="btn btn-ghost" id="btn-clear">Start over</button>
+  </div>
+
+  <div id="output" class="output" style="display:none;">
+    <div class="output-actions">
+      <button class="btn btn-primary" onclick="window.print()">Print to PDF / paper</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('output').style.display='none'; window.scrollTo({top:0,behavior:'smooth'});">Back to editing</button>
+    </div>
+    <div class="article" id="article"></div>
+  </div>
+
+  <p class="footer-note">
+    Echo v0.2 · auto-saves to your browser as you type · a Purcell Ventures tool · for the lives that don't get written down on their own
+  </p>
+</main>
+
+<div class="save-toast" id="save-toast">✓ Saved</div>
+
+<script>
+const CHAPTERS = [
+  {
+    id: 'early', title: 'Early life', sub: 'Childhood, parents, place',
+    scripture: { ref: 'Psalm 139:13-14', text: 'For you formed my inward parts; you knitted me together in my mother\'s womb. I praise you, for I am fearfully and wonderfully made.' },
+    tips: 'Start gentle. Ask one question. Wait. Don\'t fill silence — most people answer twice when given room. Look at them, not the screen.',
+    qs: [
+      { id: 'parents-name', q: 'What were your parents\' names?', hint: 'And what did they do for work?' },
+      { id: 'siblings',     q: 'Tell me about your brothers and sisters.', hint: 'Names, birth order, who you were closest to.' },
+      { id: 'childhood-home', q: 'Where did you grow up? What did the house look like?', hint: 'A street, a room, a sound, a smell.' },
+      { id: 'earliest-memory', q: 'What is your earliest memory?', hint: 'Even if it\'s small or seems random.' },
+      { id: 'childhood-faith', q: 'What was your family\'s faith like when you were a child?', hint: 'What did Sundays look like? Was God real to you then?' },
+      { id: 'school-felt-like', q: 'What did school feel like for you?', hint: 'Which teachers do you still remember? Who were your friends?' },
+      { id: 'first-job', q: 'What was your first job?', hint: 'How much did it pay? What did you learn?' },
+    ],
+  },
+  {
+    id: 'youth', title: 'Coming of age', sub: 'Teenage years, dreams, first loves',
+    scripture: { ref: '1 Corinthians 13:11', text: 'When I was a child, I spoke like a child, I thought like a child, I reasoned like a child. When I became a man, I gave up childish ways.' },
+    tips: 'This chapter tends to get vivid. Let them go on tangents — that\'s where the gold is. Don\'t pull them back to your question early.',
+    qs: [
+      { id: 'teen-dream', q: 'What did you want to be when you grew up?', hint: 'Did you go after it? Why or why not?' },
+      { id: 'first-love', q: 'Tell me about your first love.', hint: 'Or your first heartbreak.' },
+      { id: 'youth-defining', q: 'What event in your teens or twenties shaped you the most?', hint: 'Something you can still feel.' },
+      { id: 'mentor-young', q: 'Who, outside your parents, shaped you when you were young?', hint: 'Teacher, pastor, neighbor, boss, friend\'s mom.' },
+      { id: 'first-time-far', q: 'What was the first time you traveled far from home?', hint: 'What did you notice that you\'d never seen before?' },
+    ],
+  },
+  {
+    id: 'marriage', title: 'Marriage & family', sub: 'Spouse, children, the daily building of a life',
+    scripture: { ref: 'Ecclesiastes 4:9-10', text: 'Two are better than one, because they have a good reward for their toil. For if they fall, one will lift up his fellow.' },
+    tips: 'If they\'re widowed, don\'t avoid the spouse — speak the name. Most older people want to talk about the one they lost. If they get teary, sit with it. Don\'t change the subject.',
+    qs: [
+      { id: 'how-met', q: 'How did you meet your spouse?', hint: 'The actual story, not the polished version.' },
+      { id: 'proposal', q: 'Tell me about the proposal — yours or theirs.', hint: 'And the wedding.' },
+      { id: 'first-year', q: 'What was the first year of marriage actually like?', hint: 'Be honest. It usually isn\'t the easy part.' },
+      { id: 'children', q: 'Tell me about each of your children. One memory of each.', hint: 'The one you always come back to.' },
+      { id: 'parenting-lesson', q: 'What did you learn about being a parent that surprised you?', hint: 'What did you get wrong that you wish you could redo?' },
+      { id: 'grandkids', q: 'What is being a grandparent like, compared to being a parent?', hint: 'What do you see now that you missed before?' },
+    ],
+  },
+  {
+    id: 'work', title: 'Work & calling', sub: 'What you did all day and why',
+    scripture: { ref: 'Colossians 3:23', text: 'Whatever you do, work heartily, as for the Lord and not for men.' },
+    tips: 'Ask for specific employers, dates, towns. Concrete details unlock memories abstract questions can\'t reach.',
+    qs: [
+      { id: 'career-arc', q: 'Walk me through your working life — every major job.', hint: 'In order. Even the ones you hated.' },
+      { id: 'proudest-work', q: 'What\'s the piece of work you\'re proudest of?', hint: 'It doesn\'t have to be famous. It has to be yours.' },
+      { id: 'worst-boss', q: 'Tell me about the worst boss or job you ever had.', hint: 'What did it teach you?' },
+      { id: 'money-rule', q: 'What\'s your rule about money?', hint: 'The one you learned the hard way.' },
+      { id: 'calling-vs-job', q: 'Looking back, did you find your calling, or just a job?', hint: 'Is there a difference, in your view?' },
+    ],
+  },
+  {
+    id: 'faith', title: 'Faith', sub: 'God, the church, the long walk',
+    scripture: { ref: 'Psalm 90:1-2', text: 'Lord, you have been our dwelling place in all generations. Before the mountains were brought forth... from everlasting to everlasting you are God.' },
+    tips: 'Faith chapters can feel performative if framed as a test. Don\'t ask if they\'re a good Christian. Ask what God has actually been like to them, over time. Their answer is the real testimony.',
+    qs: [
+      { id: 'faith-now', q: 'How would you describe your faith today?', hint: 'In your own words. No church language required.' },
+      { id: 'church-shaped', q: 'What church or churches shaped you?', hint: 'For better or worse.' },
+      { id: 'faith-changed', q: 'How has your understanding of God changed over your life?', hint: 'What did you used to believe that you don\'t anymore?' },
+      { id: 'prayer-life', q: 'What\'s your prayer life like now?', hint: 'When? Where? About what?' },
+      { id: 'doubt', q: 'Tell me about a time you doubted.', hint: 'What pulled you back, or didn\'t.' },
+      { id: 'scripture-anchor', q: 'Is there a scripture or hymn you come back to?', hint: 'Tell me the verse and what it means to you.' },
+    ],
+  },
+  {
+    id: 'hardship', title: 'Hardship', sub: 'The losses that shaped you',
+    scripture: { ref: 'Romans 8:28', text: 'And we know that for those who love God all things work together for good, for those who are called according to his purpose.' },
+    tips: 'This is the chapter people lie in, or rush. Slow down. Ask the question. If they say "fine" — wait. The real answer usually comes after the polite one.',
+    qs: [
+      { id: 'hardest-year', q: 'What was the hardest year of your life?', hint: 'What happened? Who carried you through?' },
+      { id: 'loss', q: 'Who that you loved have you lost?', hint: 'Name them. Tell me one thing about each.' },
+      { id: 'regret', q: 'What\'s the regret you carry?', hint: 'You don\'t have to share it if you don\'t want to. But the rest of us learn from yours.' },
+      { id: 'forgive', q: 'Who have you had to forgive?', hint: 'And who have you needed to ask forgiveness from?' },
+      { id: 'healed-from', q: 'What have you healed from?', hint: 'And what hasn\'t healed yet?' },
+    ],
+  },
+  {
+    id: 'world', title: 'The world you lived through', sub: 'History from a first-person seat',
+    scripture: { ref: 'Ecclesiastes 1:9', text: 'What has been is what will be, and what has been done is what will be done, and there is nothing new under the sun.' },
+    tips: 'Anchor each memory to a year if you can. "When the Berlin Wall came down" + "I was 26 and working at..." makes it real for the grandkids who don\'t know either reference.',
+    qs: [
+      { id: 'big-event', q: 'What world event do you remember most vividly?', hint: 'Where were you when it happened?' },
+      { id: 'biggest-change', q: 'What change in everyday life over your lifetime surprises you the most?', hint: 'Technology, manners, politics, anything.' },
+      { id: 'culture-younger', q: 'What was popular when you were young that the kids today would not understand?', hint: 'Songs, dances, shows, slang.' },
+      { id: 'patriotism', q: 'How has your view of your country changed over your life?', hint: 'Be candid.' },
+    ],
+  },
+  {
+    id: 'joy', title: 'Joy', sub: 'The light, not just the weight',
+    scripture: { ref: 'Psalm 16:11', text: 'You make known to me the path of life; in your presence there is fullness of joy.' },
+    tips: 'After heavy chapters, let them breathe. This is the chapter where laughter actually shows up. Let it.',
+    qs: [
+      { id: 'happiest-day', q: 'What was the happiest day of your life?', hint: 'Tell me the smallest details you can remember.' },
+      { id: 'simple-pleasure', q: 'What\'s the simple pleasure you never get tired of?', hint: 'The one you still light up about.' },
+      { id: 'best-friendship', q: 'Tell me about your closest friendship.', hint: 'How did it start? How did it last?' },
+      { id: 'laugh', q: 'What story do you tell that always makes people laugh?', hint: 'Tell it now.' },
+    ],
+  },
+  {
+    id: 'wisdom', title: 'What you want to pass on', sub: 'For the children, the grandchildren, the ones not born yet',
+    scripture: { ref: 'Deuteronomy 6:6-7', text: 'And these words that I command you today shall be on your heart. You shall teach them diligently to your children, and shall talk of them when you sit in your house.' },
+    tips: 'The closing chapter. The questions are big — they deserve time. If you only get the answer to one of them, get the last one: the blessing. Write it down word for word.',
+    qs: [
+      { id: 'advice-young-self', q: 'If you could put one hand on the shoulder of your 18-year-old self, what would you say?', hint: 'In your own words.' },
+      { id: 'advice-grandkids', q: 'What do you most want your grandkids to know?', hint: 'About God, about people, about life. Or about you.' },
+      { id: 'misunderstood', q: 'What\'s the thing people most often misunderstand about you?', hint: 'And do you want to set it straight?' },
+      { id: 'most-grateful', q: 'What are you most grateful for, looking back?', hint: 'Person. Decision. Gift. Coincidence. Grace.' },
+      { id: 'how-remembered', q: 'How do you want to be remembered?', hint: 'Be honest. We\'ll honor it.' },
+      { id: 'final-blessing', q: 'Is there a blessing you want to leave for the people who will read this?', hint: 'Speak it now. We will write it down word for word.' },
+    ],
+  },
+];
+
+const KEY = 'echo.story.v1';
+
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+  catch { return {}; }
+}
+function saveState(s) {
+  localStorage.setItem(KEY, JSON.stringify(s));
+}
+
+const state = loadState();
+state.answers = state.answers || {};
+state.meta = state.meta || {};
+state.skipped = state.skipped || {}; // qid -> true
+state.starred = state.starred || {}; // qid -> true
+state.custom  = state.custom  || {}; // chapId -> [{ id, q, hint }]
+state.photos  = state.photos  || {}; // qid -> [{ id, dataUrl, caption }]
+state.featured = state.featured || null; // qid of the one "featured quote" — pulled to top of generated doc
+state.chapterTime = state.chapterTime || {}; // chapId -> seconds spent (accumulated across sittings)
+
+function showSaveToast() {
+  const t = document.getElementById('save-toast');
+  t.classList.add('show');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => t.classList.remove('show'), 1200);
+}
+
+// Time tracking per chapter — accumulates seconds while a textarea in that chapter is focused
+let __activeChapter = null;
+let __chapterFocusStart = null;
+function commitChapterTime() {
+  if (__activeChapter && __chapterFocusStart) {
+    const delta = Math.round((Date.now() - __chapterFocusStart) / 1000);
+    if (delta > 0 && delta < 3600) { // sanity bound — no single sitting over 1h per focus session
+      state.chapterTime[__activeChapter] = (state.chapterTime[__activeChapter] || 0) + delta;
+      saveState(state);
+    }
+  }
+  __activeChapter = null;
+  __chapterFocusStart = null;
+}
+window.addEventListener('blur', commitChapterTime);
+window.addEventListener('beforeunload', commitChapterTime);
+function fmtSec(s) {
+  if (!s) return '—';
+  if (s < 60) return `${s}s`;
+  const m = Math.floor(s/60); const r = s % 60;
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(m/60);
+  return `${h}h ${m % 60}m`;
+}
+
+function getAllQuestions() {
+  const out = [];
+  CHAPTERS.forEach((chap) => {
+    const customs = state.custom[chap.id] || [];
+    [...chap.qs, ...customs].forEach((q) => out.push({ chap, q, isCustom: customs.includes(q) }));
+  });
+  return out;
+}
+
+const chaptersEl = document.getElementById('chapters');
+
+function renderChapters() {
+  chaptersEl.innerHTML = '';
+  CHAPTERS.forEach((chap, ci) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    const head = `
+      <div class="chapter-head">
+        <span class="chapter-num">CHAPTER ${String(ci+1).padStart(2,'0')}</span>
+        <h3 class="chapter-title">${chap.title}</h3>
+        <span class="chapter-sub">${chap.sub}</span>
+        ${state.chapterTime[chap.id] ? `<span class="chapter-sub" style="margin-left:auto;color:var(--accent);">${fmtSec(state.chapterTime[chap.id])} spent</span>` : ''}
+      </div>
+      ${chap.scripture ? `
+      <blockquote style="border-left:3px solid var(--accent);padding:10px 0 10px 16px;margin:14px 0 18px;font-family:'Lora',Georgia,serif;font-style:italic;color:var(--text-muted);font-size:14px;line-height:1.6;">
+        "${escapeHtml(chap.scripture.text)}"
+        <div style="font-style:normal;font-size:12px;color:var(--text-light);margin-top:6px;font-family:Inter,sans-serif;">— ${escapeHtml(chap.scripture.ref)}</div>
+      </blockquote>
+      ` : ''}
+      ${chap.tips ? `
+      <details style="margin-bottom:14px;">
+        <summary style="cursor:pointer;color:var(--text-light);font-size:12px;letter-spacing:.08em;text-transform:uppercase;">Tips for the interviewer</summary>
+        <p style="font-size:14px;color:var(--text-muted);line-height:1.65;margin:8px 0 0;padding-left:4px;">${escapeHtml(chap.tips)}</p>
+      </details>
+      ` : ''}
+    `;
+    let body = '';
+    const customs = state.custom[chap.id] || [];
+    [...chap.qs, ...customs].forEach((q, idx) => {
+      const val = (state.answers[q.id] || '').replace(/"/g, '&quot;');
+      const isCustom = customs.includes(q);
+      const skipped = !!state.skipped[q.id];
+      const starred = !!state.starred[q.id];
+      body += `
+        <div class="q-row ${skipped ? 'q-skipped' : ''}">
+          <label class="q-label" for="q-${q.id}">${escapeHtml(q.q)}${isCustom ? ' <span class="custom-tag">CUSTOM</span>' : ''}
+            <span class="q-hint">${escapeHtml(q.hint)}</span>
+          </label>
+          <div class="q-tools">
+            <button class="q-tool ${state.featured === q.id ? 'on' : ''}" title="Mark as THE quote of the conversation (pulls to top of generated doc)" data-feature="${q.id}">"</button>
+            <button class="q-tool ${starred ? 'on' : ''}" title="Star this question" data-star="${q.id}">★</button>
+            <button class="q-tool ${skipped ? 'on' : ''}" title="${skipped ? 'Un-skip' : 'Skip this question'}" data-skip="${q.id}">${skipped ? '↺' : '⊘'}</button>
+            ${isCustom ? `<button class="q-tool" title="Delete custom question" data-delq="${chap.id}|${q.id}">×</button>` : ''}
+          </div>
+          <textarea id="q-${q.id}" data-q="${q.id}" placeholder="(their words — type as they speak)" ${skipped ? 'disabled' : ''}>${val}</textarea>
+          <div class="audio-row" id="audio-${q.id}">
+            <button class="rec-btn" data-rec="${q.id}" title="Record their voice">●</button>
+            <div class="audio-meta" id="audio-meta-${q.id}" data-audio-restore="${persistedAudioQids.has(q.id) ? '1' : '0'}">${persistedAudioQids.has(q.id) ? 'saved audio — loading…' : 'tap ● to record · auto-saved'}</div>
+          </div>
+          <div class="photo-row" id="photo-row-${q.id}">
+            ${(state.photos[q.id] || []).map((p) => `
+              <div style="position:relative;">
+                <img src="${p.dataUrl}" class="photo-thumb" alt="" data-photo-view="${q.id}|${p.id}" />
+                <button class="photo-remove" data-photo-del="${q.id}|${p.id}" style="position:absolute;top:-6px;right:-6px;">×</button>
+              </div>
+            `).join('')}
+            <label class="photo-input-label">+ Photo
+              <input type="file" accept="image/*" data-photo-add="${q.id}" />
+            </label>
+          </div>
+        </div>
+      `;
+    });
+    body += `<button class="add-question" data-addq="${chap.id}">+ Add a custom question to this chapter</button>`;
+    card.innerHTML = head + body;
+    chaptersEl.appendChild(card);
+  });
+
+  // wire textareas (autosave + toast on first save per session per question)
+  chaptersEl.querySelectorAll('textarea[data-q]').forEach((ta) => {
+    ta.addEventListener('input', (e) => {
+      state.answers[e.target.dataset.q] = e.target.value;
+      saveState(state);
+      updateProgress();
+      debouncedToast();
+    });
+    ta.addEventListener('focus', (e) => {
+      // Figure out which chapter this textarea belongs to
+      const qid = e.target.dataset.q;
+      let chapId = null;
+      CHAPTERS.forEach(c => {
+        const customs = state.custom[c.id] || [];
+        if ([...c.qs, ...customs].some(q => q.id === qid)) chapId = c.id;
+      });
+      if (chapId !== __activeChapter) commitChapterTime();
+      __activeChapter = chapId;
+      __chapterFocusStart = Date.now();
+    });
+    ta.addEventListener('blur', commitChapterTime);
+  });
+
+  // wire skip/star
+  chaptersEl.querySelectorAll('[data-skip]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const qid = btn.dataset.skip;
+      state.skipped[qid] = !state.skipped[qid];
+      saveState(state);
+      renderChapters();
+      showSaveToast();
+    });
+  });
+  chaptersEl.querySelectorAll('[data-feature]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const qid = btn.dataset.feature;
+      state.featured = (state.featured === qid) ? null : qid;
+      saveState(state);
+      renderChapters();
+      showSaveToast();
+    });
+  });
+  chaptersEl.querySelectorAll('[data-star]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const qid = btn.dataset.star;
+      state.starred[qid] = !state.starred[qid];
+      saveState(state);
+      renderChapters();
+      showSaveToast();
+    });
+  });
+  chaptersEl.querySelectorAll('[data-delq]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const [chapId, qid] = btn.dataset.delq.split('|');
+      if (!confirm('Delete this custom question? Its answer will also be removed.')) return;
+      state.custom[chapId] = (state.custom[chapId] || []).filter(q => q.id !== qid);
+      delete state.answers[qid];
+      delete state.skipped[qid];
+      delete state.starred[qid];
+      saveState(state);
+      renderChapters();
+    });
+  });
+  chaptersEl.querySelectorAll('[data-rec]').forEach((btn) => {
+    btn.addEventListener('click', () => toggleRecording(btn.dataset.rec, btn));
+  });
+  // Restore persisted audio previews
+  chaptersEl.querySelectorAll('[data-audio-restore="1"]').forEach(async (meta) => {
+    const qid = meta.id.replace('audio-meta-', '');
+    const r = await restoreAudioPreviewForQid(qid);
+    if (!r) return;
+    meta.innerHTML = `
+      <audio controls src="${r.url}" style="vertical-align: middle;"></audio>
+      <button class="audio-dl" data-dl="${qid}" style="margin-left: 8px;">Download .webm</button>
+      <button class="audio-dl" data-audio-del="${qid}" style="margin-left: 4px;color:#e54a28;border-color:#e54a28;">Delete</button>
+      <span style="font-size:10px;color:var(--accent);margin-left:6px;">✓ saved (${r.durationSec}s)</span>
+    `;
+    // Reconstruct audioState so download works
+    const rec = await getAudioBlob(qid);
+    if (rec) {
+      audioState[qid] = { blob: rec.blob, durationSec: rec.durationSec, url: r.url };
+    }
+    meta.querySelector('[data-dl]')?.addEventListener('click', () => downloadAudio(qid));
+    meta.querySelector('[data-audio-del]')?.addEventListener('click', async () => {
+      if (!confirm('Delete this recording?')) return;
+      await deleteAudioBlob(qid);
+      persistedAudioQids.delete(qid);
+      delete audioState[qid];
+      renderChapters();
+    });
+  });
+  chaptersEl.querySelectorAll('[data-photo-add]').forEach((inp) => {
+    inp.addEventListener('change', async (e) => {
+      const qid = e.target.dataset.photoAdd;
+      const file = e.target.files?.[0];
+      if (!file) return;
+      // Resize via canvas before storing so we don't blow localStorage
+      try {
+        const dataUrl = await resizeImage(file, 1200);
+        state.photos[qid] = state.photos[qid] || [];
+        state.photos[qid].push({ id: 'p_' + Date.now().toString(36), dataUrl, caption: '' });
+        saveState(state);
+        renderChapters();
+        showSaveToast();
+      } catch (err) {
+        alert('Could not load that image: ' + err);
+      }
+      e.target.value = '';
+    });
+  });
+  chaptersEl.querySelectorAll('[data-photo-del]').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const [qid, pid] = btn.dataset.photoDel.split('|');
+      state.photos[qid] = (state.photos[qid] || []).filter(p => p.id !== pid);
+      saveState(state);
+      renderChapters();
+    });
+  });
+  chaptersEl.querySelectorAll('[data-photo-view]').forEach((img) => {
+    img.addEventListener('click', () => {
+      const [qid, pid] = img.dataset.photoView.split('|');
+      const photo = (state.photos[qid] || []).find(p => p.id === pid);
+      if (!photo) return;
+      const w = window.open('', '_blank');
+      if (w) {
+        w.document.write(`<title>Photo</title><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh;"><img src="${photo.dataUrl}" style="max-width:100%;max-height:100vh;" /></body>`);
+      }
+    });
+  });
+  chaptersEl.querySelectorAll('[data-addq]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const chapId = btn.dataset.addq;
+      const q = prompt('Question to ask:');
+      if (!q || !q.trim()) return;
+      const hint = prompt('Hint or follow-up (optional):') || '';
+      const newQ = { id: `c_${chapId}_${Date.now().toString(36)}`, q: q.trim(), hint: hint.trim() };
+      state.custom[chapId] = state.custom[chapId] || [];
+      state.custom[chapId].push(newQ);
+      saveState(state);
+      renderChapters();
+      showSaveToast();
+    });
+  });
+
+  // wire meta inputs
+  ['name','nick','born','bornplace','rel','date'].forEach((k) => {
+    const el = document.getElementById('m-' + k);
+    if (!el) return;
+    // Auto-default interview date to today on first load
+    if (k === 'date' && !state.meta.date) {
+      const today = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+      state.meta.date = today;
+      saveState(state);
+    }
+    el.value = state.meta[k] || '';
+    el.addEventListener('input', () => { state.meta[k] = el.value; saveState(state); debouncedToast(); });
+  });
+
+  updateProgress();
+}
+
+let __toastDeb;
+function debouncedToast() {
+  clearTimeout(__toastDeb);
+  __toastDeb = setTimeout(() => showSaveToast(), 600);
+}
+
+async function resizeImage(file, maxDim) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.82));
+      };
+      img.onerror = () => reject(new Error('image decode failed'));
+      img.src = reader.result;
+    };
+    reader.onerror = () => reject(new Error('file read failed'));
+    reader.readAsDataURL(file);
+  });
+}
+
+// IndexedDB for audio blobs. localStorage is too small (~5MB). IndexedDB
+// scales to GB. One DB "echo-audio" with object store "blobs" keyed by qid.
+const DB_NAME = 'echo-audio';
+const DB_STORE = 'blobs';
+let __dbPromise = null;
+function openAudioDb() {
+  if (__dbPromise) return __dbPromise;
+  __dbPromise = new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = () => req.result.createObjectStore(DB_STORE);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+  return __dbPromise;
+}
+async function putAudioBlob(qid, blob, durationSec) {
+  const db = await openAudioDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, 'readwrite');
+    tx.objectStore(DB_STORE).put({ blob, durationSec, savedAt: Date.now() }, qid);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+async function getAudioBlob(qid) {
+  const db = await openAudioDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, 'readonly');
+    const req = tx.objectStore(DB_STORE).get(qid);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function deleteAudioBlob(qid) {
+  const db = await openAudioDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, 'readwrite');
+    tx.objectStore(DB_STORE).delete(qid);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+async function listAudioQids() {
+  const db = await openAudioDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, 'readonly');
+    const req = tx.objectStore(DB_STORE).getAllKeys();
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// Audio recording: PERSISTED via IndexedDB. Per question.
+const audioState = {}; // qid -> { recorder, chunks, startTs, blob, url, durationSec, timerId }
+const persistedAudioQids = new Set();
+
+// On page load, find which questions have saved audio + restore UI on render
+(async function loadPersistedAudio() {
+  try {
+    const keys = await listAudioQids();
+    keys.forEach((k) => persistedAudioQids.add(k));
+    // Re-render chapters once persisted audio is known
+    if (typeof renderChapters === 'function') renderChapters();
+  } catch {}
+})();
+
+async function restoreAudioPreviewForQid(qid) {
+  const rec = await getAudioBlob(qid);
+  if (!rec) return null;
+  const url = URL.createObjectURL(rec.blob);
+  return { url, durationSec: rec.durationSec };
+}
+
+async function toggleRecording(qid, btn) {
+  const s = audioState[qid] || (audioState[qid] = {});
+  if (s.recorder && s.recorder.state === 'recording') {
+    s.recorder.stop();
+    return;
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    s.chunks = [];
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '';
+    const rec = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+    s.recorder = rec;
+    s.startTs = Date.now();
+    rec.ondataavailable = (e) => { if (e.data.size > 0) s.chunks.push(e.data); };
+    rec.onstop = async () => {
+      s.durationSec = Math.round((Date.now() - s.startTs) / 1000);
+      const blob = new Blob(s.chunks, { type: rec.mimeType || 'audio/webm' });
+      s.blob = blob;
+      if (s.url) URL.revokeObjectURL(s.url);
+      s.url = URL.createObjectURL(blob);
+      // Persist to IndexedDB so it survives page reload
+      try {
+        await putAudioBlob(qid, blob, s.durationSec);
+        persistedAudioQids.add(qid);
+      } catch (err) {
+        console.warn('audio persist failed', err);
+      }
+      stream.getTracks().forEach((t) => t.stop());
+      clearInterval(s.timerId);
+      btn.classList.remove('recording');
+      btn.textContent = '●';
+      const meta = document.getElementById('audio-meta-' + qid);
+      if (meta) {
+        meta.innerHTML = `
+          <audio controls src="${s.url}" style="vertical-align: middle;"></audio>
+          <button class="audio-dl" data-dl="${qid}" style="margin-left: 8px;">Download .webm</button>
+          <button class="audio-dl" data-audio-del="${qid}" style="margin-left: 4px;color:#e54a28;border-color:#e54a28;">Delete</button>
+          <span style="font-size:10px;color:var(--accent);margin-left:6px;">✓ saved</span>
+        `;
+        meta.querySelector('[data-dl]')?.addEventListener('click', () => downloadAudio(qid));
+        meta.querySelector('[data-audio-del]')?.addEventListener('click', async () => {
+          if (!confirm('Delete this recording?')) return;
+          await deleteAudioBlob(qid);
+          persistedAudioQids.delete(qid);
+          delete audioState[qid];
+          renderChapters();
+        });
+      }
+    };
+    rec.start();
+    btn.classList.add('recording');
+    btn.textContent = '■';
+    const meta = document.getElementById('audio-meta-' + qid);
+    s.timerId = setInterval(() => {
+      const secs = Math.floor((Date.now() - s.startTs) / 1000);
+      if (meta) meta.textContent = `recording… ${secs}s — tap ■ to stop`;
+    }, 250);
+  } catch (e) {
+    const meta = document.getElementById('audio-meta-' + qid);
+    if (meta) meta.textContent = 'mic permission denied — enable it in browser settings';
+  }
+}
+
+function downloadAudio(qid) {
+  const s = audioState[qid];
+  if (!s?.blob) return;
+  const name = (state.meta.name || 'echo').replace(/[^a-z0-9-]+/gi, '-').toLowerCase();
+  const filename = `${name}-${qid}-${s.durationSec || 0}s.webm`;
+  const url = URL.createObjectURL(s.blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function updateProgress() {
+  let total = 0, done = 0, skipped = 0;
+  CHAPTERS.forEach(c => {
+    const customs = state.custom[c.id] || [];
+    [...c.qs, ...customs].forEach(q => {
+      if (state.skipped[q.id]) { skipped++; return; }
+      total++;
+      if ((state.answers[q.id] || '').trim()) done++;
+    });
+  });
+  const pct = total ? Math.round((done/total)*100) : 0;
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-text-val').textContent =
+    `${done} of ${total} answered (${pct}%)` + (skipped ? ` · ${skipped} skipped` : '');
+}
+
+function paragraphify(text) {
+  return (text || '').trim()
+    .split(/\n\s*\n/)
+    .map(p => `<p>${escapeHtml(p).replace(/\n/g, '<br>')}</p>`)
+    .join('');
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+}
+
+function generate() {
+  const m = state.meta;
+  const name = m.name?.trim() || 'A Life';
+  const nick = m.nick?.trim();
+  const born = m.born?.trim() ? `b. ${escapeHtml(m.born)}` : '';
+  const bornplace = m.bornplace?.trim() ? `, ${escapeHtml(m.bornplace)}` : '';
+  const rel = m.rel?.trim() ? ` Interviewed by ${escapeHtml(m.rel)}.` : '';
+  const date = m.date?.trim() ? ` (${escapeHtml(m.date)})` : '';
+
+  let html = `
+    <h1>${escapeHtml(name)}</h1>
+    ${nick ? `<p style="font-size:18px;color:#5d564a;margin:0 0 4px;">Known as <em>${escapeHtml(nick)}</em></p>` : ''}
+    <p class="dates">${born}${bornplace}${date ? ' · interview' + date : ''}</p>
+    <p style="font-size:14px;color:#888;margin-bottom:30px;">A life captured in their own words.${rel}</p>
+  `;
+  // Featured quote — pulled to top above all chapters
+  if (state.featured) {
+    const featuredAnswer = (state.answers[state.featured] || '').trim();
+    if (featuredAnswer) {
+      let featuredQuestion = '';
+      CHAPTERS.forEach(c => {
+        const customs = state.custom[c.id] || [];
+        [...c.qs, ...customs].forEach(q => {
+          if (q.id === state.featured) featuredQuestion = q.q;
+        });
+      });
+      html += `
+        <blockquote style="margin:0 0 36px;padding:24px 28px;background:#f5efe1;border-left:5px solid #b9aa7a;font-family:'Cinzel',Georgia,serif;font-size:22px;line-height:1.5;color:#3a3328;font-style:italic;">
+          &ldquo;${escapeHtml(featuredAnswer.split('\n')[0])}&rdquo;
+          <div style="font-style:normal;font-size:12px;color:#6b5e3f;margin-top:14px;font-family:Inter,sans-serif;letter-spacing:0.04em;">— in response to: ${escapeHtml(featuredQuestion)}</div>
+        </blockquote>
+      `;
+    }
+  }
+  CHAPTERS.forEach((chap) => {
+    const customs = state.custom[chap.id] || [];
+    const chapterContent = [...chap.qs, ...customs].map(q => {
+      if (state.skipped[q.id]) return null;
+      const a = (state.answers[q.id] || '').trim();
+      const photos = state.photos[q.id] || [];
+      if (!a && photos.length === 0) return null;
+      const starred = state.starred[q.id] ? ' <span style="color:#b9aa7a;">★</span>' : '';
+      const photoHtml = photos.map(p => `<img src="${p.dataUrl}" style="max-width:100%;border-radius:6px;margin:12px 0;" alt="" />`).join('');
+      return `
+        <h3>${escapeHtml(q.q)}${starred}</h3>
+        ${paragraphify(a)}
+        ${photoHtml}
+      `;
+    }).filter(Boolean).join('');
+    if (chapterContent.trim()) {
+      html += `<h2>${escapeHtml(chap.title)}</h2>${chapterContent}`;
+    }
+  });
+  html += `<div class="footer">Captured with Echo · ${new Date().toLocaleDateString()}</div>`;
+  document.getElementById('article').innerHTML = html;
+  document.getElementById('output').style.display = 'block';
+  document.getElementById('output').scrollIntoView({ behavior: 'smooth' });
+}
+
+function generateMarkdown() {
+  const m = state.meta;
+  const name = m.name?.trim() || 'A Life';
+  let md = `# ${name}\n\n`;
+  if (m.nick?.trim()) md += `*Known as ${m.nick}*\n\n`;
+  const subline = [
+    m.born?.trim() && `Born ${m.born}`,
+    m.bornplace?.trim() && m.bornplace,
+    m.date?.trim() && `interview ${m.date}`,
+    m.rel?.trim() && `interviewed by ${m.rel}`,
+  ].filter(Boolean).join(' · ');
+  if (subline) md += `${subline}\n\n`;
+  md += `_A life captured in their own words._\n\n---\n\n`;
+  CHAPTERS.forEach((chap) => {
+    const customs = state.custom[chap.id] || [];
+    const chapterContent = [...chap.qs, ...customs].map(q => {
+      if (state.skipped[q.id]) return null;
+      const a = (state.answers[q.id] || '').trim();
+      if (!a) return null;
+      const star = state.starred[q.id] ? ' ⭐' : '';
+      return `### ${q.q}${star}\n\n${a}\n`;
+    }).filter(Boolean).join('\n');
+    if (chapterContent.trim()) {
+      md += `## ${chap.title}\n\n${chapterContent}\n`;
+    }
+  });
+  md += `\n---\n\n*Captured with Echo · ${new Date().toLocaleDateString()}*\n`;
+  return md;
+}
+
+function exportMarkdown() {
+  const md = generateMarkdown();
+  const name = (state.meta.name || 'life-story').replace(/[^a-z0-9-]+/gi, '-').toLowerCase();
+  const blob = new Blob([md], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `${name}.md`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showSaveToast();
+}
+
+document.getElementById('btn-generate').addEventListener('click', generate);
+document.getElementById('btn-export-md').addEventListener('click', exportMarkdown);
+document.getElementById('btn-export-zip').addEventListener('click', exportArchive);
+
+async function exportArchive() {
+  if (typeof JSZip === 'undefined') {
+    alert('JSZip is still loading, try again in a second.');
+    return;
+  }
+  const name = (state.meta.name || 'life-story').replace(/[^a-z0-9-]+/gi, '-').toLowerCase();
+  const zip = new JSZip();
+  // 1. The markdown story
+  zip.file('story.md', generateMarkdown());
+  // 2. JSON dump of all state for re-import / archival
+  zip.file('echo-state.json', JSON.stringify(state, null, 2));
+  // 3. Photos folder
+  let photoCount = 0;
+  for (const [qid, photos] of Object.entries(state.photos || {})) {
+    for (let i = 0; i < photos.length; i++) {
+      const p = photos[i];
+      // dataUrl is "data:image/jpeg;base64,...."
+      const b64 = (p.dataUrl || '').split(',')[1];
+      if (b64) {
+        zip.file(`photos/${qid}-${i}.jpg`, b64, { base64: true });
+        photoCount++;
+      }
+    }
+  }
+  // 4. Audio folder — pull from IndexedDB
+  let audioCount = 0;
+  try {
+    const qids = await listAudioQids();
+    for (const qid of qids) {
+      const rec = await getAudioBlob(qid);
+      if (rec?.blob) {
+        zip.file(`audio/${qid}.webm`, rec.blob);
+        audioCount++;
+      }
+    }
+  } catch (e) { console.warn('audio export failed', e); }
+  // 5. README explaining the archive
+  zip.file('README.txt', `Echo archive for ${state.meta.name || 'this life'}
+Generated ${new Date().toLocaleString()}
+
+Contents:
+- story.md — the printable life story (open in any markdown viewer or text editor)
+- echo-state.json — full backup of the interview, importable back into Echo
+- photos/ — ${photoCount} photo${photoCount === 1 ? '' : 's'} attached to specific questions (filenames are question IDs)
+- audio/ — ${audioCount} voice recording${audioCount === 1 ? '' : 's'} per question (.webm format, playable in any modern browser)
+
+To re-import into Echo: paste the contents of echo-state.json into your browser's
+localStorage under the key "echo.story.v1". (Or just bring it to whoever maintains
+Echo and they can help.)
+
+Built with Echo — https://thebigjah.github.io/echo/
+`);
+  const blob = await zip.generateAsync({ type: 'blob' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${name}-echo-archive-${new Date().toISOString().slice(0,10)}.zip`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showSaveToast();
+}
+document.getElementById('btn-clear').addEventListener('click', () => {
+  if (!confirm('Erase all answers and start over? This cannot be undone.')) return;
+  localStorage.removeItem(KEY);
+  state.answers = {};
+  state.meta = {};
+  renderChapters();
+});
+
+renderChapters();
+</script>
+</body>
+</html>

@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TULIP — How Many Points Are You?</title>
+<meta name="description" content="Personal self-assessment of the five points of Calvinism. Calculate your honest agreement across T-U-L-I-P. For Christians who actually want to do the math.">
+<style>
+  :root {
+    --bg: #faf5e9;
+    --bg-alt: #f0e9d4;
+    --card: #fffdf3;
+    --border: #c9b890;
+    --accent: #6b4423;
+    --accent-light: #8b5e3c;
+    --gold: #9a7a2e;
+    --text: #2d1f0e;
+    --text-muted: #6b5444;
+    --text-light: #9a8270;
+    --calvinist: #5a3a8a;
+    --arminian: #2a6b6b;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    min-height: 100vh;
+  }
+  .container { max-width: 780px; margin: 0 auto; padding: 48px 24px 80px; }
+  header { text-align: center; margin-bottom: 32px; }
+  .label-tag {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+  }
+  h1 {
+    font-family: "Cinzel", Georgia, serif;
+    font-size: clamp(30px, 5vw, 48px);
+    font-weight: 700; line-height: 1.1; margin-bottom: 16px;
+    color: var(--text);
+  }
+  .subtitle {
+    font-size: 16px; color: var(--text-muted);
+    max-width: 580px; margin: 0 auto 12px;
+  }
+  .smallnote {
+    font-size: 13px; color: var(--text-light);
+    max-width: 580px; margin: 0 auto;
+    font-style: italic;
+  }
+  .progress-track {
+    height: 4px; background: var(--bg-alt);
+    border-radius: 4px; overflow: hidden;
+    margin: 36px 0 28px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent) 0%, var(--gold) 100%);
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 36px 32px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .point-letter {
+    font-family: "Cinzel", Georgia, serif;
+    font-size: 84px; font-weight: 700;
+    color: var(--gold); line-height: 1; margin-bottom: 8px;
+    letter-spacing: 0.05em;
+  }
+  .point-name {
+    font-family: "Cinzel", Georgia, serif;
+    font-size: 22px; font-weight: 600;
+    color: var(--text); margin-bottom: 20px;
+  }
+  .stance {
+    border-left: 3px solid var(--border);
+    padding-left: 16px; margin-bottom: 16px;
+  }
+  .stance-calvinist { border-left-color: var(--calvinist); }
+  .stance-arminian { border-left-color: var(--arminian); }
+  .stance-label {
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .stance-calvinist .stance-label { color: var(--calvinist); }
+  .stance-arminian .stance-label { color: var(--arminian); }
+  .stance-body {
+    font-size: 14px; color: var(--text-muted);
+    line-height: 1.7;
+  }
+  .scripture {
+    background: var(--bg-alt);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 16px 0 24px;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  .scripture strong { color: var(--text); }
+  .scale-prompt {
+    font-family: "Cinzel", Georgia, serif;
+    font-size: 17px; font-weight: 600;
+    color: var(--text); margin: 24px 0 16px;
+    text-align: center;
+  }
+  .scale-row {
+    display: flex; justify-content: space-between;
+    gap: 8px; margin-bottom: 12px;
+  }
+  .scale-btn {
+    flex: 1;
+    padding: 14px 6px;
+    background: var(--bg-alt);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--text);
+    transition: all 0.15s ease;
+    text-align: center;
+    font-weight: 600;
+  }
+  .scale-btn:hover {
+    border-color: var(--accent-light);
+    background: var(--bg);
+  }
+  .scale-labels {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--text-light);
+    margin-bottom: 24px;
+  }
+  .nav-row {
+    display: flex; justify-content: space-between;
+    align-items: center; margin-top: 24px;
+  }
+  .btn-secondary {
+    padding: 10px 20px;
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .meta {
+    text-align: center; color: var(--text-light);
+    font-size: 13px; margin-top: 32px;
+  }
+  /* Report */
+  .score-display {
+    text-align: center; padding: 32px 0 24px;
+  }
+  .score-num {
+    font-family: "Cinzel", Georgia, serif;
+    font-size: 96px; font-weight: 700;
+    color: var(--gold); line-height: 1; margin-bottom: 4px;
+  }
+  .score-label {
+    font-family: "Cinzel", Georgia, serif;
+    font-size: 18px; color: var(--text);
+    margin-bottom: 8px;
+  }
+  .score-tag {
+    display: inline-block;
+    padding: 8px 18px;
+    background: var(--bg-alt);
+    border-radius: 999px;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--accent);
+  }
+  .breakdown {
+    margin: 28px 0;
+    background: var(--bg-alt);
+    border-radius: 8px;
+    padding: 20px 24px;
+  }
+  .breakdown-row {
+    display: flex; justify-content: space-between;
+    align-items: center; padding: 8px 0;
+    border-bottom: 1px dashed var(--border);
+    font-size: 14px;
+  }
+  .breakdown-row:last-child { border-bottom: 0; }
+  .breakdown-letter {
+    font-family: "Cinzel", Georgia, serif;
+    font-weight: 700; color: var(--gold);
+    font-size: 18px; margin-right: 8px;
+  }
+  .verdict {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+    color: var(--bg);
+    padding: 24px 24px;
+    border-radius: 10px;
+    margin: 24px 0;
+  }
+  .verdict h3 {
+    font-family: "Cinzel", Georgia, serif;
+    font-size: 18px; margin-bottom: 8px;
+  }
+  .verdict p {
+    font-size: 14px; opacity: 0.95;
+  }
+  .restart-link {
+    display: block; text-align: center;
+    margin-top: 24px;
+    color: var(--text-light);
+    text-decoration: underline;
+    font-size: 13px; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="label-tag">A personal self-assessment</div>
+    <h1>How many points are you?</h1>
+    <p class="subtitle">The five points of Calvinism — Total depravity, Unconditional election, Limited atonement, Irresistible grace, Perseverance of the saints — each rated honestly, then summed.</p>
+    <p class="smallnote">For Christians who actually want to do the math. ~10 minutes. Result stays in your browser.</p>
+  </header>
+
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+  <div id="app"></div>
+
+  <p class="meta">Built by <a href="https://purcellventures.co" style="color:inherit">Elijah Purcell</a> · For your friend who's a "3.5-point Calvinist" — now you can answer back · No theological side is treated as a strawman</p>
+</div>
+
+<script>
+const POINTS = [
+  {
+    letter: "T",
+    name: "Total Depravity",
+    summary: "How thoroughly does sin affect human nature?",
+    calvinist: {
+      label: "Calvinist position",
+      body: "After the fall, every faculty of human nature — mind, will, affections, body — is corrupted by sin. Not that humans are as evil as they could be, but that there is no part of the person untouched by sin. Therefore the unregenerate person cannot, of their own will, choose God. They are dead, not just sick. Salvation must originate with God."
+    },
+    arminian: {
+      label: "Wesleyan / Arminian position",
+      body: "Humans are deeply fallen and cannot save themselves — but God has restored to every person a measure of 'prevenient grace' (grace that comes before salvation) that enables the will to respond. The fall is total in scope but not absolute in effect; the image of God remains, and the gospel call genuinely invites a real human choice."
+    },
+    scripture: {
+      label: "Wrestling texts",
+      body: "<strong>Calvinist anchor:</strong> Romans 3:10-18 ('none seek for God'); Ephesians 2:1-5 ('dead in trespasses'); John 6:44 ('no one can come to me unless the Father draws him'). <strong>Counter-anchor:</strong> Joshua 24:15 ('choose this day whom you will serve'); Acts 17:30 ('God commands all people everywhere to repent'); Revelation 22:17 ('let the one who is thirsty come')."
+    },
+    prompt: "How much do you agree with the Calvinist Total Depravity position as stated above?"
+  },
+  {
+    letter: "U",
+    name: "Unconditional Election",
+    summary: "On what basis does God choose whom He saves?",
+    calvinist: {
+      label: "Calvinist position",
+      body: "Before the foundation of the world, God chose specific individuals for salvation. This election is not based on anything foreseen in the person (not their faith, not their works, not their potential) — it is purely God's sovereign, free choice. The decisive factor in who gets saved is God's election."
+    },
+    arminian: {
+      label: "Wesleyan / Arminian position",
+      body: "God elects to salvation based on His foreknowledge of who will freely respond to His grace. Election is real — God genuinely chooses — but the decisive factor includes the person's God-enabled response. Election is corporate (in Christ) and individual, but conditional on faith."
+    },
+    scripture: {
+      label: "Wrestling texts",
+      body: "<strong>Calvinist anchor:</strong> Romans 9 (especially 'Jacob I loved, Esau I hated'); Ephesians 1:4-5 ('chose us before the foundation of the world'); John 15:16 ('you did not choose me, but I chose you'). <strong>Counter-anchor:</strong> 1 Timothy 2:3-4 ('God desires all to be saved'); 2 Peter 3:9 ('not wishing that any should perish'); 1 Peter 1:2 ('according to the foreknowledge of God')."
+    },
+    prompt: "How much do you agree with the Calvinist Unconditional Election position?"
+  },
+  {
+    letter: "L",
+    name: "Limited Atonement",
+    summary: "For whom did Christ die? (Most controversial point.)",
+    calvinist: {
+      label: "Calvinist position",
+      body: "Christ's death actually atoned for — actually paid for the sins of — the elect specifically. It was sufficient for all but efficient only for those for whom it was intended. To say Christ died for everyone (including those who finally reject Him) is to make His death potentially ineffective. The atonement is particular, definite, accomplished."
+    },
+    arminian: {
+      label: "Wesleyan / Arminian position",
+      body: "Christ died for all people without exception. His atonement is universal in scope and intent. It is applied to those who believe, but it is genuinely offered to and provided for every person. To limit the atonement is to undercut both the genuineness of the gospel offer and the universal scope of God's love."
+    },
+    scripture: {
+      label: "Wrestling texts",
+      body: "<strong>Calvinist anchor:</strong> John 10:11 ('the good shepherd lays down his life for the sheep'); Matthew 1:21 ('he will save his people from their sins'); Acts 20:28 ('the church of God, which he obtained with his own blood'). <strong>Counter-anchor:</strong> 1 John 2:2 ('the propitiation for our sins, and not for ours only but also for the sins of the whole world'); 1 Timothy 2:6 ('a ransom for all'); 2 Peter 2:1 ('even denying the Master who bought them')."
+    },
+    prompt: "How much do you agree with the Calvinist Limited Atonement position?"
+  },
+  {
+    letter: "I",
+    name: "Irresistible Grace",
+    summary: "Can God's saving call be refused?",
+    calvinist: {
+      label: "Calvinist position",
+      body: "When God effectually calls a person to salvation, that person will and must respond. The Spirit's inward work on the elect is sovereign and effective — God does not merely offer salvation, He gives it. He doesn't override the will; He renews the will so that the person genuinely WANTS Christ. The new birth precedes and produces faith."
+    },
+    arminian: {
+      label: "Wesleyan / Arminian position",
+      body: "God's grace is genuinely offered to all and genuinely enables real response — but the will is left free to accept or reject. The Spirit woos, convicts, draws — but does not coerce. The 'irresistible' framing misreads the relationship between divine sovereignty and human response. Faith precedes the new birth in some sense (or they are simultaneous and mutually causal)."
+    },
+    scripture: {
+      label: "Wrestling texts",
+      body: "<strong>Calvinist anchor:</strong> John 6:37 ('all that the Father gives me will come to me'); Romans 8:29-30 (the 'golden chain' — predestined, called, justified, glorified, all in unbroken sequence); Acts 16:14 ('the Lord opened her heart to pay attention'). <strong>Counter-anchor:</strong> Acts 7:51 ('you stiff-necked people... you always resist the Holy Spirit'); Matthew 23:37 ('how often I would have gathered... and you would not'); Hebrews 6:4-6 ('those who have once been enlightened... and then have fallen away')."
+    },
+    prompt: "How much do you agree with the Calvinist Irresistible Grace position?"
+  },
+  {
+    letter: "P",
+    name: "Perseverance of the Saints",
+    summary: "Can a true Christian lose their salvation?",
+    calvinist: {
+      label: "Calvinist position",
+      body: "Those whom God has truly saved will persevere in faith to the end. They may fall into serious sin temporarily, but they cannot finally and totally fall away. Their perseverance is sustained by God's preservation — He keeps them. Those who appear to fall away permanently were never genuinely converted to begin with (1 John 2:19). 'Once saved, always saved' — properly understood."
+    },
+    arminian: {
+      label: "Wesleyan / Arminian position",
+      body: "Genuine believers can fall away. Salvation is conditional on continuing faith — and it is possible for someone genuinely born again to renounce that faith and be lost. (Different Arminian traditions vary on the seriousness and possibility of recovery.) Warnings in Scripture about apostasy are genuine warnings to actual believers, not theoretical hypotheticals."
+    },
+    scripture: {
+      label: "Wrestling texts",
+      body: "<strong>Calvinist anchor:</strong> John 10:28-29 ('no one will snatch them out of my hand'); Romans 8:38-39 ('nothing... will be able to separate us from the love of God'); Philippians 1:6 ('he who began a good work... will bring it to completion'). <strong>Counter-anchor:</strong> Hebrews 10:26-31 ('if we go on sinning deliberately after receiving the knowledge of the truth'); 2 Peter 2:20-22 ('if, after they have escaped... they are again entangled'); 1 Timothy 1:19-20 ('some have made shipwreck of their faith')."
+    },
+    prompt: "How much do you agree with the Calvinist Perseverance of the Saints position?"
+  },
+];
+
+const SCALE = [
+  { label: "0", value: 0,    text: "Strongly disagree" },
+  { label: "¼", value: 0.25, text: "Lean against" },
+  { label: "½", value: 0.5,  text: "Genuinely undecided" },
+  { label: "¾", value: 0.75, text: "Lean toward" },
+  { label: "1", value: 1.0,  text: "Strongly agree" },
+];
+
+let answers = [];
+let current = 0;
+
+const app = document.getElementById("app");
+const progressFill = document.getElementById("progressFill");
+
+function render() {
+  if (current >= POINTS.length) { renderReport(); return; }
+  const p = POINTS[current];
+  progressFill.style.width = `${(current / POINTS.length) * 100}%`;
+  app.innerHTML = `
+    <div class="card">
+      <div class="point-letter">${p.letter}</div>
+      <div class="point-name">${p.name}</div>
+      <div style="font-size:14px;color:var(--text-muted);margin-bottom:24px;font-style:italic">${p.summary}</div>
+
+      <div class="stance stance-calvinist">
+        <div class="stance-label">${p.calvinist.label}</div>
+        <div class="stance-body">${p.calvinist.body}</div>
+      </div>
+
+      <div class="stance stance-arminian">
+        <div class="stance-label">${p.arminian.label}</div>
+        <div class="stance-body">${p.arminian.body}</div>
+      </div>
+
+      <div class="scripture">
+        <div style="font-weight:700;color:var(--text);margin-bottom:6px;font-size:12px;letter-spacing:0.08em;text-transform:uppercase">📖 ${p.scripture.label}</div>
+        <div>${p.scripture.body}</div>
+      </div>
+
+      <div class="scale-prompt">${p.prompt}</div>
+      <div class="scale-row" id="scaleRow"></div>
+      <div class="scale-labels">
+        <span>Disagree (Arminian-leaning)</span>
+        <span>Agree (Calvinist-leaning)</span>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn-secondary" id="back" ${current === 0 ? "disabled" : ""}>← Back</button>
+        <span style="color:var(--text-light);font-size:13px">Point ${current + 1} of ${POINTS.length}</span>
+      </div>
+    </div>
+  `;
+  const row = document.getElementById("scaleRow");
+  SCALE.forEach((s) => {
+    const b = document.createElement("button");
+    b.className = "scale-btn";
+    b.innerHTML = `<div style="font-size:18px;font-family:Cinzel,serif;color:var(--gold)">${s.label}</div><div style="font-size:11px;color:var(--text-light);margin-top:4px">${s.text}</div>`;
+    b.onclick = () => { answers[current] = s.value; current++; render(); };
+    row.appendChild(b);
+  });
+  document.getElementById("back").onclick = () => { if (current > 0) { current--; render(); } };
+}
+
+function renderReport() {
+  progressFill.style.width = "100%";
+  const total = answers.reduce((a, b) => a + b, 0);
+  const totalStr = (Math.round(total * 100) / 100).toFixed(2).replace(/\.?0+$/, "");
+  let label, tag, verdictTitle, verdictBody;
+
+  function renderTrajectory() {
+    let hist;
+    try { hist = JSON.parse(localStorage.getItem("calvinism.history.v1") || "[]"); }
+    catch { hist = []; }
+    if (hist.length < 2) return ''; // not enough data
+    const last5 = hist.slice(-6, -1); // exclude the just-added one
+    if (last5.length === 0) return '';
+    const W = 200, H = 60, pad = 6;
+    const max = 5, min = 0;
+    const range = max - min;
+    const pts = last5.concat([{ total }]).map((h, i, arr) => {
+      const x = pad + (i / Math.max(arr.length - 1, 1)) * (W - 2 * pad);
+      const y = H - pad - ((h.total - min) / range) * (H - 2 * pad);
+      return `${x.toFixed(2)},${y.toFixed(2)}`;
+    });
+    return `
+      <div style="margin-top:24px;padding:16px 18px;background:var(--bg-alt);border:1px solid var(--border);border-radius:8px;">
+        <div style="font-size:11px;letter-spacing:.12em;color:var(--accent);text-transform:uppercase;font-weight:700;margin-bottom:10px;">Your trajectory (last ${last5.length + 1} results)</div>
+        <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:60px;display:block;">
+          <line x1="${pad}" y1="${H - pad - ((2.5 - min) / range) * (H - 2*pad)}" x2="${W-pad}" y2="${H - pad - ((2.5 - min) / range) * (H - 2*pad)}" stroke="#b9aa7a" stroke-dasharray="2,2" stroke-width="0.5" vector-effect="non-scaling-stroke" />
+          <polyline points="${pts.join(' ')}" fill="none" stroke="${total >= 2.5 ? '#5a4022' : '#8b6a3d'}" stroke-width="1.5" vector-effect="non-scaling-stroke" />
+          ${pts.map(p => `<circle cx="${p.split(',')[0]}" cy="${p.split(',')[1]}" r="2" fill="#5a4022" />`).join('')}
+        </svg>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--accent-light);margin-top:4px;">
+          <span>${new Date(last5[0].ts).toLocaleDateString()}</span>
+          <span>today</span>
+        </div>
+        ${(() => {
+          const earliest = last5[0].total;
+          const delta = total - earliest;
+          if (Math.abs(delta) < 0.2) return '<p style="margin:8px 0 0;font-size:13px;color:var(--accent-light);">Your view has been stable.</p>';
+          if (delta > 0) return `<p style="margin:8px 0 0;font-size:13px;color:var(--accent-light);">You've moved <strong style="color:var(--accent);">+${delta.toFixed(2)} points toward Calvinism</strong> since ${new Date(last5[0].ts).toLocaleDateString()}.</p>`;
+          return `<p style="margin:8px 0 0;font-size:13px;color:var(--accent-light);">You've moved <strong style="color:var(--accent);">${delta.toFixed(2)} points away from Calvinism</strong> since ${new Date(last5[0].ts).toLocaleDateString()}.</p>`;
+        })()}
+      </div>
+    `;
+  }
+
+  function neighborsFor(t) {
+    if (t >= 4.75) return "Sproul, Edwards, the Puritans, the Westminster divines, modern Reformed Baptists (Piper, MacArthur). You'd be at home at a 9Marks conference or a Reformed Baptist church.";
+    if (t >= 4.25) return "Reformed-leaning but with some hesitation. Like late-life Spurgeon or someone wrestling with 4-point Calvinism (Amyraldian). Most modern PCA churches sit here.";
+    if (t >= 3.5) return "Closer to Sproul than Wesley but with real reservations. Like a 'soft Calvinist' or the older Lutheran tradition.";
+    if (t >= 2.5) return "Honestly mixed. Like much of evangelicalism — including a lot of pastors who'd defend Reformed soteriology but not its sharpest edges. Closer to Lewis, Tim Keller in his more moderate moments, or generic Baptist tradition.";
+    if (t >= 1.5) return "Wesleyan / Arminian / Anabaptist family. Methodists, most Pentecostals, the Free Will Baptist tradition, much of the Holiness movement. John Wesley would recognize you.";
+    return "Strong free-will tradition. Anabaptist (Mennonite, Brethren), much of the Restoration Movement, most of Eastern Orthodoxy, and historic Catholicism. The opposite end of the spectrum from a 5-point Calvinist.";
+  }
+
+  if (total >= 4.5) {
+    label = "5-Point Calvinist";
+    tag = "Full TULIP";
+    verdictTitle = "You're a full-TULIP Calvinist.";
+    verdictBody = "Welcome to the Reformed tradition. Your theological neighbors are Sproul, Piper, Edwards, the Puritans, and the Westminster divines. Heavy reading awaits — start with Sproul's 'Chosen by God' if you haven't, then Edwards's 'Freedom of the Will.'";
+  } else if (total >= 3.5) {
+    label = `${totalStr}-Point Calvinist`;
+    tag = "Reformed-leaning";
+    verdictTitle = "You're significantly Reformed but not fully there.";
+    verdictBody = "You're in good company — many thoughtful Calvinists wrestle with Limited Atonement specifically. You're closer to Sproul than Wesley. Worth asking yourself which point you didn't full-agree with and why — that's where your real theological convictions live.";
+  } else if (total >= 2.5) {
+    label = `${totalStr}-Point Calvinist`;
+    tag = "Mixed / moderate Reformed";
+    verdictTitle = "You're an honest mixed bag.";
+    verdictBody = "You see real force in the Calvinist arguments but you're not buying the whole package. This is where a LOT of thoughtful Christians actually land — they just don't usually do the math. Look at which points you agreed with vs. didn't and what they have in common — that pattern probably reveals your deeper theological instincts.";
+  } else if (total >= 1.5) {
+    label = `${totalStr}-Point Calvinist`;
+    tag = "Mostly Arminian / Wesleyan";
+    verdictTitle = "You're closer to Wesley than Calvin.";
+    verdictBody = "You're in the Wesleyan / Arminian / Anabaptist family. Your theological neighbors are Wesley, the Methodists, the Anabaptists, and most Pentecostals. Worth reading Wesley directly — his 'Free Grace' sermon is the historical anti-Calvinist document.";
+  } else {
+    label = `${totalStr}-Point Calvinist`;
+    tag = "Strong free-will tradition";
+    verdictTitle = "You're firmly in the free-will tradition.";
+    verdictBody = "You hold a robust view of human free response to grace. Your theological neighbors are Wesley, the Anabaptists, much of Catholicism, and most of the Eastern Orthodox tradition. Worth knowing your own tradition's best representatives — and reading Calvin himself just to make sure you're disagreeing with what he ACTUALLY said, not the caricature.";
+  }
+
+  const breakdownRows = POINTS.map((p, i) => {
+    const v = answers[i];
+    let vText;
+    if (v === 0) vText = "Disagree";
+    else if (v === 0.25) vText = "Lean against";
+    else if (v === 0.5) vText = "Undecided";
+    else if (v === 0.75) vText = "Lean toward";
+    else vText = "Agree";
+    return `<div class="breakdown-row">
+      <div><span class="breakdown-letter">${p.letter}</span><span style="color:var(--text)">${p.name}</span></div>
+      <div style="color:var(--text-muted);font-size:13px">${vText} (${v})</div>
+    </div>`;
+  }).join("");
+
+  document.querySelector("header h1").textContent = "Your Result";
+  document.querySelector(".subtitle").textContent = "Honest sum across all five points. Below: breakdown + interpretation + reading list.";
+  document.querySelector(".smallnote").style.display = "none";
+
+  // Save the result to history (for "your trajectory over time" view)
+  try {
+    const hist = JSON.parse(localStorage.getItem("calvinism.history.v1") || "[]");
+    hist.push({ ts: Date.now(), total, points: [...answers] });
+    localStorage.setItem("calvinism.history.v1", JSON.stringify(hist));
+  } catch {}
+
+  // Define helper functions on window so the inline onclick handlers can find them
+  window.__shareResult = async (t) => {
+    const tStr = (Math.round(t * 100) / 100).toFixed(2).replace(/\.?0+$/, "");
+    const text = `Took the TULIP self-assessment. I'm a ${tStr}-point Calvinist — ${(neighborsFor(t)).split('.')[0]}.\n\nTry it: https://thebigjah.github.io/calvinism-test/`;
+    if (navigator.share) {
+      try { await navigator.share({ text }); return; } catch {}
+    }
+    try { await navigator.clipboard.writeText(text); alert("Copied to clipboard."); }
+    catch { prompt("Copy this:", text); }
+  };
+  window.__downloadResult = (t) => {
+    const tStr = (Math.round(t * 100) / 100).toFixed(2).replace(/\.?0+$/, "");
+    const rows = POINTS.map((p, i) => `${p.letter} ${p.name}: ${answers[i]}`).join("\n");
+    const txt = `TULIP Self-Assessment\nDate: ${new Date().toLocaleString()}\nScore: ${tStr} / 5\n\nBreakdown:\n${rows}\n\nVia https://thebigjah.github.io/calvinism-test/`;
+    const blob = new Blob([txt], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `tulip-${tStr}.txt`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  app.innerHTML = `
+    <div class="card">
+      <div class="score-display">
+        <div class="score-num">${totalStr}</div>
+        <div class="score-label">out of 5</div>
+        <div class="score-tag">${tag}</div>
+      </div>
+
+      <div class="breakdown">${breakdownRows}</div>
+
+      <div class="verdict">
+        <h3>${verdictTitle}</h3>
+        <p>${verdictBody}</p>
+      </div>
+
+      <div style="margin-top:20px;font-size:14px;color:var(--text-muted);line-height:1.75">
+        <strong style="color:var(--text)">A note on the math:</strong> This is a tool for self-clarity, not theological certification. The five points aren't equal in importance — Limited Atonement is the most-debated even among Reformed people, while Total Depravity is the most-accepted across traditions. Your number is useful AS a number — but the more useful thing is to look at WHICH points you agreed with and which you didn't, and ask why. The pattern tells you more than the total.
+      </div>
+
+      <div style="margin-top:20px;font-size:14px;color:var(--text-muted);line-height:1.75">
+        <strong style="color:var(--text)">Where to go next:</strong>
+        <ul style="margin-top:8px;padding-left:20px">
+          <li><strong>If 4+:</strong> R.C. Sproul, <em>Chosen by God</em></li>
+          <li><strong>If 2-4:</strong> Roger Olson, <em>Arminian Theology: Myths and Realities</em> + John Piper, <em>Five Points</em> (read both, side by side)</li>
+          <li><strong>If 0-2:</strong> John Wesley, <em>Sermon 110: Free Grace</em> (free online) + Calvin himself (Institutes, Book III) — read both, fair to both</li>
+          <li><strong>Across all tiers:</strong> Kenneth Stewart, <em>10 Myths About Calvinism</em> — clears up what each side actually says</li>
+        </ul>
+      </div>
+
+      <div style="margin-top:20px;font-size:14px;color:var(--text-muted);line-height:1.75">
+        <strong style="color:var(--text)">Your theological neighbors at ${totalStr} points:</strong>
+        <p style="margin-top:8px;">${neighborsFor(total)}</p>
+      </div>
+
+      ${renderTrajectory()}
+
+      <div style="margin-top:24px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="restart-btn" onclick="window.__shareResult(${total})" style="background:var(--accent);color:var(--bg);border:none;padding:10px 18px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;letter-spacing:.04em;cursor:pointer;">Share result</button>
+        <button class="restart-btn" onclick="window.__downloadResult(${total})" style="background:transparent;color:var(--text);border:1px solid var(--border-light);padding:10px 18px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;letter-spacing:.04em;cursor:pointer;">Download</button>
+        <span class="restart-link" onclick="current=0;answers=[];document.querySelector('header h1').textContent='How many points are you?';document.querySelector('.subtitle').textContent='The five points of Calvinism — Total depravity, Unconditional election, Limited atonement, Irresistible grace, Perseverance of the saints — each rated honestly, then summed.';document.querySelector('.smallnote').style.display='block';render();">Start over</span>
+      </div>
+    </div>
+  `;
+}
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Examen — Ignatian end-of-day prayer</title>
+<meta name="description" content="The Ignatian Examen — five movements at the end of each day: gratitude, ask for light, review, ask forgiveness, look toward tomorrow. 500-year tradition, in 10 minutes a night.">
+<meta property="og:title" content="Examen — Ignatian end-of-day prayer">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --bg: #2a2620;
+    --bg-alt: #322d26;
+    --panel: #3a342c;
+    --ink: #e8e0cf;
+    --ink-soft: #a89c84;
+    --ink-faint: #6a6052;
+    --accent: #c2a173;
+    --accent-light: #d4ba8e;
+    --serif: Georgia, "Times New Roman", serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.7;
+    min-height: 100vh;
+    padding: 1rem;
+  }
+  .container { max-width: 600px; margin: 0 auto; }
+  header { text-align: center; padding: 2rem 0 1.5rem; }
+  header h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 6vw, 2.6rem);
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+    letter-spacing: -0.01em;
+  }
+  header p {
+    color: var(--ink-soft);
+    font-style: italic;
+    font-size: 0.95rem;
+  }
+
+  .date-strip {
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 1.5rem;
+  }
+  .date-strip input[type="date"] {
+    background: var(--panel);
+    color: var(--ink);
+    border: 1px solid var(--ink-faint);
+    border-radius: 4px;
+    padding: 0.4rem 0.7rem;
+    font-family: inherit;
+    margin: 0 0.4rem;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .tab {
+    padding: 0.55rem 1.1rem;
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--ink-faint);
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .tab.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+  .tab:hover:not(.active) { border-color: var(--accent); color: var(--ink); }
+
+  .movement {
+    background: var(--panel);
+    border: 1px solid var(--ink-faint);
+    border-radius: 10px;
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 1.25rem;
+  }
+  .movement .num {
+    font-family: var(--serif);
+    color: var(--accent);
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .movement h2 {
+    font-family: var(--serif);
+    font-size: 1.3rem;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+  }
+  .movement .invitation {
+    color: var(--ink-soft);
+    font-style: italic;
+    margin-bottom: 1rem;
+    line-height: 1.7;
+  }
+  .movement textarea {
+    width: 100%;
+    background: var(--bg-alt);
+    color: var(--ink);
+    border: 1px solid var(--ink-faint);
+    border-radius: 6px;
+    padding: 0.85rem 1rem;
+    font-family: var(--serif);
+    font-size: 1rem;
+    line-height: 1.7;
+    resize: vertical;
+    min-height: 80px;
+  }
+  .movement textarea:focus { outline: none; border-color: var(--accent); }
+
+  .actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+  button {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 0.7rem 1.4rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  button:hover { background: var(--accent-light); }
+  button.ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--ink-faint);
+  }
+  button.ghost:hover { color: var(--ink); border-color: var(--accent); }
+
+  .history-entry {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--ink-faint);
+  }
+  .history-entry:last-child { border-bottom: none; }
+  .history-entry .date {
+    color: var(--accent);
+    font-family: var(--serif);
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  .history-entry .body { color: var(--ink); font-size: 0.92rem; }
+  .history-entry .body .label {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 0.7rem;
+    display: block;
+  }
+  .history-entry .body .content {
+    font-family: var(--serif);
+    white-space: pre-wrap;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+
+  .empty {
+    text-align: center;
+    color: var(--ink-faint);
+    padding: 1.5rem 0;
+    font-style: italic;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Examen</h1>
+  <p>five hundred years of end-of-day prayer, in ten minutes</p>
+</header>
+
+<div class="date-strip">
+  <button class="ghost" onclick="prevDay()" style="padding:0.3rem 0.7rem;font-size:0.78rem;">← prev</button>
+  praying for <input type="date" id="date-picker">
+  <button class="ghost" onclick="nextDay()" style="padding:0.3rem 0.7rem;font-size:0.78rem;">next →</button>
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-view="pray">Pray</button>
+  <button class="tab" data-view="history">History</button>
+  <button class="tab" data-view="manage">Manage</button>
+</div>
+
+<div id="view-pray" class="view">
+
+  <div class="movement">
+    <div class="num">i</div>
+    <h2>Gratitude</h2>
+    <div class="invitation">Begin with thanksgiving. What did you receive today that you did not earn? A meal, a face, an unearned mercy, a moment of beauty. Name three.</div>
+    <textarea data-bind="gratitude" placeholder="Three gifts of today..."></textarea>
+  </div>
+
+  <div class="movement">
+    <div class="num">ii</div>
+    <h2>Ask for light</h2>
+    <div class="invitation">Ask the Spirit to walk through your day with you. Not your assessment of the day — His. Pause briefly. Then begin.</div>
+    <textarea data-bind="light" placeholder="Lord, show me what you want me to see..." rows="3"></textarea>
+  </div>
+
+  <div class="movement">
+    <div class="num">iii</div>
+    <h2>Review the day</h2>
+    <div class="invitation">Walk through the hours of today as if rewinding a film. Where did you feel most alive — what Ignatius called consolation? Where did you feel resistance, anxiety, deadness — desolation? Don't analyze. Notice.</div>
+    <textarea data-bind="review" placeholder="Where I felt life. Where I felt resistance. Without judging."></textarea>
+  </div>
+
+  <div class="movement">
+    <div class="num">iv</div>
+    <h2>Ask forgiveness</h2>
+    <div class="invitation">Where did you fail to love today? Be specific. Not "I was a bad person" — "I snapped at her" or "I gossiped to him." Confess plainly. Receive forgiveness. Then let it go.</div>
+    <textarea data-bind="forgiveness" placeholder="What needs to be named..."></textarea>
+  </div>
+
+  <div class="movement">
+    <div class="num">v</div>
+    <h2>Look toward tomorrow</h2>
+    <div class="invitation">Ask the Spirit's help for tomorrow. What do you need? Specific people, specific situations, specific weaknesses. End with a simple "amen" — and rest.</div>
+    <textarea data-bind="tomorrow" placeholder="Lord, tomorrow I need..."></textarea>
+  </div>
+
+  <div class="actions">
+    <button onclick="saveExamen()">Save tonight's examen</button>
+    <button class="ghost" onclick="clearForm()">Clear form</button>
+  </div>
+
+</div>
+
+<div id="view-history" class="view" style="display:none;">
+  <div class="movement">
+    <h2 style="font-size:1.1rem;">Past examens</h2>
+    <input type="text" id="history-search" placeholder="Search across past entries" style="width:100%;background:var(--bg-alt);color:var(--ink);border:1px solid var(--ink-faint);border-radius:6px;padding:0.7rem 0.95rem;font-family:inherit;margin-bottom:1rem;">
+    <div id="history-list"></div>
+  </div>
+</div>
+
+<div id="view-manage" class="view" style="display:none;">
+  <div class="movement">
+    <h2 style="font-size:1.1rem;">Manage</h2>
+    <div class="actions" style="justify-content:flex-start;">
+      <button class="ghost" id="export-btn">Export JSON</button>
+      <button class="ghost" id="import-btn">Import JSON</button>
+      <button class="ghost" id="reset-btn" style="color:#c46a4a;border-color:#5a3a2a;">Reset all</button>
+      <input type="file" id="import-file" accept=".json" style="display:none;">
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>Tradition: St. Ignatius of Loyola, 16th century. Form: yours.<br>
+  <a href="https://github.com/thebigjah/examen">source</a></p>
+</footer>
+
+</div>
+
+<script>
+'use strict';
+
+const KEY = 'examen.v1';
+let all = load();
+let currentDate = todayKey();
+
+function load() { try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch { return {}; } }
+function save() { localStorage.setItem(KEY, JSON.stringify(all)); }
+function escapeHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function fmtDate(key) {
+  const dt = new Date(key + 'T00:00:00');
+  if (isNaN(dt)) return key;
+  return dt.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+}
+
+function getDay(key) {
+  if (!all[key]) all[key] = {};
+  return all[key];
+}
+
+function navigateTo(key) {
+  currentDate = key;
+  document.getElementById('date-picker').value = key;
+  fillForm();
+}
+
+function fillForm() {
+  const day = getDay(currentDate);
+  ['gratitude','light','review','forgiveness','tomorrow'].forEach(k => {
+    const el = document.querySelector(`[data-bind="${k}"]`);
+    if (el) el.value = day[k] || '';
+  });
+}
+
+function saveExamen() {
+  const day = getDay(currentDate);
+  ['gratitude','light','review','forgiveness','tomorrow'].forEach(k => {
+    const el = document.querySelector(`[data-bind="${k}"]`);
+    if (el) day[k] = el.value;
+  });
+  day.savedAt = new Date().toISOString();
+  save();
+  alert('Saved. Sleep well.');
+}
+
+function clearForm() {
+  if (!confirm('Clear this day\'s entries from the form? (Already-saved data remains until you re-save.)')) return;
+  ['gratitude','light','review','forgiveness','tomorrow'].forEach(k => {
+    const el = document.querySelector(`[data-bind="${k}"]`);
+    if (el) el.value = '';
+  });
+}
+
+window.prevDay = () => {
+  const d = new Date(currentDate + 'T00:00:00');
+  d.setDate(d.getDate() - 1);
+  navigateTo(d.toISOString().split('T')[0]);
+};
+window.nextDay = () => {
+  const d = new Date(currentDate + 'T00:00:00');
+  d.setDate(d.getDate() + 1);
+  navigateTo(d.toISOString().split('T')[0]);
+};
+
+// Auto-save on input
+document.querySelectorAll('[data-bind]').forEach(el => {
+  el.addEventListener('input', () => {
+    const day = getDay(currentDate);
+    day[el.dataset.bind] = el.value;
+    save();
+  });
+});
+
+function renderHistory() {
+  const q = (document.getElementById('history-search')?.value || '').toLowerCase().trim();
+  const dates = Object.keys(all).filter(d => all[d].savedAt || all[d].gratitude || all[d].review).sort().reverse();
+  let list = dates;
+  if (q) {
+    list = list.filter(d => {
+      const entry = all[d];
+      return ['gratitude','light','review','forgiveness','tomorrow'].some(k =>
+        (entry[k] || '').toLowerCase().includes(q)
+      ) || d.includes(q);
+    });
+  }
+  const el = document.getElementById('history-list');
+  if (!list.length) { el.innerHTML = q ? '<div class="empty">No matches.</div>' : '<div class="empty">No examens saved yet.</div>'; return; }
+  el.innerHTML = list.map(d => {
+    const entry = all[d];
+    return `
+      <div class="history-entry">
+        <div class="date">${escapeHtml(fmtDate(d))}</div>
+        <div class="body">
+          ${entry.gratitude ? `<span class="label">Gratitude</span><div class="content">${escapeHtml(entry.gratitude)}</div>` : ''}
+          ${entry.review ? `<span class="label">Review</span><div class="content">${escapeHtml(entry.review)}</div>` : ''}
+          ${entry.forgiveness ? `<span class="label">Forgiveness</span><div class="content">${escapeHtml(entry.forgiveness)}</div>` : ''}
+          ${entry.tomorrow ? `<span class="label">Tomorrow</span><div class="content">${escapeHtml(entry.tomorrow)}</div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(all, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'examen-' + todayKey() + '.json';
+  a.click();
+}
+function importJSON(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!confirm('Merge entries from this file? Existing entries with same date will be merged.')) return;
+      Object.keys(data).forEach(k => { all[k] = { ...(all[k] || {}), ...data[k] }; });
+      save();
+      navigateTo(currentDate);
+      renderHistory();
+      alert('Merged.');
+    } catch (err) { alert('Bad JSON: ' + err.message); }
+  };
+  r.readAsText(file);
+}
+function resetAll() {
+  if (!confirm('Erase all examens?')) return;
+  if (!confirm('Really?')) return;
+  localStorage.removeItem(KEY); all = {};
+  navigateTo(currentDate); renderHistory();
+}
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + name).style.display = '';
+  document.querySelector(`.tab[data-view="${name}"]`).classList.add('active');
+  if (name === 'history') renderHistory();
+}
+
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
+document.getElementById('date-picker').addEventListener('change', (e) => { if (e.target.value) navigateTo(e.target.value); });
+document.getElementById('history-search').addEventListener('input', renderHistory);
+document.getElementById('export-btn').addEventListener('click', exportJSON);
+document.getElementById('import-btn').addEventListener('click', () => document.getElementById('import-file').click());
+document.getElementById('import-file').addEventListener('change', importJSON);
+document.getElementById('reset-btn').addEventListener('click', resetAll);
+
+window.saveExamen = saveExamen;
+window.clearForm = clearForm;
+
+navigateTo(todayKey());
+</script>
+
+</body>
+</html>

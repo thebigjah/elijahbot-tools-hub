@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Worship Set — plan it Saturday, lead it Sunday</title>
+<meta name="description" content="Plan worship sets: song, key, BPM, transition notes, scripture segue, leader notes. Save sets and re-run. For worship leaders who actually think about flow.">
+<meta property="og:title" content="Worship Set — plan it Saturday, lead it Sunday">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --bg: #ebe8db;
+    --panel: #fbf8ec;
+    --ink: #1d1812;
+    --ink-soft: #6b5a44;
+    --ink-faint: #a89880;
+    --accent: #2e5a7e;
+    --accent-light: #6889a0;
+    --warn: #b85c2e;
+    --done: #4a7c3d;
+    --slow: #c9803a;
+    --med: #8a8a3a;
+    --fast: #3a8a5a;
+    --border: #d2c8b0;
+    --serif: Georgia, "Times New Roman", serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 1rem;
+  }
+  .container { max-width: 760px; margin: 0 auto; }
+  header { text-align: center; padding: 2rem 0; }
+  header h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 6vw, 2.6rem);
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+    letter-spacing: -0.01em;
+  }
+  header p {
+    color: var(--ink-soft);
+    font-style: italic;
+    font-size: 0.95rem;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .tab {
+    padding: 0.55rem 1.1rem;
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .tab.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+  .tab:hover:not(.active) { border-color: var(--accent); color: var(--ink); }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(29,24,18,0.06);
+  }
+  .panel h2 {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    color: var(--accent);
+    margin-bottom: 0.85rem;
+  }
+  .panel p.help { color: var(--ink-soft); font-size: 0.88rem; margin-bottom: 1rem; }
+
+  label {
+    display: block;
+    color: var(--accent);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin: 1rem 0 0.4rem;
+    font-weight: 600;
+  }
+  label:first-child { margin-top: 0; }
+
+  input[type="text"], input[type="date"], input[type="number"], textarea, select {
+    width: 100%;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 6px;
+    padding: 0.65rem 0.9rem;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  textarea { min-height: 60px; resize: vertical; }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+  }
+  @media (max-width: 480px) { .form-grid { grid-template-columns: 1fr; } }
+
+  button {
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    padding: 0.7rem 1.3rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  button:hover { background: var(--accent); }
+  button.ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+  }
+  button.ghost:hover { background: var(--bg); color: var(--ink); border-color: var(--accent); }
+
+  .row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
+
+  .song-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.6rem;
+  }
+  .song-card.dragging { opacity: 0.4; }
+  .song-card .header {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 0.4rem;
+  }
+  .song-card .grip {
+    color: var(--ink-faint);
+    cursor: grab;
+    font-size: 1.1rem;
+    user-select: none;
+  }
+  .song-card .grip:active { cursor: grabbing; }
+  .song-card .title {
+    flex: 1;
+    font-family: var(--serif);
+    color: var(--accent);
+    font-size: 1.1rem;
+  }
+  .song-card .key-bpm {
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+  .song-card .meta {
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+    margin-bottom: 0.4rem;
+  }
+  .song-card .notes {
+    color: var(--ink-soft);
+    font-size: 0.88rem;
+    font-style: italic;
+    line-height: 1.55;
+    margin-top: 0.4rem;
+    white-space: pre-wrap;
+  }
+  .song-card .scripture {
+    color: var(--slow);
+    font-size: 0.85rem;
+    margin-top: 0.4rem;
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  .song-card .actions {
+    display: flex;
+    gap: 0.35rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .song-card .actions button { padding: 0.3rem 0.65rem; font-size: 0.78rem; }
+  .bpm-band {
+    display: inline-block;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    margin-right: 0.4rem;
+  }
+  .bpm-slow { background: var(--slow); }
+  .bpm-med  { background: var(--med); }
+  .bpm-fast { background: var(--fast); }
+
+  .set-summary {
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .saved-set {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .saved-set:last-child { border-bottom: none; }
+  .saved-set .name {
+    font-family: var(--serif);
+    color: var(--accent);
+    font-size: 1.1rem;
+    margin-bottom: 0.2rem;
+  }
+  .saved-set .meta {
+    color: var(--ink-faint);
+    font-size: 0.78rem;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .saved-set .preview {
+    color: var(--ink);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+  }
+  .saved-set .actions { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+  .saved-set .actions button { padding: 0.35rem 0.7rem; font-size: 0.78rem; }
+
+  .empty {
+    text-align: center;
+    color: var(--ink-faint);
+    padding: 1.5rem 0;
+    font-style: italic;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Worship Set</h1>
+  <p>plan it Saturday, lead it Sunday</p>
+</header>
+
+<div class="tabs">
+  <button class="tab active" data-view="build">Build set</button>
+  <button class="tab" data-view="saved">Saved sets</button>
+  <button class="tab" data-view="manage">Manage</button>
+</div>
+
+<div id="view-build" class="view">
+  <div class="panel">
+    <h2>Current set</h2>
+    <div class="form-grid">
+      <div>
+        <label>Set name</label>
+        <input type="text" id="set-name" placeholder="e.g., Stonebridge AM 5/24, Identity in Christ">
+      </div>
+      <div>
+        <label>Date</label>
+        <input type="date" id="set-date">
+      </div>
+    </div>
+    <label>Opening prayer / call to worship</label>
+    <textarea id="set-opener" placeholder="Scripture you'll open with. A specific call. Quiet first."></textarea>
+    <div id="songs-list" style="margin-top:1.5rem;"></div>
+    <div class="set-summary" id="set-summary"></div>
+    <div class="row">
+      <button id="save-btn">Save this set</button>
+      <button class="ghost" id="export-md-btn">Export as Markdown</button>
+      <button class="ghost" id="clear-set-btn">Clear set</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Add a song</h2>
+    <label>Title</label>
+    <input type="text" id="s-title" placeholder="e.g., Goodness of God / Build My Life / How Great Thou Art">
+    <div class="form-grid">
+      <div>
+        <label>Key</label>
+        <input type="text" id="s-key" placeholder="e.g., G, A, D, Bm — original or your transposition">
+      </div>
+      <div>
+        <label>BPM</label>
+        <input type="number" id="s-bpm" min="50" max="200" placeholder="e.g., 72, 96, 130">
+      </div>
+    </div>
+    <label>Scripture intro / segue (optional)</label>
+    <input type="text" id="s-scripture" placeholder="e.g., Lamentations 3:22-23 read before song">
+    <label>Notes — transition, tempo, who plays, leader cues</label>
+    <textarea id="s-notes" placeholder="e.g., Start with acoustic only. Drop the bridge first time, take it second. Hand off to backup on V2."></textarea>
+    <button id="add-song-btn" style="margin-top:1rem;">Add to set</button>
+  </div>
+</div>
+
+<div id="view-saved" class="view" style="display:none;">
+  <div class="panel">
+    <h2>Saved sets</h2>
+    <input type="text" id="saved-search" placeholder="Search by name, song, scripture" style="margin-bottom:1rem;">
+    <div id="saved-list"></div>
+  </div>
+</div>
+
+<div id="view-manage" class="view" style="display:none;">
+  <div class="panel">
+    <h2>Manage</h2>
+    <div class="row">
+      <button class="ghost" id="export-btn">Export JSON</button>
+      <button class="ghost" id="import-btn">Import JSON</button>
+      <button class="ghost" id="reset-btn" style="color:#b04a4a;border-color:#d8b6b6;">Reset all</button>
+      <input type="file" id="import-file" accept=".json" style="display:none;">
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>For worship leaders who think about flow before Saturday night panic.<br>
+  <a href="https://github.com/thebigjah/worship-set">source</a></p>
+</footer>
+
+</div>
+
+<script>
+'use strict';
+
+const KEY_SETS = 'worshipset.sets.v1';
+const KEY_CURRENT = 'worshipset.current.v1';
+
+let savedSets = loadSaved();
+let current = loadCurrent();
+
+function loadSaved() { try { return JSON.parse(localStorage.getItem(KEY_SETS) || '[]'); } catch { return []; } }
+function loadCurrent() {
+  try { return JSON.parse(localStorage.getItem(KEY_CURRENT) || '{}'); }
+  catch { return {}; }
+}
+function saveSaved() { localStorage.setItem(KEY_SETS, JSON.stringify(savedSets)); }
+function saveCurrent() { localStorage.setItem(KEY_CURRENT, JSON.stringify(current)); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function escapeHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function bpmBand(bpm) {
+  if (!bpm) return '';
+  if (bpm < 80) return 'slow';
+  if (bpm < 120) return 'med';
+  return 'fast';
+}
+function bpmLabel(bpm) {
+  if (!bpm) return '';
+  if (bpm < 80) return 'slow';
+  if (bpm < 120) return 'mid-tempo';
+  return 'up-tempo';
+}
+
+function initCurrent() {
+  if (!current.songs) current.songs = [];
+  document.getElementById('set-name').value = current.name || '';
+  document.getElementById('set-date').value = current.date || todayKey();
+  document.getElementById('set-opener').value = current.opener || '';
+  renderCurrentSongs();
+}
+
+function syncCurrentFromForm() {
+  current.name = document.getElementById('set-name').value;
+  current.date = document.getElementById('set-date').value;
+  current.opener = document.getElementById('set-opener').value;
+  saveCurrent();
+}
+
+function addSong() {
+  const song = {
+    id: uid(),
+    title: document.getElementById('s-title').value.trim(),
+    key: document.getElementById('s-key').value.trim(),
+    bpm: parseInt(document.getElementById('s-bpm').value, 10) || null,
+    scripture: document.getElementById('s-scripture').value.trim(),
+    notes: document.getElementById('s-notes').value.trim(),
+  };
+  if (!song.title) { alert('Song title required.'); return; }
+  current.songs = current.songs || [];
+  current.songs.push(song);
+  saveCurrent();
+  ['s-title','s-key','s-bpm','s-scripture','s-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('s-title').focus();
+  renderCurrentSongs();
+}
+
+function renderCurrentSongs() {
+  const el = document.getElementById('songs-list');
+  if (!current.songs || !current.songs.length) {
+    el.innerHTML = '<div class="empty">No songs yet. Add one below.</div>';
+    document.getElementById('set-summary').innerHTML = '';
+    return;
+  }
+  el.innerHTML = current.songs.map((s, i) => `
+    <div class="song-card" draggable="true" data-i="${i}">
+      <div class="header">
+        <span class="grip">⋮⋮</span>
+        <span class="title">${i+1}. ${escapeHtml(s.title)}</span>
+        ${s.bpm || s.key ? `<span class="key-bpm">${s.key ? escapeHtml(s.key) : ''}${s.key && s.bpm ? ' · ' : ''}${s.bpm ? `<span class="bpm-band bpm-${bpmBand(s.bpm)}"></span>${s.bpm} bpm` : ''}</span>` : ''}
+      </div>
+      ${s.scripture ? `<div class="scripture">📖 ${escapeHtml(s.scripture)}</div>` : ''}
+      ${s.notes ? `<div class="notes">${escapeHtml(s.notes)}</div>` : ''}
+      <div class="actions">
+        ${i > 0 ? `<button class="ghost" onclick="moveSong(${i},-1)">↑</button>` : ''}
+        ${i < current.songs.length-1 ? `<button class="ghost" onclick="moveSong(${i},1)">↓</button>` : ''}
+        <button class="ghost" onclick="editSong(${i})">Edit</button>
+        <button class="ghost" onclick="removeSong(${i})">Remove</button>
+      </div>
+    </div>
+  `).join('');
+
+  // Drag and drop
+  const cards = el.querySelectorAll('.song-card');
+  let dragIdx = null;
+  cards.forEach(card => {
+    card.addEventListener('dragstart', (e) => {
+      dragIdx = parseInt(card.dataset.i, 10);
+      card.classList.add('dragging');
+    });
+    card.addEventListener('dragend', () => card.classList.remove('dragging'));
+    card.addEventListener('dragover', (e) => { e.preventDefault(); });
+    card.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const dropIdx = parseInt(card.dataset.i, 10);
+      if (dragIdx === null || dropIdx === dragIdx) return;
+      const [moved] = current.songs.splice(dragIdx, 1);
+      current.songs.splice(dropIdx, 0, moved);
+      saveCurrent();
+      renderCurrentSongs();
+    });
+  });
+
+  // Summary stats
+  const bpms = current.songs.filter(s => s.bpm).map(s => s.bpm);
+  const avgBpm = bpms.length ? Math.round(bpms.reduce((s,n)=>s+n,0) / bpms.length) : null;
+  const keys = current.songs.map(s => s.key).filter(Boolean).join(' → ');
+  const tempoFlow = current.songs.map(s => bpmLabel(s.bpm) || '?').join(' → ');
+  document.getElementById('set-summary').innerHTML = `
+    <strong>${current.songs.length} song${current.songs.length===1?'':'s'}</strong>${avgBpm ? ' · avg ' + avgBpm + ' bpm' : ''}<br>
+    Key flow: ${keys || '—'}<br>
+    Tempo flow: ${tempoFlow}
+  `;
+}
+
+window.moveSong = (i, delta) => {
+  const newIdx = i + delta;
+  if (newIdx < 0 || newIdx >= current.songs.length) return;
+  const [moved] = current.songs.splice(i, 1);
+  current.songs.splice(newIdx, 0, moved);
+  saveCurrent();
+  renderCurrentSongs();
+};
+
+window.editSong = (i) => {
+  const s = current.songs[i];
+  const newTitle = prompt('Title:', s.title); if (newTitle === null) return;
+  const newKey = prompt('Key:', s.key); if (newKey === null) return;
+  const newBpm = prompt('BPM:', s.bpm || ''); if (newBpm === null) return;
+  const newScripture = prompt('Scripture:', s.scripture); if (newScripture === null) return;
+  const newNotes = prompt('Notes:', s.notes); if (newNotes === null) return;
+  s.title = newTitle.trim() || s.title;
+  s.key = newKey.trim();
+  s.bpm = parseInt(newBpm, 10) || null;
+  s.scripture = newScripture.trim();
+  s.notes = newNotes.trim();
+  saveCurrent();
+  renderCurrentSongs();
+};
+
+window.removeSong = (i) => {
+  if (!confirm('Remove this song from the set?')) return;
+  current.songs.splice(i, 1);
+  saveCurrent();
+  renderCurrentSongs();
+};
+
+function saveSet() {
+  syncCurrentFromForm();
+  if (!current.name) { alert('Give this set a name first.'); return; }
+  if (!current.songs || !current.songs.length) { alert('Add at least one song.'); return; }
+  const id = current.id || uid();
+  const existing = savedSets.findIndex(s => s.id === id);
+  const setData = { ...current, id, savedAt: new Date().toISOString() };
+  if (existing >= 0) savedSets[existing] = setData;
+  else savedSets.push(setData);
+  current.id = id;
+  saveSaved();
+  saveCurrent();
+  alert('Saved.');
+  renderSaved();
+}
+
+function clearSet() {
+  if (!confirm('Clear the current set? (Saved sets are untouched.)')) return;
+  current = { songs: [] };
+  saveCurrent();
+  initCurrent();
+}
+
+function exportMd() {
+  syncCurrentFromForm();
+  if (!current.songs || !current.songs.length) { alert('Empty set.'); return; }
+  let md = `# ${current.name || 'Untitled set'}\n\n`;
+  if (current.date) md += `**Date:** ${current.date}\n\n`;
+  if (current.opener) md += `## Opener\n\n${current.opener}\n\n`;
+  md += `## Songs\n\n`;
+  current.songs.forEach((s, i) => {
+    md += `### ${i+1}. ${s.title}\n\n`;
+    if (s.key || s.bpm) md += `**Key:** ${s.key || '—'} · **BPM:** ${s.bpm || '—'}\n\n`;
+    if (s.scripture) md += `**Scripture:** ${s.scripture}\n\n`;
+    if (s.notes) md += `**Notes:** ${s.notes}\n\n`;
+  });
+  const blob = new Blob([md], { type:'text/markdown' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'worship-set-' + (current.date || todayKey()) + '.md';
+  a.click();
+}
+
+function renderSaved() {
+  const q = (document.getElementById('saved-search')?.value || '').toLowerCase().trim();
+  let list = [...savedSets].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  if (q) {
+    list = list.filter(s =>
+      (s.name || '').toLowerCase().includes(q) ||
+      JSON.stringify(s.songs || []).toLowerCase().includes(q)
+    );
+  }
+  const el = document.getElementById('saved-list');
+  if (!list.length) { el.innerHTML = q ? '<div class="empty">No matches.</div>' : '<div class="empty">No saved sets yet.</div>'; return; }
+  el.innerHTML = list.map(s => `
+    <div class="saved-set">
+      <div class="name">${escapeHtml(s.name || '(untitled)')}</div>
+      <div class="meta">${s.date || ''} · ${(s.songs || []).length} song${(s.songs || []).length===1?'':'s'}</div>
+      <div class="preview">${(s.songs || []).map(x => escapeHtml(x.title)).join(' → ') || '—'}</div>
+      <div class="actions">
+        <button onclick="loadSet('${s.id}')">Load</button>
+        <button class="ghost" onclick="duplicateSet('${s.id}')">Duplicate</button>
+        <button class="ghost" onclick="deleteSet('${s.id}')">Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.loadSet = (id) => {
+  const s = savedSets.find(x => x.id === id);
+  if (!s) return;
+  current = JSON.parse(JSON.stringify(s));
+  saveCurrent();
+  initCurrent();
+  showView('build');
+};
+
+window.duplicateSet = (id) => {
+  const s = savedSets.find(x => x.id === id);
+  if (!s) return;
+  current = JSON.parse(JSON.stringify(s));
+  current.id = uid();
+  current.name = (s.name || '') + ' (copy)';
+  current.date = todayKey();
+  saveCurrent();
+  initCurrent();
+  showView('build');
+};
+
+window.deleteSet = (id) => {
+  if (!confirm('Delete this saved set?')) return;
+  savedSets = savedSets.filter(s => s.id !== id);
+  saveSaved();
+  renderSaved();
+};
+
+function exportJSON() {
+  const blob = new Blob([JSON.stringify({sets: savedSets, current}, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'worship-set-' + todayKey() + '.json';
+  a.click();
+}
+function importJSON(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      const inSets = data.sets || (Array.isArray(data) ? data : []);
+      if (!confirm('Merge ' + inSets.length + ' sets?')) return;
+      const existing = new Set(savedSets.map(s => s.id));
+      let added = 0;
+      inSets.forEach(s => { if (!existing.has(s.id)) { savedSets.push(s); added++; } });
+      saveSaved();
+      renderSaved();
+      alert('Added ' + added + ' sets.');
+    } catch (err) { alert('Bad JSON: ' + err.message); }
+  };
+  r.readAsText(file);
+}
+function resetAll() {
+  if (!confirm('Erase all sets?')) return;
+  if (!confirm('Really?')) return;
+  localStorage.removeItem(KEY_SETS);
+  localStorage.removeItem(KEY_CURRENT);
+  savedSets = []; current = {};
+  initCurrent(); renderSaved();
+}
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + name).style.display = '';
+  document.querySelector(`.tab[data-view="${name}"]`).classList.add('active');
+  if (name === 'build') initCurrent();
+  if (name === 'saved') renderSaved();
+}
+
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
+document.getElementById('add-song-btn').addEventListener('click', addSong);
+document.getElementById('save-btn').addEventListener('click', saveSet);
+document.getElementById('clear-set-btn').addEventListener('click', clearSet);
+document.getElementById('export-md-btn').addEventListener('click', exportMd);
+document.getElementById('saved-search').addEventListener('input', renderSaved);
+document.getElementById('export-btn').addEventListener('click', exportJSON);
+document.getElementById('import-btn').addEventListener('click', () => document.getElementById('import-file').click());
+document.getElementById('import-file').addEventListener('change', importJSON);
+document.getElementById('reset-btn').addEventListener('click', resetAll);
+
+// Auto-sync form changes
+['set-name','set-date','set-opener'].forEach(id => {
+  document.getElementById(id).addEventListener('input', syncCurrentFromForm);
+});
+
+initCurrent();
+renderSaved();
+</script>
+
+</body>
+</html>

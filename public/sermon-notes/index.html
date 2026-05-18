@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sermon Notes — take it Sunday, remember it Friday</title>
+<meta name="description" content="Sunday sermon note-taking. Date, preacher, passage, key points, application, follow-up questions. History across years, search across notes, top-referenced book stats.">
+<meta property="og:title" content="Sermon Notes — take it Sunday, remember it Friday">
+<meta property="og:description" content="Sunday note-taking for sermons. History + search.">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --bg: #f7f2e9;
+    --panel: #fffcf5;
+    --ink: #1d1812;
+    --ink-soft: #6b5a44;
+    --ink-faint: #a89880;
+    --accent: #5a4022;
+    --accent-light: #8b6a3d;
+    --gold: #9a7a2e;
+    --border: #d8c9a8;
+    --serif: "Cinzel", Georgia, "Times New Roman", serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 1rem;
+  }
+  .container { max-width: 640px; margin: 0 auto; }
+
+  header { text-align: center; padding: 2rem 0; }
+  header h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 6vw, 2.75rem);
+    color: var(--accent);
+    letter-spacing: 0.03em;
+    margin-bottom: 0.3rem;
+  }
+  header p {
+    color: var(--ink-soft);
+    font-style: italic;
+    font-size: 0.95rem;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .tab {
+    padding: 0.55rem 1.1rem;
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .tab.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+  .tab:hover:not(.active) {
+    border-color: var(--accent);
+    color: var(--ink);
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(29,24,18,0.06);
+  }
+  .panel h2 {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+  .panel .help {
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    font-style: italic;
+  }
+
+  label {
+    display: block;
+    color: var(--gold);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin: 1.25rem 0 0.4rem;
+    font-weight: 600;
+  }
+  label:first-child { margin-top: 0; }
+
+  input[type="text"], input[type="date"], textarea {
+    width: 100%;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 6px;
+    padding: 0.7rem 0.95rem;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  textarea { min-height: 80px; resize: vertical; }
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  button {
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    padding: 0.7rem 1.3rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  button:hover { background: var(--accent); }
+  button.ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+  }
+  button.ghost:hover { background: var(--bg); color: var(--ink); border-color: var(--accent); }
+
+  .row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
+
+  .sermon-card {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .sermon-card:last-child { border-bottom: none; }
+  .sermon-card .meta {
+    color: var(--ink-faint);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.3rem;
+  }
+  .sermon-card .title {
+    font-family: var(--serif);
+    color: var(--accent);
+    font-size: 1.1rem;
+    margin-bottom: 0.3rem;
+  }
+  .sermon-card .passages {
+    color: var(--gold);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    font-style: italic;
+  }
+  .sermon-card .body {
+    color: var(--ink);
+    margin-top: 0.5rem;
+    line-height: 1.65;
+  }
+  .sermon-card .body .label {
+    color: var(--gold);
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 0.6rem;
+    display: block;
+  }
+  .sermon-card .body .content {
+    white-space: pre-wrap;
+    color: var(--ink);
+    margin-bottom: 0.4rem;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+  }
+  .stat {
+    text-align: center;
+    padding: 0.85rem 0.4rem;
+    background: var(--bg);
+    border-radius: 8px;
+  }
+  .stat .n {
+    font-family: var(--serif);
+    font-size: 1.6rem;
+    color: var(--accent);
+    line-height: 1.1;
+  }
+  .stat .l {
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0.25rem;
+  }
+
+  .empty {
+    text-align: center;
+    color: var(--ink-faint);
+    padding: 1.5rem 0;
+    font-style: italic;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+    line-height: 1.6;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Sermon Notes</h1>
+  <p>take it Sunday, remember it Friday</p>
+</header>
+
+<div class="tabs">
+  <button class="tab active" data-view="new">New</button>
+  <button class="tab" data-view="history">History</button>
+  <button class="tab" data-view="stats">Stats</button>
+  <button class="tab" data-view="manage">Manage</button>
+</div>
+
+<div id="view-new" class="view">
+  <div class="panel">
+    <h2>Today's sermon</h2>
+    <p class="help">Date defaults to today. Fill in what serves you — empty fields are skipped.</p>
+
+    <label for="n-date">Date</label>
+    <input type="date" id="n-date">
+
+    <label for="n-church">Church</label>
+    <input type="text" id="n-church" placeholder="e.g., Stonebridge / Kennesaw First Baptist" list="church-list">
+    <datalist id="church-list"></datalist>
+
+    <label for="n-preacher">Preacher</label>
+    <input type="text" id="n-preacher" placeholder="e.g., Pastor Matt" list="preacher-list">
+    <datalist id="preacher-list"></datalist>
+
+    <label for="n-title">Title or theme</label>
+    <input type="text" id="n-title" placeholder="e.g., What grace really costs">
+
+    <label for="n-passages">Passages</label>
+    <input type="text" id="n-passages" placeholder="e.g., Romans 6:1-14; John 1:14-17">
+
+    <label for="n-keypoints">Key points</label>
+    <textarea id="n-keypoints" placeholder="The main ideas the preacher made. Bullet style is fine."></textarea>
+
+    <label for="n-application">Application — what this means I do Monday</label>
+    <textarea id="n-application" placeholder="Specifics. 'Stop X.' 'Call so-and-so.' 'Read this passage daily this week.'"></textarea>
+
+    <label for="n-questions">Questions I want to follow up on</label>
+    <textarea id="n-questions" placeholder="Things to ask Pastor / look up / wrestle with."></textarea>
+
+    <label for="n-tags">Tag (optional)</label>
+    <input type="text" id="n-tags" placeholder="e.g., grace, identity, suffering, marriage">
+
+    <div class="row">
+      <button id="save-btn">Save sermon</button>
+      <button class="ghost" id="clear-btn">Clear form</button>
+    </div>
+  </div>
+</div>
+
+<div id="view-history" class="view" style="display:none;">
+  <div class="panel">
+    <h2>Past sermons</h2>
+    <input type="text" id="history-search" placeholder="Search title, preacher, passage, body, tag" style="margin-bottom:1rem;">
+    <div id="history-list"></div>
+  </div>
+</div>
+
+<div id="view-stats" class="view" style="display:none;">
+  <div class="panel">
+    <h2>How you've heard</h2>
+    <div class="stats" id="stats-grid"></div>
+  </div>
+  <div class="panel">
+    <h2>Top-referenced books</h2>
+    <div id="top-books"></div>
+  </div>
+  <div class="panel">
+    <h2>By preacher</h2>
+    <div id="by-preacher"></div>
+  </div>
+</div>
+
+<div id="view-manage" class="view" style="display:none;">
+  <div class="panel">
+    <h2>Manage</h2>
+    <div class="row">
+      <button class="ghost" id="export-btn">Export JSON</button>
+      <button class="ghost" id="export-md-btn">Export Markdown</button>
+      <button class="ghost" id="import-btn">Import JSON</button>
+      <button class="ghost" id="reset-btn" style="color:#b04a4a;border-color:#d8b6b6;">Reset all</button>
+      <input type="file" id="import-file" accept=".json" style="display:none;">
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>No cloud. No reminders.<br>
+  <a href="https://github.com/thebigjah/sermon-notes">source</a>
+  </p>
+</footer>
+
+</div>
+
+<script>
+'use strict';
+
+const KEY = 'sermonnotes.v1';
+
+let sermons = load();
+
+function load() {
+  try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; }
+}
+function save() { localStorage.setItem(KEY, JSON.stringify(sermons)); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function escapeHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtDate(d) {
+  const dt = new Date(d + 'T00:00:00');
+  if (isNaN(dt)) return d;
+  return dt.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+// Pre-populate date and church for convenience
+function initNew() {
+  document.getElementById('n-date').value = todayKey();
+  // Default church to most-recent church
+  if (sermons.length) {
+    const last = sermons[sermons.length - 1];
+    if (last.church) document.getElementById('n-church').value = last.church;
+  }
+  // Populate autocomplete datalists with seen values
+  const churches = [...new Set(sermons.map(s => s.church).filter(Boolean))].sort();
+  const preachers = [...new Set(sermons.map(s => s.preacher).filter(Boolean))].sort();
+  document.getElementById('church-list').innerHTML = churches.map(c => `<option value="${escapeHtml(c)}">`).join('');
+  document.getElementById('preacher-list').innerHTML = preachers.map(p => `<option value="${escapeHtml(p)}">`).join('');
+}
+
+function saveSermon() {
+  const s = {
+    id: uid(),
+    date: document.getElementById('n-date').value,
+    church: document.getElementById('n-church').value.trim(),
+    preacher: document.getElementById('n-preacher').value.trim(),
+    title: document.getElementById('n-title').value.trim(),
+    passages: document.getElementById('n-passages').value.trim(),
+    keypoints: document.getElementById('n-keypoints').value.trim(),
+    application: document.getElementById('n-application').value.trim(),
+    questions: document.getElementById('n-questions').value.trim(),
+    tags: document.getElementById('n-tags').value.trim(),
+    savedAt: new Date().toISOString(),
+  };
+  if (!s.date) { alert('Date required.'); return; }
+  if (!s.title && !s.preacher && !s.keypoints) { alert('Add a title, preacher, or key points.'); return; }
+  sermons.push(s);
+  save();
+  alert('Saved.');
+  clearNew();
+  initNew();
+}
+
+function clearNew() {
+  ['n-church','n-preacher','n-title','n-passages','n-keypoints','n-application','n-questions','n-tags'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+}
+
+function renderHistory() {
+  const el = document.getElementById('history-list');
+  const q = (document.getElementById('history-search')?.value || '').toLowerCase().trim();
+  if (!sermons.length) { el.innerHTML = '<div class="empty">No sermons logged yet.</div>'; return; }
+  let list = [...sermons].sort((a, b) => b.date.localeCompare(a.date));
+  if (q) {
+    list = list.filter(s =>
+      (s.title || '').toLowerCase().includes(q) ||
+      (s.preacher || '').toLowerCase().includes(q) ||
+      (s.passages || '').toLowerCase().includes(q) ||
+      (s.keypoints || '').toLowerCase().includes(q) ||
+      (s.application || '').toLowerCase().includes(q) ||
+      (s.questions || '').toLowerCase().includes(q) ||
+      (s.tags || '').toLowerCase().includes(q) ||
+      s.date.includes(q)
+    );
+  }
+  if (!list.length) { el.innerHTML = '<div class="empty">No matches.</div>'; return; }
+  el.innerHTML = list.map(s => `
+    <div class="sermon-card">
+      <div class="meta">${escapeHtml(fmtDate(s.date))}${s.church ? ' · ' + escapeHtml(s.church) : ''}${s.preacher ? ' · ' + escapeHtml(s.preacher) : ''}${s.tags ? ' · ' + escapeHtml(s.tags) : ''}</div>
+      ${s.title ? `<div class="title">${escapeHtml(s.title)}</div>` : ''}
+      ${s.passages ? `<div class="passages">${escapeHtml(s.passages)}</div>` : ''}
+      <div class="body">
+        ${s.keypoints ? `<span class="label">Key points</span><div class="content">${escapeHtml(s.keypoints)}</div>` : ''}
+        ${s.application ? `<span class="label">Application</span><div class="content">${escapeHtml(s.application)}</div>` : ''}
+        ${s.questions ? `<span class="label">Follow-up</span><div class="content">${escapeHtml(s.questions)}</div>` : ''}
+      </div>
+      <div class="row">
+        <button class="ghost" onclick="deleteSermon('${s.id}')" style="padding:0.3rem 0.7rem;font-size:0.78rem;">Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.deleteSermon = (id) => {
+  if (!confirm('Delete this sermon?')) return;
+  sermons = sermons.filter(s => s.id !== id);
+  save();
+  renderHistory();
+};
+
+const BOOKS = [
+  'Genesis','Exodus','Leviticus','Numbers','Deuteronomy','Joshua','Judges','Ruth','1 Samuel','2 Samuel',
+  '1 Kings','2 Kings','1 Chronicles','2 Chronicles','Ezra','Nehemiah','Esther','Job','Psalm','Psalms','Proverbs',
+  'Ecclesiastes','Song','Isaiah','Jeremiah','Lamentations','Ezekiel','Daniel','Hosea','Joel','Amos',
+  'Obadiah','Jonah','Micah','Nahum','Habakkuk','Zephaniah','Haggai','Zechariah','Malachi',
+  'Matthew','Mark','Luke','John','Acts','Romans','1 Corinthians','2 Corinthians','Galatians','Ephesians',
+  'Philippians','Colossians','1 Thessalonians','2 Thessalonians','1 Timothy','2 Timothy','Titus','Philemon',
+  'Hebrews','James','1 Peter','2 Peter','1 John','2 John','3 John','Jude','Revelation',
+];
+
+function extractBooks(passages) {
+  const found = [];
+  for (const b of BOOKS) {
+    const re = new RegExp('\\b' + b.replace(/ /g, '\\s+') + '\\b', 'i');
+    if (re.test(passages)) found.push(b);
+  }
+  return found;
+}
+
+function renderStats() {
+  const total = sermons.length;
+  const thisYear = sermons.filter(s => s.date.startsWith(String(new Date().getFullYear()))).length;
+  const uniquePreachers = new Set(sermons.map(s => s.preacher).filter(Boolean)).size;
+
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat"><div class="n">${total}</div><div class="l">total</div></div>
+    <div class="stat"><div class="n">${thisYear}</div><div class="l">${new Date().getFullYear()}</div></div>
+    <div class="stat"><div class="n">${uniquePreachers}</div><div class="l">preachers</div></div>
+  `;
+
+  const bookCounts = {};
+  sermons.forEach(s => {
+    extractBooks(s.passages || '').forEach(b => {
+      bookCounts[b] = (bookCounts[b] || 0) + 1;
+    });
+  });
+  const sorted = Object.entries(bookCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  document.getElementById('top-books').innerHTML = sorted.length ? sorted.map(([b, c]) => `
+    <div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);">
+      <span>${escapeHtml(b)}</span>
+      <span style="color:var(--ink-soft);">${c}</span>
+    </div>
+  `).join('') : '<div class="empty">No passages logged yet.</div>';
+
+  const preacherCounts = {};
+  sermons.forEach(s => {
+    if (s.preacher) preacherCounts[s.preacher] = (preacherCounts[s.preacher] || 0) + 1;
+  });
+  const pSorted = Object.entries(preacherCounts).sort((a, b) => b[1] - a[1]);
+  document.getElementById('by-preacher').innerHTML = pSorted.length ? pSorted.map(([p, c]) => `
+    <div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);">
+      <span>${escapeHtml(p)}</span>
+      <span style="color:var(--ink-soft);">${c} sermon${c === 1 ? '' : 's'}</span>
+    </div>
+  `).join('') : '<div class="empty">No preachers logged yet.</div>';
+}
+
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(sermons, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'sermon-notes-' + todayKey() + '.json';
+  a.click();
+}
+
+function exportMarkdown() {
+  const sorted = [...sermons].sort((a, b) => a.date.localeCompare(b.date));
+  let md = '# Sermon notes\n\nExported ' + new Date().toISOString().split('T')[0] + '\n\n';
+  sorted.forEach(s => {
+    md += `\n## ${fmtDate(s.date)} — ${s.title || '(untitled)'}\n\n`;
+    if (s.church) md += `**Church:** ${s.church}  \n`;
+    if (s.preacher) md += `**Preacher:** ${s.preacher}  \n`;
+    if (s.passages) md += `**Passages:** ${s.passages}  \n`;
+    if (s.tags) md += `**Tag:** ${s.tags}  \n`;
+    if (s.keypoints) md += `\n### Key points\n\n${s.keypoints}\n`;
+    if (s.application) md += `\n### Application\n\n${s.application}\n`;
+    if (s.questions) md += `\n### Follow-up\n\n${s.questions}\n`;
+    md += '\n---\n';
+  });
+  const blob = new Blob([md], { type: 'text/markdown' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'sermon-notes-' + todayKey() + '.md';
+  a.click();
+}
+
+function importJSON(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!Array.isArray(data)) throw new Error('not an array');
+      if (!confirm('Merge ' + data.length + ' sermons into your existing ' + sermons.length + '?')) return;
+      const existing = new Set(sermons.map(s => s.id));
+      let added = 0;
+      data.forEach(s => { if (!existing.has(s.id)) { sermons.push(s); added++; } });
+      save();
+      renderAll();
+      alert('Added ' + added + ' sermons.');
+    } catch (err) { alert('Bad JSON: ' + err.message); }
+  };
+  reader.readAsText(file);
+}
+
+function resetAll() {
+  if (!confirm('Erase all sermon notes?')) return;
+  if (!confirm('Really? Cannot be undone.')) return;
+  localStorage.removeItem(KEY);
+  sermons = [];
+  renderAll();
+}
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + name).style.display = '';
+  document.querySelector(`.tab[data-view="${name}"]`).classList.add('active');
+  if (name === 'new') initNew();
+  if (name === 'history') renderHistory();
+  if (name === 'stats') renderStats();
+}
+
+function renderAll() {
+  renderHistory();
+  renderStats();
+}
+
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
+document.getElementById('save-btn').addEventListener('click', saveSermon);
+document.getElementById('clear-btn').addEventListener('click', clearNew);
+document.getElementById('history-search').addEventListener('input', renderHistory);
+document.getElementById('export-btn').addEventListener('click', exportJSON);
+document.getElementById('export-md-btn').addEventListener('click', exportMarkdown);
+document.getElementById('import-btn').addEventListener('click', () => document.getElementById('import-file').click());
+document.getElementById('import-file').addEventListener('change', importJSON);
+document.getElementById('reset-btn').addEventListener('click', resetAll);
+
+initNew();
+renderAll();
+</script>
+
+</body>
+</html>

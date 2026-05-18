@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day Sheet — your day, on one page</title>
+<meta name="description" content="A single-page daily planner you can print and carry. Top 3 priorities, 3 gratitudes, hour blocks 6am to 11pm. Saved per date.">
+<meta property="og:title" content="Day Sheet — your day, on one page">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --bg: #f4ede0;
+    --paper: #fffcf2;
+    --ink: #1d1812;
+    --ink-soft: #6b5a44;
+    --ink-faint: #a89880;
+    --accent: #3a4a5a;
+    --accent-light: #6080a0;
+    --highlight: #c2a173;
+    --rule: #c8bca0;
+    --serif: Georgia, "Times New Roman", serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    min-height: 100vh;
+    padding: 1rem;
+  }
+  .container { max-width: 800px; margin: 0 auto; }
+  header { text-align: center; padding: 1.5rem 0; }
+  header h1 {
+    font-family: var(--serif);
+    font-size: clamp(1.8rem, 5vw, 2.4rem);
+    color: var(--accent);
+    margin-bottom: 0.3rem;
+  }
+  header p {
+    color: var(--ink-soft);
+    font-style: italic;
+    font-size: 0.9rem;
+  }
+
+  .controls {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+  }
+  .controls button {
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 0.55rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85rem;
+  }
+  .controls button.ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--rule);
+  }
+  .controls button:hover { background: var(--accent); }
+  .controls input[type="date"] {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 0.5rem 0.85rem;
+    font-family: inherit;
+    color: var(--ink);
+  }
+  .controls .label {
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .sheet {
+    background: var(--paper);
+    padding: 2rem 2rem 2.5rem;
+    border-radius: 4px;
+    box-shadow: 0 4px 14px rgba(29,24,18,0.12);
+    border: 1px solid var(--rule);
+    min-height: 11in;
+    max-width: 8.5in;
+    margin: 0 auto;
+  }
+  .sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 0.85rem;
+    margin-bottom: 1.5rem;
+  }
+  .sheet-header .date-display {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    color: var(--accent);
+  }
+  .sheet-header .day-of-week {
+    color: var(--ink-soft);
+    font-style: italic;
+    font-size: 0.9rem;
+  }
+  .sheet-header .quote {
+    font-family: var(--serif);
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+    font-style: italic;
+    text-align: right;
+    max-width: 50%;
+  }
+
+  .sheet-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  @media (max-width: 600px) { .sheet-row { grid-template-columns: 1fr; gap: 1rem; } }
+
+  .section {
+    margin-bottom: 1.25rem;
+  }
+  .section h2 {
+    font-family: var(--serif);
+    color: var(--accent);
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 0.3rem;
+  }
+  .section .item {
+    display: flex;
+    gap: 0.6rem;
+    margin-bottom: 0.5rem;
+    align-items: center;
+  }
+  .section .num {
+    color: var(--highlight);
+    font-family: var(--serif);
+    font-weight: 700;
+    width: 1.5rem;
+    flex-shrink: 0;
+  }
+  .section input[type="text"] {
+    flex: 1;
+    background: transparent;
+    border: none;
+    border-bottom: 1px dotted var(--rule);
+    padding: 0.35rem 0.2rem;
+    font-family: inherit;
+    color: var(--ink);
+    font-size: 0.95rem;
+  }
+  .section input[type="text"]:focus { outline: none; border-bottom-color: var(--accent); }
+  .section input[type="checkbox"] {
+    width: 0.95rem;
+    height: 0.95rem;
+    accent-color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .hours {
+    margin-top: 1.5rem;
+  }
+  .hours h2 {
+    font-family: var(--serif);
+    color: var(--accent);
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.6rem;
+    border-bottom: 1px solid var(--accent);
+    padding-bottom: 0.3rem;
+  }
+  .hour-row {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr;
+    gap: 0.85rem;
+    border-bottom: 1px dotted var(--rule);
+    padding: 0.3rem 0;
+    align-items: center;
+  }
+  .hour-row .time {
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    text-align: right;
+    font-family: ui-monospace, monospace;
+  }
+  .hour-row input[type="text"] {
+    background: transparent;
+    border: none;
+    padding: 0.35rem 0.2rem;
+    font-family: inherit;
+    color: var(--ink);
+    font-size: 0.9rem;
+    width: 100%;
+  }
+  .hour-row input[type="text"]:focus { outline: none; }
+
+  .notes-section {
+    margin-top: 1.5rem;
+  }
+  .notes-section h2 {
+    font-family: var(--serif);
+    color: var(--accent);
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 0.3rem;
+  }
+  .notes-section textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    font-family: var(--serif);
+    color: var(--ink);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    resize: vertical;
+    min-height: 80px;
+    padding: 0.35rem 0;
+  }
+  .notes-section textarea:focus { outline: none; }
+
+  .sheet-footer {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--rule);
+    text-align: center;
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+    font-style: italic;
+  }
+
+  @media print {
+    body { background: white; padding: 0; }
+    .controls, header, .footer-info { display: none !important; }
+    .sheet {
+      box-shadow: none;
+      border: none;
+      padding: 0.5in;
+      max-width: 100%;
+      margin: 0;
+    }
+  }
+
+  .footer-info {
+    text-align: center;
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+    margin-top: 2rem;
+  }
+  .footer-info a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Day Sheet</h1>
+  <p>your day, on one page · made to print</p>
+</header>
+
+<div class="controls">
+  <button class="ghost" onclick="prevDay()">← prev day</button>
+  <span class="label">Date</span>
+  <input type="date" id="date-picker">
+  <button class="ghost" onclick="nextDay()">next day →</button>
+  <button class="ghost" onclick="todayBtn()">Today</button>
+  <button onclick="window.print()">Print</button>
+</div>
+
+<div class="sheet" id="sheet">
+  <div class="sheet-header">
+    <div>
+      <div class="date-display" id="date-display"></div>
+      <div class="day-of-week" id="day-of-week"></div>
+    </div>
+    <div class="quote" id="header-quote">"Teach us to number our days, that we may gain a heart of wisdom." — Psalm 90:12</div>
+  </div>
+
+  <div class="sheet-row">
+    <div class="section">
+      <h2>Top 3 priorities</h2>
+      <div class="item"><span class="num">1.</span><input type="text" data-bind="p1"></div>
+      <div class="item"><span class="num">2.</span><input type="text" data-bind="p2"></div>
+      <div class="item"><span class="num">3.</span><input type="text" data-bind="p3"></div>
+    </div>
+    <div class="section">
+      <h2>Gratitude</h2>
+      <div class="item"><span class="num">◆</span><input type="text" data-bind="g1"></div>
+      <div class="item"><span class="num">◆</span><input type="text" data-bind="g2"></div>
+      <div class="item"><span class="num">◆</span><input type="text" data-bind="g3"></div>
+    </div>
+  </div>
+
+  <div class="sheet-row">
+    <div class="section">
+      <h2>Calendar / commitments</h2>
+      <div class="item"><input type="text" data-bind="c1" placeholder="time + event"></div>
+      <div class="item"><input type="text" data-bind="c2" placeholder="time + event"></div>
+      <div class="item"><input type="text" data-bind="c3" placeholder="time + event"></div>
+      <div class="item"><input type="text" data-bind="c4" placeholder="time + event"></div>
+    </div>
+    <div class="section">
+      <h2>One scripture / verse for today</h2>
+      <div class="item"><input type="text" data-bind="s1" placeholder="reference"></div>
+      <div class="item" style="margin-top:0.3rem;"><input type="text" data-bind="s2" placeholder="key line"></div>
+
+      <h2 style="margin-top:1rem;">Person to reach out to</h2>
+      <div class="item"><input type="text" data-bind="r1" placeholder="who · why · how"></div>
+    </div>
+  </div>
+
+  <div class="hours">
+    <h2>Hours</h2>
+    <div id="hours-grid"></div>
+  </div>
+
+  <div class="notes-section">
+    <h2>Notes / ideas / capture</h2>
+    <textarea data-bind="notes" placeholder="Spillover. Mid-day thoughts. Anything to remember tomorrow."></textarea>
+  </div>
+
+  <div class="notes-section">
+    <h2>End-of-day reflection</h2>
+    <textarea data-bind="reflection" placeholder="What worked. What didn't. One thing for tomorrow." rows="3"></textarea>
+  </div>
+
+  <div class="sheet-footer">— ebp · daysheet</div>
+</div>
+
+<div class="footer-info">
+  <p>Saved per date in your browser. <a href="https://github.com/thebigjah/day-sheet">source</a></p>
+</div>
+
+</div>
+
+<script>
+'use strict';
+
+const KEY = 'daysheet.v1';
+let allDays = load();
+let currentDate = todayKey();
+
+const HEADER_QUOTES = [
+  '"Teach us to number our days, that we may gain a heart of wisdom." — Psalm 90:12',
+  '"This is the day the Lord has made; let us rejoice and be glad in it." — Psalm 118:24',
+  '"Commit to the Lord whatever you do, and he will establish your plans." — Proverbs 16:3',
+  '"Do not be anxious about anything." — Philippians 4:6',
+  '"Be still, and know that I am God." — Psalm 46:10',
+  '"Whatever you do, work at it with all your heart, as working for the Lord." — Colossians 3:23',
+  '"Sufficient unto the day is the evil thereof." — Matthew 6:34 (KJV)',
+];
+
+function load() { try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch { return {}; } }
+function saveAll() { localStorage.setItem(KEY, JSON.stringify(allDays)); }
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function fmtFullDate(key) {
+  const dt = new Date(key + 'T00:00:00');
+  if (isNaN(dt)) return key;
+  return dt.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
+function fmtDayOfWeek(key) {
+  const dt = new Date(key + 'T00:00:00');
+  if (isNaN(dt)) return '';
+  return dt.toLocaleDateString('en-US', { weekday: 'long' });
+}
+function escapeHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function getDay(key) {
+  if (!allDays[key]) allDays[key] = {};
+  return allDays[key];
+}
+
+function shuffleQuote(key) {
+  const seed = key.split('-').reduce((a,b) => a + parseInt(b,10), 0);
+  return HEADER_QUOTES[seed % HEADER_QUOTES.length];
+}
+
+function renderHourGrid() {
+  const grid = document.getElementById('hours-grid');
+  const labels = [];
+  for (let h = 6; h <= 23; h++) {
+    const ampm = h < 12 ? h + ' am' : h === 12 ? '12 pm' : (h-12) + ' pm';
+    labels.push({ h, label: ampm });
+  }
+  grid.innerHTML = labels.map(({h, label}) => `
+    <div class="hour-row">
+      <div class="time">${label}</div>
+      <input type="text" data-bind="hour-${h}">
+    </div>
+  `).join('');
+  bindInputs();
+}
+
+function bindInputs() {
+  document.querySelectorAll('[data-bind]').forEach(el => {
+    const key = el.dataset.bind;
+    el.removeEventListener('input', el._dsHandler || (() => {}));
+    el._dsHandler = () => {
+      const day = getDay(currentDate);
+      day[key] = el.value;
+      saveAll();
+    };
+    el.addEventListener('input', el._dsHandler);
+  });
+}
+
+function fillFromDay() {
+  const day = getDay(currentDate);
+  document.querySelectorAll('[data-bind]').forEach(el => {
+    const key = el.dataset.bind;
+    el.value = day[key] || '';
+  });
+}
+
+function navigateTo(key) {
+  currentDate = key;
+  document.getElementById('date-picker').value = key;
+  document.getElementById('date-display').textContent = fmtFullDate(key);
+  document.getElementById('day-of-week').textContent = fmtDayOfWeek(key);
+  document.getElementById('header-quote').textContent = shuffleQuote(key);
+  fillFromDay();
+}
+
+window.prevDay = () => {
+  const d = new Date(currentDate + 'T00:00:00');
+  d.setDate(d.getDate() - 1);
+  navigateTo(d.toISOString().split('T')[0]);
+};
+window.nextDay = () => {
+  const d = new Date(currentDate + 'T00:00:00');
+  d.setDate(d.getDate() + 1);
+  navigateTo(d.toISOString().split('T')[0]);
+};
+window.todayBtn = () => navigateTo(todayKey());
+
+document.getElementById('date-picker').addEventListener('change', (e) => {
+  if (e.target.value) navigateTo(e.target.value);
+});
+
+renderHourGrid();
+navigateTo(todayKey());
+</script>
+
+</body>
+</html>

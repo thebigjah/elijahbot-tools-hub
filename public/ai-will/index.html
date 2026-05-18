@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Will — Business Continuity Document Generator</title>
+<meta name="description" content="A 30-minute interview that generates an operational continuity document for a small business — so the work keeps running if the owner can't. Free for over-60 SMB owners.">
+<meta property="og:title" content="AI Will — Business Continuity Document Generator">
+<meta property="og:description" content="A 30-min interview, a printable continuity doc. So your business keeps running if you can't.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://thebigjah.github.io/ai-will/">
+<meta name="theme-color" content="#0a0604">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;500;600;700&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0604; --bg2: #16110b; --card: #1b1510;
+    --border: #2e2820; --border-light: #3a342a;
+    --text: #f5f0e0; --text-muted: #b6a98e; --text-light: #847b69;
+    --accent: #c2a173; --accent-bright: #e8b968; --intrusion: #e54a28;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: Inter, system-ui, sans-serif; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+  .serif { font-family: 'Cinzel', Georgia, serif; }
+  .lora { font-family: 'Lora', Georgia, serif; }
+  .kicker { font-size: 12px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin: 0 0 14px; }
+  h1.title { font-family: 'Cinzel', Georgia, serif; font-size: clamp(36px, 5vw, 52px); font-weight: 700; margin: 0 0 14px; line-height: 1.05; }
+  p.lead { font-size: 18px; color: var(--text-muted); max-width: 640px; line-height: 1.65; margin: 0 0 32px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 18px; }
+  .section-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+  .section-num { font-size: 11px; font-weight: 700; letter-spacing: .14em; color: var(--accent); text-transform: uppercase; }
+  .section-title { font-family: 'Cinzel', Georgia, serif; font-size: 22px; margin: 0; }
+  label.q-label { display: block; font-size: 14px; color: var(--text); margin: 14px 0 6px; font-weight: 500; }
+  label.q-label .q-hint { display: block; font-size: 12px; color: var(--text-light); font-weight: 400; margin-top: 2px; }
+  textarea, input[type=text] {
+    width: 100%; padding: 11px 13px;
+    background: var(--bg2); color: var(--text);
+    border: 1px solid var(--border-light); border-radius: 8px;
+    font-family: 'Lora', Georgia, serif; font-size: 15px;
+    outline: none;
+  }
+  textarea { min-height: 70px; resize: vertical; }
+  textarea:focus, input:focus { border-color: var(--accent); }
+  .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .meta-grid label { font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: .12em; }
+  .btn { appearance: none; border: none; cursor: pointer; padding: 14px 24px; border-radius: 8px; font-family: inherit; font-size: 15px; font-weight: 700; letter-spacing: .04em; transition: transform 80ms; }
+  .btn:active { transform: translateY(1px) scale(.99); }
+  .btn-primary { background: var(--accent); color: var(--bg); }
+  .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border-light); }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 30px 0 18px; }
+  .progress { background: var(--bg2); border: 1px solid var(--border); border-radius: 999px; height: 8px; overflow: hidden; margin: 14px 0 24px; }
+  .progress > div { height: 100%; background: var(--accent); transition: width 160ms; }
+  .progress-text { font-size: 12px; color: var(--text-light); margin-bottom: 12px; }
+  .output { background: #fff; color: #14110b; margin-top: 32px; border-radius: 0; }
+  .output .article { padding: 48px clamp(24px, 6vw, 72px); font-family: 'Lora', Georgia, serif; font-size: 16px; line-height: 1.7; }
+  .output h1 { font-family: 'Cinzel', Georgia, serif; font-size: 38px; margin: 0 0 6px; }
+  .output h2 { font-family: 'Cinzel', Georgia, serif; font-size: 22px; margin: 30px 0 8px; padding-bottom: 4px; border-bottom: 2px solid #b9aa7a; }
+  .output h3 { font-family: 'Cinzel', Georgia, serif; font-size: 16px; margin: 22px 0 4px; color: #6b5e3f; }
+  .output .biz-line { font-size: 14px; color: #5d564a; margin-bottom: 22px; font-style: italic; }
+  .output .footer { margin-top: 28px; padding-top: 16px; border-top: 1px solid #ddd; font-size: 12px; color: #888; }
+  .output-actions { display: flex; gap: 10px; padding: 18px 22px; background: #ecebe5; flex-wrap: wrap; }
+  @media print {
+    body { background: #fff !important; color: #14110b !important; padding: 0; }
+    .wrap > *:not(.output) { display: none !important; }
+    .output { box-shadow: none; }
+    .output-actions { display: none; }
+    .output .article { padding: 0; }
+  }
+  .footer-note { font-size: 13px; color: var(--text-light); text-align: center; margin-top: 36px; }
+  .save-toast { position: fixed; bottom: 24px; right: 24px; background: var(--card); border: 1px solid var(--accent); color: var(--accent-bright); padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; opacity: 0; transition: opacity 200ms; pointer-events: none; z-index: 200; box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
+  .save-toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <p class="kicker">For small-business owners</p>
+  <h1 class="title">AI Will.</h1>
+  <p class="lead">
+    A 30-minute interview that generates an operational continuity document for your business — so the work keeps running if you can&apos;t. Free for owners over 60. Bring your bookkeeper or spouse. Answer plainly. Print the result. Put it where someone can find it.
+  </p>
+
+  <div class="card">
+    <h2 class="section-title serif" style="margin:0 0 14px;">The basics</h2>
+    <div class="meta-grid">
+      <div><label>Business legal name</label><input id="m-name" type="text" placeholder="e.g. Sarah Wilkins Bakery LLC" /></div>
+      <div><label>Owner name</label><input id="m-owner" type="text" placeholder="e.g. Sarah Wilkins" /></div>
+      <div><label>Address</label><input id="m-addr" type="text" placeholder="street, city, state" /></div>
+      <div><label>Phone</label><input id="m-phone" type="text" placeholder="business number" /></div>
+      <div><label>EIN / tax ID</label><input id="m-ein" type="text" placeholder="optional but recommended" /></div>
+      <div><label>Date prepared</label><input id="m-date" type="text" placeholder="today" /></div>
+    </div>
+  </div>
+
+  <div class="progress-text" id="progress-text">0 of 0 questions answered</div>
+  <div class="progress"><div id="progress-bar" style="width:0%"></div></div>
+
+  <div id="sections"></div>
+
+  <div class="actions">
+    <button class="btn btn-primary" id="btn-generate">Generate the continuity document →</button>
+    <button class="btn btn-ghost" id="btn-export-md">Export as Markdown</button>
+    <button class="btn btn-ghost" id="btn-clear">Start over</button>
+  </div>
+
+  <div id="output" class="output" style="display:none;">
+    <div class="output-actions">
+      <button class="btn btn-primary" onclick="window.print()">Print to PDF / paper</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('output').style.display='none'; window.scrollTo({top:0,behavior:'smooth'});">Back to editing</button>
+    </div>
+    <div class="article" id="article"></div>
+  </div>
+
+  <p class="footer-note">AI Will v0.1 · saves locally · a Purcell Ventures community-service tool · for the businesses that don&apos;t have a Plan B</p>
+</main>
+<div class="save-toast" id="save-toast">✓ Saved</div>
+
+<script>
+const SECTIONS = [
+  {
+    id: 'access', title: 'Access + accounts',
+    blurb: 'Where things live and how to get into them. Without this, nothing else matters.',
+    qs: [
+      { id: 'bank', q: 'Where do you bank? (name + branch + account types)', hint: 'Checking, savings, lines of credit.' },
+      { id: 'bank-signers', q: 'Who is a signer on the bank accounts?', hint: 'And who is NOT but should be in an emergency?' },
+      { id: 'pos', q: 'What system processes payments?', hint: 'Square, Stripe, Clover, etc. Where are the credentials kept?' },
+      { id: 'payroll', q: 'How is payroll run? On what software / by whom?', hint: 'Gusto / Paychex / accountant / paper checks. When are the cycles?' },
+      { id: 'accountant', q: 'Who is your bookkeeper / accountant / CPA?', hint: 'Name + phone + email + what they do for you.' },
+      { id: 'attorney', q: 'Do you have a business attorney? Who?', hint: 'Name + firm + when you last used them.' },
+      { id: 'passwords', q: 'Where is the password to the main email account stored?', hint: 'Manager, a notebook, a spouse. Be specific.' },
+    ],
+  },
+  {
+    id: 'daily',
+    title: 'The daily rhythm',
+    blurb: 'What needs to happen every day for the business not to fall apart.',
+    qs: [
+      { id: 'open', q: 'How does the business open each day? (Step-by-step.)', hint: 'Doors unlocked, lights on, music on, register opened, alarm disabled, etc.' },
+      { id: 'close', q: 'How does the business close?', hint: 'Including cash deposit, alarm, lights, locks.' },
+      { id: 'orders', q: 'How do orders / clients / shipments get processed each day?', hint: 'What gets ordered, when, from whom?' },
+      { id: 'critical-must', q: 'What is the ONE thing that must happen every single day or money is lost?', hint: 'Order placed by 2 PM? Truck loaded by 4? Be specific.' },
+    ],
+  },
+  {
+    id: 'people',
+    title: 'People',
+    blurb: 'Who depends on the business and who runs it.',
+    qs: [
+      { id: 'employees', q: 'List every employee + role + pay rate + pay schedule + tenure.', hint: 'Even 1099 contractors. Full names.' },
+      { id: 'right-hand', q: 'Who knows the business best after you?', hint: 'The person who could keep it running for two weeks.' },
+      { id: 'irreplaceable', q: 'Is there anyone whose departure would seriously hurt the business?', hint: 'Be honest. Plan for the worst.' },
+      { id: 'family-roles', q: 'Are any family members involved formally or informally?', hint: 'Spouse on payroll, kid working summers, etc.' },
+    ],
+  },
+  {
+    id: 'vendors',
+    title: 'Vendors + critical suppliers',
+    blurb: 'Who do you owe regularly + who do you depend on.',
+    qs: [
+      { id: 'top-vendors', q: 'Top 5 vendors by spend. Name + product + payment terms + contact.', hint: 'The ones whose loss would break the operation.' },
+      { id: 'lease', q: 'If you rent the building, who is the landlord? When does the lease end?', hint: 'And where is the lease document kept?' },
+      { id: 'utilities', q: 'List the utilities (power, water, gas, internet) + account numbers.', hint: 'Phone numbers, account IDs, autopay status.' },
+      { id: 'insurance', q: 'List every insurance policy + carrier + policy number + agent contact.', hint: 'Liability, property, workers comp, key man, BOP, vehicle.' },
+    ],
+  },
+  {
+    id: 'customers',
+    title: 'Customers + revenue',
+    blurb: 'Where the money comes from and who would notice if it stopped.',
+    qs: [
+      { id: 'top-clients', q: 'Top 10 customers / accounts by revenue (last 12 months).', hint: 'Name, contact, what they buy, how often.' },
+      { id: 'recurring', q: 'How much of revenue is recurring vs. one-time?', hint: 'Subscriptions, retainers, contracts.' },
+      { id: 'collections', q: 'Anyone currently owe you money? How much, how old?', hint: 'AR aging — who should be chased first.' },
+      { id: 'pipeline', q: 'What new business is in the pipeline that someone needs to follow up on?', hint: 'Proposals out, conversations in progress.' },
+    ],
+  },
+  {
+    id: 'transitions',
+    title: 'Transition scenarios',
+    blurb: 'If you couldn\\'t be here tomorrow, what would happen?',
+    qs: [
+      { id: 'two-week', q: 'If you were out for 2 weeks unexpectedly, who runs the business?', hint: 'Name. Phone number. What can they decide, what needs to wait.' },
+      { id: 'two-month', q: 'If you were out for 2 months, what changes?', hint: 'Decisions that would normally need you. Bills, hiring, big choices.' },
+      { id: 'permanent', q: 'If you couldn\\'t come back at all, what should happen to the business?', hint: 'Sell, transfer, wind down, hand to someone specific. Be plain.' },
+      { id: 'succession', q: 'Is there a named successor? Written down?', hint: 'In a will, an operating agreement, a buy-sell. Where?' },
+      { id: 'value', q: 'What\\'s a realistic price tag for the business if sold quickly?', hint: 'Your honest gut number. Not what you\\'d like.' },
+    ],
+  },
+  {
+    id: 'specific',
+    title: 'The specific knowledge only YOU have',
+    blurb: 'The stuff in your head that nobody else knows.',
+    qs: [
+      { id: 'tricks', q: 'What are 3 things you do that nobody else knows how to do?', hint: 'Could be customer-specific quirks, vendor relationships, secret recipes, etc.' },
+      { id: 'relationships', q: 'List 3-5 relationships YOU personally hold that the business needs.', hint: 'Banker, top customer, key vendor, landlord, etc.' },
+      { id: 'reputation', q: 'How would you describe the business\\'s reputation in town?', hint: 'In one or two sentences a successor could use.' },
+      { id: 'mistakes', q: 'What mistakes should a successor avoid?', hint: 'The ones that took you years to learn.' },
+    ],
+  },
+  {
+    id: 'paperwork',
+    title: 'Where the paperwork lives',
+    blurb: 'Locations. Be specific enough that a stranger could find it.',
+    qs: [
+      { id: 'corp-docs', q: 'Where are the formation documents kept? (LLC operating agreement, articles, etc.)', hint: 'Physical and digital.' },
+      { id: 'tax-records', q: 'Where are the last 3 years of tax returns?', hint: 'CPA folder, fireproof safe, etc.' },
+      { id: 'contracts', q: 'Where are vendor + customer contracts stored?', hint: 'Filing cabinet, Dropbox folder, etc.' },
+      { id: 'wills', q: 'Do you have a personal will? Where is it?', hint: 'And is the business addressed in it?' },
+    ],
+  },
+  {
+    id: 'closing',
+    title: 'One last thing',
+    blurb: 'For whoever reads this if you can\\'t be here.',
+    qs: [
+      { id: 'message', q: 'Write a short note to whoever takes over.', hint: 'What you would want them to know. What matters most. What you\\'re proud of.' },
+    ],
+  },
+];
+
+const KEY = 'aiwill.state.v1';
+const state = (() => { try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch { return {}; } })();
+state.answers = state.answers || {};
+state.meta = state.meta || {};
+function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
+function escapeHtml(s) { return String(s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+let __toastTimer;
+function showToast(msg = '✓ Saved') {
+  const t = document.getElementById('save-toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(__toastTimer);
+  __toastTimer = setTimeout(() => t.classList.remove('show'), 1200);
+}
+let __toastDeb;
+function debouncedToast() { clearTimeout(__toastDeb); __toastDeb = setTimeout(() => showToast(), 600); }
+
+const sectionsEl = document.getElementById('sections');
+
+function renderSections() {
+  sectionsEl.innerHTML = '';
+  SECTIONS.forEach((sec, si) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    let body = `
+      <div class="section-head">
+        <span class="section-num">SECTION ${String(si+1).padStart(2,'0')}</span>
+        <h3 class="section-title">${escapeHtml(sec.title)}</h3>
+      </div>
+      <p style="font-size:14px;color:var(--text-muted);margin:0 0 10px;line-height:1.6;">${escapeHtml(sec.blurb)}</p>
+    `;
+    sec.qs.forEach((q) => {
+      const v = (state.answers[q.id] || '').replace(/"/g, '&quot;');
+      body += `
+        <label class="q-label" for="q-${q.id}">${escapeHtml(q.q)}
+          <span class="q-hint">${escapeHtml(q.hint)}</span>
+        </label>
+        <textarea id="q-${q.id}" data-q="${q.id}" placeholder="(plain words — sentences are fine)">${v}</textarea>
+      `;
+    });
+    card.innerHTML = body;
+    sectionsEl.appendChild(card);
+  });
+  sectionsEl.querySelectorAll('textarea[data-q]').forEach((ta) => {
+    ta.addEventListener('input', (e) => {
+      state.answers[e.target.dataset.q] = e.target.value;
+      save();
+      updateProgress();
+      debouncedToast();
+    });
+  });
+  ['name','owner','addr','phone','ein','date'].forEach((k) => {
+    const el = document.getElementById('m-' + k);
+    if (!el) return;
+    if (k === 'date' && !state.meta.date) {
+      state.meta.date = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+      save();
+    }
+    el.value = state.meta[k] || '';
+    el.addEventListener('input', () => { state.meta[k] = el.value; save(); debouncedToast(); });
+  });
+  updateProgress();
+}
+
+function updateProgress() {
+  let total = 0, done = 0;
+  SECTIONS.forEach(s => s.qs.forEach(q => { total++; if ((state.answers[q.id] || '').trim()) done++; }));
+  const pct = total ? Math.round((done/total)*100) : 0;
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `${done} of ${total} answered (${pct}%)`;
+}
+
+function paragraphify(text) {
+  return (text || '').trim().split(/\n\s*\n/).map(p => `<p>${escapeHtml(p).replace(/\n/g, '<br>')}</p>`).join('');
+}
+
+function generate() {
+  const m = state.meta;
+  const name = m.name?.trim() || 'This business';
+  const owner = m.owner?.trim();
+  const addr = m.addr?.trim();
+  const phone = m.phone?.trim();
+  const ein = m.ein?.trim();
+  const date = m.date?.trim() || new Date().toLocaleDateString();
+  let html = `
+    <h1>${escapeHtml(name)} — Continuity Document</h1>
+    <p class="biz-line">
+      ${[owner && `Owner: ${escapeHtml(owner)}`, addr && escapeHtml(addr), phone && escapeHtml(phone), ein && `EIN: ${escapeHtml(ein)}`].filter(Boolean).join(' · ')}
+    </p>
+    <p style="font-size:13px;color:#888;margin-bottom:24px;">Prepared ${escapeHtml(date)}. If you are reading this, the owner cannot be here. Below is everything they thought you would need to know.</p>
+  `;
+  SECTIONS.forEach((sec) => {
+    const content = sec.qs.map(q => {
+      const a = (state.answers[q.id] || '').trim();
+      if (!a) return null;
+      return `<h3>${escapeHtml(q.q)}</h3>${paragraphify(a)}`;
+    }).filter(Boolean).join('');
+    if (content.trim()) html += `<h2>${escapeHtml(sec.title)}</h2>${content}`;
+  });
+  html += `<div class="footer">Generated with AI Will · ${new Date().toLocaleDateString()} · https://thebigjah.github.io/ai-will/</div>`;
+  document.getElementById('article').innerHTML = html;
+  document.getElementById('output').style.display = 'block';
+  document.getElementById('output').scrollIntoView({ behavior: 'smooth' });
+}
+
+function generateMarkdown() {
+  const m = state.meta;
+  const name = m.name?.trim() || 'This business';
+  let md = `# ${name} — Continuity Document\n\n`;
+  const sub = [m.owner && `Owner: ${m.owner}`, m.addr, m.phone, m.ein && `EIN: ${m.ein}`].filter(Boolean).join(' · ');
+  if (sub) md += `*${sub}*\n\n`;
+  md += `_Prepared ${m.date || new Date().toLocaleDateString()}. If you're reading this, the owner can't be here._\n\n---\n\n`;
+  SECTIONS.forEach((sec) => {
+    const content = sec.qs.map(q => {
+      const a = (state.answers[q.id] || '').trim();
+      if (!a) return null;
+      return `### ${q.q}\n\n${a}\n`;
+    }).filter(Boolean).join('\n');
+    if (content.trim()) md += `## ${sec.title}\n\n${content}\n`;
+  });
+  md += `\n---\n\n*Generated with AI Will · ${new Date().toLocaleDateString()}*\n`;
+  return md;
+}
+
+function exportMarkdown() {
+  const md = generateMarkdown();
+  const name = (state.meta.name || 'continuity-doc').replace(/[^a-z0-9-]+/gi, '-').toLowerCase();
+  const blob = new Blob([md], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = `${name}.md`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast();
+}
+
+document.getElementById('btn-generate').addEventListener('click', generate);
+document.getElementById('btn-export-md').addEventListener('click', exportMarkdown);
+document.getElementById('btn-clear').addEventListener('click', () => {
+  if (!confirm('Erase everything and start over? This cannot be undone.')) return;
+  localStorage.removeItem(KEY);
+  state.answers = {}; state.meta = {};
+  renderSections();
+});
+
+renderSections();
+</script>
+</body>
+</html>

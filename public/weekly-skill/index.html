@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Weekly Skill — one new fun thing to learn this week</title>
+<meta name="description" content="A new fun skill every week. Card flourishes, knots, juggling, spinning, beatbox, magic. One per week, your choice or random. Track what you've mastered.">
+<meta property="og:title" content="Weekly Skill — one new fun thing to learn this week">
+<meta property="og:description" content="42 curated skills. Auto-picks one each Monday. Track what you've mastered. Free, no accounts.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://thebigjah.github.io/weekly-skill/">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#0a0604">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0604;
+    --bg-2: #16110b;
+    --card: #1b1510;
+    --border: #2e2820;
+    --border-light: #3a342a;
+    --text: #f5f0e0;
+    --text-muted: #b6a98e;
+    --text-light: #847b69;
+    --accent: #c2a173;
+    --accent-bright: #e8b968;
+    --good: #9bd187;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: Inter, system-ui, sans-serif; line-height: 1.5; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+  .serif { font-family: 'Cinzel', Georgia, serif; }
+  .kicker { font-size: 12px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin: 0 0 14px; }
+  h1.title { font-family: 'Cinzel', Georgia, serif; font-size: clamp(40px, 6vw, 60px); font-weight: 700; margin: 0 0 14px; line-height: 1.04; }
+  p.lead { font-size: 17px; color: var(--text-muted); max-width: 600px; line-height: 1.65; margin: 0 0 32px; }
+  .hero {
+    background: linear-gradient(135deg, var(--card) 0%, var(--bg-2) 100%);
+    border: 1px solid var(--accent);
+    border-radius: 16px;
+    padding: 36px 32px;
+    margin-bottom: 28px;
+    box-shadow: 0 4px 24px rgba(194,161,115,0.1);
+  }
+  .hero-kicker { font-size: 11px; font-weight: 700; letter-spacing: .14em; color: var(--accent-bright); text-transform: uppercase; margin-bottom: 14px; }
+  .hero-name { font-family: 'Cinzel', Georgia, serif; font-size: clamp(28px, 4vw, 40px); font-weight: 700; margin: 0 0 12px; }
+  .hero-desc { font-size: 16px; color: var(--text-muted); line-height: 1.65; margin: 0 0 18px; max-width: 580px; }
+  .hero-meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; font-size: 13px; color: var(--text-light); }
+  .hero-meta span { display: inline-flex; align-items: center; gap: 4px; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; letter-spacing: .04em; }
+  .badge.easy   { background: rgba(155,209,135,0.15); color: var(--good); border: 1px solid var(--good); }
+  .badge.medium { background: rgba(232,185,104,0.12); color: var(--accent); border: 1px solid var(--accent); }
+  .badge.hard   { background: rgba(229,74,40,0.12); color: #f0a288; border: 1px solid #e54a28; }
+  .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn {
+    appearance: none; border: none; cursor: pointer;
+    padding: 12px 22px; border-radius: 8px;
+    font-family: inherit; font-size: 14px; font-weight: 700; letter-spacing: .04em;
+    transition: transform 80ms ease;
+  }
+  .btn:active { transform: translateY(1px) scale(.99); }
+  .btn-primary { background: var(--accent); color: var(--bg); }
+  .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border-light); }
+  .btn-good { background: var(--good); color: var(--bg); }
+  .btn-quiet { background: transparent; color: var(--text-light); border: 1px solid var(--border); font-size: 12px; padding: 8px 14px; }
+  .section-title { font-family: 'Cinzel', Georgia, serif; font-size: 22px; color: var(--text); margin: 36px 0 14px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px;
+    cursor: pointer; transition: border-color 120ms, transform 120ms;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .card-name { font-family: 'Cinzel', Georgia, serif; font-size: 17px; color: var(--text); margin: 0 0 8px; line-height: 1.3; }
+  .card-desc { font-size: 13px; color: var(--text-muted); margin: 0 0 10px; line-height: 1.5; }
+  .card-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 11px; color: var(--text-light); }
+  .mastered { opacity: 0.55; }
+  .mastered .card-name::after { content: ' ✓'; color: var(--good); }
+  .footer-note { font-size: 13px; color: var(--text-light); text-align: center; margin-top: 50px; }
+  .empty { text-align: center; padding: 30px 20px; color: var(--text-light); font-size: 14px; }
+  .link {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: transparent; color: var(--accent); text-decoration: none;
+    border: 1px solid var(--border-light); padding: 8px 14px; border-radius: 6px;
+    font-size: 13px;
+  }
+  .link:hover { border-color: var(--accent); }
+  .chip { padding: 6px 12px; border-radius: 999px; background: transparent; border: 1px solid var(--border-light); color: var(--text-muted); font-size: 12px; cursor: pointer; font-family: inherit; }
+  .chip.on { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 600; }
+  .chip:hover { border-color: var(--accent); }
+  .custom-tag { display: inline-block; font-size: 9px; color: var(--accent); margin-left: 4px; padding: 1px 6px; border: 1px solid var(--accent); border-radius: 4px; vertical-align: middle; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <p class="kicker">One new fun thing to learn this week</p>
+  <h1 class="title">Weekly Skill.</h1>
+  <p class="lead">
+    The world is full of small, surprising skills no one teaches anymore — how to throw a card, tie a bowline, spin a staff, palm a coin. One per week. Pick one. Learn it. Move on.
+  </p>
+
+  <div id="this-week"></div>
+
+  <h2 class="section-title">Browse the library</h2>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center;">
+    <div id="diff-chips" style="display:flex;gap:6px;"></div>
+    <button class="chip" id="family-chip" onclick="toggleFamily()" title="Skills good for doing with younger family / Hannah">👨‍👧 Family-friendly</button>
+    <button class="btn btn-quiet" onclick="addCustomSkill()" style="margin-left:auto;">+ Add custom skill</button>
+    <button class="btn btn-quiet" onclick="shareMastered()" title="Share your mastered skills as a list">Share my list</button>
+  </div>
+  <div id="grid"></div>
+
+  <h2 class="section-title" id="mastered-title" style="display:none;">Mastered <span style="font-size:14px;color:var(--text-light);font-family:Inter,sans-serif;">— skills you've added to your collection</span></h2>
+  <div id="mastered-grid"></div>
+
+  <p class="footer-note">Weekly Skill v0.1 · auto-picks a new skill every Monday · saves to your browser · a Purcell Ventures tool</p>
+</main>
+
+<script>
+const SKILLS = [
+  { id: 'pressure-fan', name: 'Pressure fan (card flourish)', desc: 'Spread a deck into a perfect fan with one hand. The classic intro to card magic.', time: '10 min', difficulty: 'easy', family: true, tutorial: 'https://www.youtube.com/results?search_query=pressure+fan+tutorial' },
+  { id: 'charlier-cut', name: 'Charlier cut', desc: 'A one-handed card cut. Hours of fidget value once you have it down.', time: '15 min', difficulty: 'medium', tutorial: 'https://www.youtube.com/results?search_query=charlier+cut+tutorial' },
+  { id: 'thumb-fan', name: 'Thumb fan', desc: 'A more elegant card fan than the pressure version. Magicians use this constantly.', time: '20 min', difficulty: 'easy', tutorial: 'https://www.youtube.com/results?search_query=thumb+fan+cards' },
+  { id: 'bowline', name: 'Bowline knot', desc: 'The most useful knot ever invented. Holds a loop that won\\'t slip. Saves lives.', time: '10 min', difficulty: 'easy', tutorial: 'https://www.animatedknots.com/bowline-knot' },
+  { id: 'trucker-hitch', name: 'Trucker\\'s hitch', desc: 'A pulley made of rope. Crank tension into a tie-down without a ratchet strap.', time: '15 min', difficulty: 'medium', tutorial: 'https://www.animatedknots.com/truckers-hitch-knot' },
+  { id: 'monkey-fist', name: 'Monkey\\'s fist knot', desc: 'A heavy round knot used as a throw-weight or keychain. Looks ancient and complicated. Isn\\'t.', time: '1 hour', difficulty: 'hard', tutorial: 'https://www.animatedknots.com/monkeys-fist-knot' },
+  { id: 'figure-8', name: 'Figure-8 follow-through (climbing)', desc: 'The knot that connects a climber to a rope. Standard at every gym.', time: '10 min', difficulty: 'easy', tutorial: 'https://www.animatedknots.com/figure-8-follow-through-loop-knot' },
+  { id: 'juggle-3', name: 'Juggle 3 balls (cascade)', desc: 'The basic 3-ball pattern. Cheap entry into a whole hobby tree.', time: '1 week', difficulty: 'medium', tutorial: 'https://www.youtube.com/results?search_query=juggle+3+balls+beginner' },
+  { id: 'finger-whistle', name: 'Whistle with fingers', desc: 'The piercing 2-finger whistle that cuts through any crowd.', time: '1 hour (mostly frustration)', difficulty: 'hard', tutorial: 'https://www.youtube.com/results?search_query=how+to+whistle+with+fingers' },
+  { id: 'thumb-around', name: 'Pen-spinning thumbaround', desc: 'Spin a pen 360° around your thumb. The classic high-school move.', time: '1 week', difficulty: 'medium', tutorial: 'https://www.youtube.com/results?search_query=thumb+around+pen+spin' },
+  { id: 'staff-figure-8', name: 'Bo staff: figure-8 spin', desc: 'The infinity spin in front of your body. Foundation for all staff flow.', time: '1 week', difficulty: 'hard', tutorial: 'https://www.youtube.com/results?search_query=bo+staff+figure+8+beginner' },
+  { id: 'yoyo-walk-dog', name: 'Yo-yo: walk the dog', desc: 'Send a spinning yo-yo across the floor like a leashed dog. First yo-yo trick.', time: '10 min', difficulty: 'easy', family: true, tutorial: 'https://www.youtube.com/results?search_query=walk+the+dog+yoyo' },
+  { id: 'yoyo-rock-cradle', name: 'Yo-yo: rock the cradle', desc: 'Form a string triangle and rock the spinning yo-yo through it.', time: '30 min', difficulty: 'medium', tutorial: 'https://www.youtube.com/results?search_query=rock+the+cradle+yoyo' },
+  { id: 'origami-crane', name: 'Origami crane', desc: 'Japan\\'s symbol of peace and a wedding gift, folded from one square.', time: '30 min', difficulty: 'medium', family: true, tutorial: 'https://www.youtube.com/results?search_query=origami+crane+instructions' },
+  { id: 'kickdrum-beatbox', name: 'Beatbox: classic kick drum', desc: 'The boom that anchors every beat. \\'B\\' sound through closed lips.', time: '30 min', difficulty: 'easy', tutorial: 'https://www.youtube.com/results?search_query=beatbox+kick+drum+tutorial' },
+  { id: 'snare-roll', name: 'Beatbox: snare roll', desc: 'The classic snap sound. Combine with kick drum and you have a basic loop.', time: '1 hour', difficulty: 'medium', tutorial: 'https://www.youtube.com/results?search_query=beatbox+snare+tutorial' },
+  { id: 'french-drop', name: 'Magic: French drop', desc: 'A coin (or anything small) vanishes from your hand. The first sleight everyone learns.', time: '30 min', difficulty: 'medium', tutorial: 'https://www.youtube.com/results?search_query=french+drop+coin+tutorial' },
+  { id: 'thumb-tip', name: 'Magic: thumb-tip vanish', desc: 'Make a silk handkerchief disappear with a $3 prop. Pro magicians still use this.', time: '1 hour', difficulty: 'medium', tutorial: 'https://www.youtube.com/results?search_query=thumb+tip+routine' },
+  { id: 'memory-palace', name: 'Memory palace technique', desc: 'Memorize a 30-item list by walking through a familiar place in your mind. Ancient mnemonic.', time: '1 day', difficulty: 'medium', tutorial: 'https://www.youtube.com/results?search_query=memory+palace+technique+beginner' },
+  { id: 'rubiks-cube', name: 'Solve a Rubik\\'s cube', desc: 'Beginner method. Sub-2-minute solve achievable in a week.', time: '1 week', difficulty: 'medium', family: true, tutorial: 'https://www.youtube.com/results?search_query=rubiks+cube+beginner+method' },
+  { id: 'cup-stacking', name: 'Speed cup stacking — 3-3-3', desc: 'Stack 3 pyramids of 3 cups and un-stack faster than you think.', time: '30 min', difficulty: 'easy', family: true, tutorial: 'https://www.youtube.com/results?search_query=speed+stacking+3+3+3' },
+  { id: 'sign-alphabet', name: 'American Sign Language alphabet', desc: 'Fingerspell A-Z. Foundation for any further ASL.', time: '1 hour', difficulty: 'easy', family: true, tutorial: 'https://www.youtube.com/results?search_query=asl+alphabet+tutorial' },
+  { id: 'tongue-twisters', name: 'Master 3 tongue twisters', desc: 'Pad-thai pita / Toy boat / Red leather. Diction and confidence on demand.', time: '1 hour', difficulty: 'easy', tutorial: 'https://www.youtube.com/results?search_query=hardest+tongue+twisters' },
+  { id: 'mental-math-squares', name: 'Mental math: 2-digit squares', desc: 'Square any 2-digit number in your head in under 5 seconds.', time: '1 week', difficulty: 'medium', tutorial: 'https://www.youtube.com/results?search_query=mental+math+squaring+two+digit' },
+  { id: 'calligraphy-italic', name: 'Italic calligraphy alphabet', desc: 'One pen, one alphabet. Write things people screenshot.', time: '1 week', difficulty: 'medium', tutorial: 'https://www.youtube.com/results?search_query=italic+calligraphy+beginner' },
+  { id: 'kendama-spike', name: 'Kendama: cup + spike', desc: 'The Japanese skill toy. Big cup → small cup → spike combo.', time: '1 week', difficulty: 'medium', tutorial: 'https://www.youtube.com/results?search_query=kendama+beginner+tricks' },
+  { id: 'basketball-spin', name: 'Spin a basketball on your finger', desc: 'Classic playground move. Sustain it for 30 seconds.', time: '1 hour', difficulty: 'medium', tutorial: 'https://www.youtube.com/results?search_query=spin+basketball+finger+tutorial' },
+  { id: 'whistle-warble', name: 'Whistle: warble (vibrato)', desc: 'Hold a single note and add a smooth vibrato. Sounds professional fast.', time: '1 hour', difficulty: 'medium', tutorial: 'https://www.youtube.com/results?search_query=whistling+vibrato' },
+  { id: 'morse-distress', name: 'Memorize Morse code for SOS', desc: 'Three dots three dashes three dots. Could save someone\\'s life. Five-min skill, lifetime ROI.', time: '5 min', difficulty: 'easy', family: true, tutorial: 'https://en.wikipedia.org/wiki/SOS' },
+  { id: 'cpr-cycle', name: 'Memorize the CPR compression cycle', desc: '30 compressions, 2 breaths, repeat. Hands-only is fine. Lifetime skill.', time: '15 min', difficulty: 'easy', family: true, tutorial: 'https://www.youtube.com/results?search_query=hands+only+cpr+american+heart' },
+  { id: 'guitar-chords', name: 'Learn 4 guitar chords (G/C/D/Em)', desc: 'These 4 chords unlock thousands of songs. One evening of practice.', time: '1 week', difficulty: 'medium', tutorial: 'https://www.youtube.com/results?search_query=g+c+d+em+chords+guitar+beginner' },
+  { id: 'rapid-typing', name: 'Touch-type to 60 wpm', desc: 'If you hunt-and-peck, the 2-week investment to type properly returns forever.', time: '2 weeks', difficulty: 'medium', tutorial: 'https://www.keybr.com/' },
+  { id: 'recite-psalm-23', name: 'Memorize Psalm 23 cold', desc: 'The most-quoted psalm. Once it\\'s in you, it stays. Pulls itself up in hard moments.', time: '1 hour', difficulty: 'easy', family: true, tutorial: 'https://www.biblegateway.com/passage/?search=Psalm+23&version=ESV' },
+  { id: 'recite-romans-8-28', name: 'Memorize Romans 8 in chunks', desc: 'The chapter Christians keep coming back to. Try 8:1, 8:28, 8:35-39 first. Build the whole chapter over the week.', time: '1 week', difficulty: 'medium', tutorial: 'https://www.biblegateway.com/passage/?search=Romans+8&version=ESV' },
+  { id: 'check-mate-in-1', name: 'Solve a chess mate-in-1 stream', desc: 'Lichess puzzle Rush at the easiest rating. Trains pattern recognition fast.', time: '30 min', difficulty: 'easy', tutorial: 'https://lichess.org/training' },
+  { id: 'speed-cube-sub-2', name: 'Sub-2-minute Rubik\\'s cube solve', desc: 'After learning the beginner method, drill the F2L look-ahead to get under 2 min.', time: '1 week', difficulty: 'hard', tutorial: 'https://www.youtube.com/results?search_query=sub+2+minute+cube+beginner' },
+  { id: 'wood-mallet-knot', name: 'Hand-whittle a wooden hook (or comfort item)', desc: 'Pick up a stick + a knife. Whittle a hook, a spoon, or a smooth worry-stone. The shop classes of the past.', time: '2 hours', difficulty: 'medium', family: true, tutorial: 'https://www.youtube.com/results?search_query=whittling+beginner+spoon' },
+  { id: 'jumprope-double-under', name: 'Jump rope: double under', desc: 'The rope passes twice per jump. CrossFit benchmark. 10 in a row.', time: '1 week', difficulty: 'medium', tutorial: 'https://www.youtube.com/results?search_query=jump+rope+double+under+tutorial' },
+  { id: 'paper-airplane-loop', name: 'Fold a stunt paper airplane (loop)', desc: 'One throw, smooth loop, returns to you. Specific fold. Reusable party trick.', time: '15 min', difficulty: 'easy', family: true, tutorial: 'https://www.youtube.com/results?search_query=paper+airplane+loop+return' },
+  { id: 'apologetics-cosmological', name: 'Cosmological argument for God in 60 seconds', desc: 'Be able to explain the Kalam cosmological argument out loud, in your own words, in under a minute. WLC has the cleanest version.', time: '1 hour', difficulty: 'medium', tutorial: 'https://www.reasonablefaith.org/writings/popular-writings/existence-nature-of-god/the-kalam-cosmological-argument/' },
+  { id: 'apologetics-resurrection', name: 'Minimal facts case for the Resurrection', desc: 'Gary Habermas\\'s 5 facts. Be able to walk a skeptic through them without notes.', time: '1 day', difficulty: 'medium', tutorial: 'https://www.youtube.com/results?search_query=minimal+facts+resurrection+habermas' },
+  { id: 'whistle-melody', name: 'Whistle a recognizable melody', desc: 'Pick one short song (Andy Griffith theme, the Bonanza intro, "When the Saints..."). Whistle it cleanly.', time: '30 min', difficulty: 'easy', family: true, tutorial: 'https://www.youtube.com/results?search_query=how+to+whistle+a+melody' },
+];
+
+const KEY = 'weekly-skill.state.v1';
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch { return {}; }
+}
+function saveState(s) { localStorage.setItem(KEY, JSON.stringify(s)); }
+const state = loadState();
+state.mastered = state.mastered || []; // [{id, ts}]
+state.weekly = state.weekly || {}; // { isoWeek: skillId }
+state.skipped = state.skipped || []; // ids skipped this week
+state.custom = state.custom || []; // user-added skills
+state.diffFilter = state.diffFilter || 'all'; // 'all' | 'easy' | 'medium' | 'hard'
+state.familyOnly = state.familyOnly || false;
+
+window.toggleFamily = () => {
+  state.familyOnly = !state.familyOnly;
+  saveState(state);
+  render();
+};
+
+window.shareMastered = async () => {
+  if (state.mastered.length === 0) {
+    alert('No mastered skills yet. Come back when you\\'ve learned a few.');
+    return;
+  }
+  const list = state.mastered
+    .map(m => allSkills().find(s => s.id === m.id))
+    .filter(Boolean)
+    .map(s => `• ${s.name}`)
+    .join('\\n');
+  const text = `Skills I\\'ve learned via Weekly Skill (${state.mastered.length}):\\n\\n${list}\\n\\nTry it: https://thebigjah.github.io/weekly-skill/`;
+  if (navigator.share) {
+    try { await navigator.share({ text }); return; } catch {}
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    alert('Copied to clipboard.');
+  } catch {
+    prompt('Copy:', text);
+  }
+};
+
+function allSkills() {
+  const userSkills = state.custom.map(s => ({ ...s, isCustom: true }));
+  return [...SKILLS, ...userSkills];
+}
+
+window.addCustomSkill = () => {
+  const name = prompt('Skill name (e.g. "Solve a Sudoku"):');
+  if (!name || !name.trim()) return;
+  const desc = prompt('One-line description:') || '';
+  const time = prompt('Time to learn (e.g. "1 hour", "1 week"):') || '?';
+  const difficulty = (prompt('Difficulty (easy/medium/hard):') || 'medium').toLowerCase();
+  const tutorial = prompt('Tutorial URL (optional):') || `https://www.youtube.com/results?search_query=${encodeURIComponent(name + ' tutorial')}`;
+  const finalDiff = ['easy','medium','hard'].includes(difficulty) ? difficulty : 'medium';
+  const skill = {
+    id: 'c_' + Date.now().toString(36),
+    name: name.trim(),
+    desc: desc.trim(),
+    time: time.trim(),
+    difficulty: finalDiff,
+    tutorial: tutorial.trim(),
+  };
+  state.custom.push(skill);
+  saveState(state);
+  render();
+};
+window.removeCustomSkill = (id) => {
+  if (!confirm('Remove this custom skill?')) return;
+  state.custom = state.custom.filter(s => s.id !== id);
+  state.mastered = state.mastered.filter(m => m.id !== id);
+  saveState(state);
+  render();
+};
+
+function isoWeek(d = new Date()) {
+  const date = new Date(d.getTime());
+  date.setHours(0, 0, 0, 0);
+  date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+  const week1 = new Date(date.getFullYear(), 0, 4);
+  return date.getFullYear() + '-W' + String(1 + Math.round(((date - week1) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7)).padStart(2, '0');
+}
+
+function getMasteredIds() { return state.mastered.map(m => m.id); }
+function isMastered(id) { return getMasteredIds().includes(id); }
+
+function pickRandomUnmastered(exclude = []) {
+  const pool = allSkills().filter(s => !isMastered(s.id) && !exclude.includes(s.id));
+  if (pool.length === 0) return null;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function getThisWeekSkill() {
+  const week = isoWeek();
+  let id = state.weekly[week];
+  if (id) {
+    const found = allSkills().find(s => s.id === id);
+    if (found) return found;
+  }
+  // Pick a new one
+  const picked = pickRandomUnmastered();
+  if (!picked) return null;
+  state.weekly[week] = picked.id;
+  state.skipped = [];
+  saveState(state);
+  return picked;
+}
+
+function getPacingHint() {
+  const totalUnmastered = allSkills().filter(s => !isMastered(s.id)).length;
+  const weeksLeft = totalUnmastered;
+  if (weeksLeft === 0) return 'You\\'ve learned them all. Add custom skills to keep going.';
+  if (weeksLeft < 10) return `Only ${weeksLeft} weeks of new skills left at this pace. Add some custom ones.`;
+  if (weeksLeft < 30) return `${weeksLeft} weeks of skills queued.`;
+  return `${weeksLeft} weeks of skills queued — basically a year of learning.`;
+}
+
+function renderThisWeek() {
+  const el = document.getElementById('this-week');
+  const skill = getThisWeekSkill();
+  if (!skill) {
+    el.innerHTML = `<div class="hero" style="text-align:center;"><h2 class="hero-name">You've mastered them all.</h2><p class="hero-desc">Add new skills below or come back next week.</p></div>`;
+    return;
+  }
+  el.innerHTML = `
+    <div class="hero">
+      <p class="hero-kicker">This week · ${isoWeek()}</p>
+      <h2 class="hero-name">${escapeHtml(skill.name)}</h2>
+      <p class="hero-desc">${escapeHtml(skill.desc)}</p>
+      <div class="hero-meta">
+        <span class="badge ${skill.difficulty}">${skill.difficulty}</span>
+        <span>⏱ ${escapeHtml(skill.time)}</span>
+      </div>
+      <div class="hero-actions">
+        <a class="link" href="${skill.tutorial}" target="_blank" rel="noopener">Open tutorial ↗</a>
+        <button class="btn btn-good" onclick="markLearned('${skill.id}')">I learned it ✓</button>
+        <button class="btn btn-ghost" onclick="skipWeekly('${skill.id}')">Skip — pick another</button>
+      </div>
+      <p style="margin:14px 0 0;font-size:12px;color:var(--text-light);">${escapeHtml(getPacingHint())}</p>
+    </div>
+  `;
+}
+
+window.markLearned = (id) => {
+  if (isMastered(id)) return;
+  state.mastered.push({ id, ts: Date.now() });
+  saveState(state);
+  // Auto-rotate to next skill for the week
+  delete state.weekly[isoWeek()];
+  saveState(state);
+  render();
+};
+window.skipWeekly = (id) => {
+  state.skipped = (state.skipped || []).concat([id]);
+  const picked = pickRandomUnmastered(state.skipped);
+  if (picked) {
+    state.weekly[isoWeek()] = picked.id;
+    saveState(state);
+  } else {
+    delete state.weekly[isoWeek()];
+    saveState(state);
+  }
+  render();
+};
+window.unmaster = (id) => {
+  state.mastered = state.mastered.filter(m => m.id !== id);
+  saveState(state);
+  render();
+};
+window.makeThisWeek = (id) => {
+  state.weekly[isoWeek()] = id;
+  saveState(state);
+  render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+function renderGrid() {
+  // difficulty chips
+  const chips = document.getElementById('diff-chips');
+  chips.innerHTML = ['all','easy','medium','hard'].map(d => `
+    <button class="chip ${state.diffFilter === d ? 'on' : ''}" onclick="setDiff('${d}')">${d === 'all' ? 'all' : d}</button>
+  `).join('');
+
+  // Sync the family chip styling
+  const famChip = document.getElementById('family-chip');
+  if (famChip) {
+    if (state.familyOnly) famChip.classList.add('on');
+    else famChip.classList.remove('on');
+  }
+
+  const grid = document.getElementById('grid');
+  const thisWeekId = state.weekly[isoWeek()];
+  let list = allSkills().filter(s => !isMastered(s.id) && s.id !== thisWeekId);
+  if (state.diffFilter !== 'all') list = list.filter(s => s.difficulty === state.diffFilter);
+  if (state.familyOnly) list = list.filter(s => s.family);
+  grid.innerHTML = list.map(s => `
+    <div class="card" onclick="makeThisWeek('${s.id}')">
+      <h3 class="card-name">${escapeHtml(s.name)}${s.isCustom ? ' <span class="custom-tag">CUSTOM</span>' : ''}</h3>
+      <p class="card-desc">${escapeHtml(s.desc)}</p>
+      <div class="card-meta">
+        <span class="badge ${s.difficulty}">${s.difficulty}</span>
+        <span>⏱ ${escapeHtml(s.time)}</span>
+        ${s.isCustom ? `<button class="btn btn-quiet" onclick="event.stopPropagation();removeCustomSkill('${s.id}')" style="margin-left:auto;font-size:10px;padding:2px 6px;">×</button>` : ''}
+      </div>
+    </div>
+  `).join('') || `<div class="empty">No ${state.diffFilter === 'all' ? '' : state.diffFilter + ' '}skills left. ${state.diffFilter !== 'all' ? 'Try a different filter or ' : ''}add custom ideas with + Add custom skill.</div>`;
+}
+
+window.setDiff = (d) => {
+  state.diffFilter = d;
+  saveState(state);
+  renderGrid();
+};
+
+function renderMastered() {
+  const grid = document.getElementById('mastered-grid');
+  const title = document.getElementById('mastered-title');
+  if (state.mastered.length === 0) { title.style.display = 'none'; grid.innerHTML = ''; return; }
+  title.style.display = 'block';
+  const list = state.mastered
+    .map(m => ({ skill: SKILLS.find(s => s.id === m.id), ts: m.ts }))
+    .filter(x => x.skill)
+    .sort((a, b) => b.ts - a.ts);
+  grid.innerHTML = `<div class="grid">` + list.map(({ skill, ts }) => `
+    <div class="card mastered">
+      <h3 class="card-name">${escapeHtml(skill.name)}</h3>
+      <p class="card-desc" style="font-size:12px;">Mastered ${new Date(ts).toLocaleDateString()}</p>
+      <div style="margin-top:8px;">
+        <button class="btn btn-quiet" onclick="event.stopPropagation();unmaster('${skill.id}')">Unmark</button>
+      </div>
+    </div>
+  `).join('') + '</div>';
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function render() {
+  renderThisWeek();
+  renderGrid();
+  renderMastered();
+}
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solomon — one drop of wisdom a day</title>
+<meta name="description" content="A curated quote each day from Proverbs, the Christian tradition, and classical philosophy. Save favorites. Write a reflection. The opposite of doom-scrolling.">
+<meta property="og:title" content="Solomon — one drop of wisdom a day">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --bg: #f4ede1;
+    --panel: #fdf9eb;
+    --ink: #1d1812;
+    --ink-soft: #6b5a44;
+    --ink-faint: #a89880;
+    --accent: #4a3a26;
+    --accent-light: #6e5a40;
+    --gold: #b89540;
+    --proverbs: #8a4a2a;
+    --christian: #4a4a8a;
+    --classical: #4a6a4a;
+    --modern: #6a4a4a;
+    --border: #d8cbb0;
+    --serif: Georgia, "Times New Roman", serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.65;
+    min-height: 100vh;
+    padding: 1rem;
+  }
+  .container { max-width: 640px; margin: 0 auto; }
+  header { text-align: center; padding: 2rem 0; }
+  header h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 6vw, 2.6rem);
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+    letter-spacing: -0.01em;
+  }
+  header p {
+    color: var(--ink-soft);
+    font-style: italic;
+    font-size: 0.95rem;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .tab {
+    padding: 0.55rem 1.1rem;
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .tab.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+  .tab:hover:not(.active) { border-color: var(--accent); color: var(--ink); }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 2rem 1.75rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(29,24,18,0.06);
+  }
+  .panel h2 {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    color: var(--accent);
+    margin-bottom: 0.85rem;
+  }
+
+  .quote-display {
+    text-align: center;
+    padding: 1rem 0;
+  }
+  .quote-display .source-tag {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #fff;
+    margin-bottom: 1.5rem;
+  }
+  .source-tag.proverbs { background: var(--proverbs); }
+  .source-tag.christian { background: var(--christian); }
+  .source-tag.classical { background: var(--classical); }
+  .source-tag.modern { background: var(--modern); }
+
+  .quote-text {
+    font-family: var(--serif);
+    font-size: clamp(1.1rem, 3.5vw, 1.4rem);
+    line-height: 1.7;
+    color: var(--ink);
+    margin-bottom: 1.5rem;
+    font-style: italic;
+  }
+  .quote-source {
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+    letter-spacing: 0.05em;
+  }
+  .quote-context {
+    color: var(--ink-faint);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    font-style: italic;
+  }
+
+  .reflection-area {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px dashed var(--border);
+  }
+  .reflection-area label {
+    display: block;
+    color: var(--accent);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+  }
+  .reflection-area textarea {
+    width: 100%;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 6px;
+    padding: 0.85rem 1rem;
+    font-family: var(--serif);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    min-height: 100px;
+    resize: vertical;
+    color: var(--ink);
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 1.5rem;
+  }
+  button {
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    padding: 0.65rem 1.2rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 500;
+  }
+  button:hover { background: var(--accent); }
+  button.ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+  }
+  button.ghost:hover { background: var(--bg); color: var(--ink); border-color: var(--accent); }
+  button.fav {
+    background: transparent;
+    color: var(--gold);
+    border: 1px solid var(--gold);
+  }
+  button.fav:hover { background: var(--gold); color: var(--bg); }
+  button.fav.is-fav { background: var(--gold); color: var(--bg); }
+
+  .row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
+
+  .filter-row {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+    justify-content: center;
+  }
+  .filter-row button {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+    padding: 0.35rem 0.7rem;
+    font-size: 0.78rem;
+    font-weight: 400;
+  }
+  .filter-row button.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+
+  .quote-card {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .quote-card:last-child { border-bottom: none; }
+  .quote-card .text {
+    font-family: var(--serif);
+    color: var(--ink);
+    font-style: italic;
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 0.5rem;
+  }
+  .quote-card .src {
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    margin-bottom: 0.4rem;
+  }
+  .quote-card .src-tag {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #fff;
+    margin-right: 0.5rem;
+  }
+  .quote-card .reflection {
+    margin-top: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--bg);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+
+  .empty {
+    text-align: center;
+    color: var(--ink-faint);
+    padding: 1.5rem 0;
+    font-style: italic;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Solomon</h1>
+  <p>one drop of wisdom a day</p>
+</header>
+
+<div class="tabs">
+  <button class="tab active" data-view="today">Today</button>
+  <button class="tab" data-view="favorites">Favorites</button>
+  <button class="tab" data-view="all">Browse</button>
+  <button class="tab" data-view="manage">Manage</button>
+</div>
+
+<div id="view-today" class="view">
+  <div class="panel">
+    <div class="quote-display" id="quote-display"></div>
+    <div class="reflection-area">
+      <label>Your reflection (optional)</label>
+      <textarea id="reflection" placeholder="What does this say to your week? Save and it sticks to this quote."></textarea>
+      <div class="row" style="justify-content:center;">
+        <button onclick="saveReflection()">Save reflection</button>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="ghost" onclick="prevQuote()">← previous</button>
+      <button class="fav" id="fav-btn" onclick="toggleFav()">☆ favorite</button>
+      <button onclick="randomQuote()">surprise me</button>
+      <button class="ghost" onclick="nextQuote()">next →</button>
+    </div>
+  </div>
+</div>
+
+<div id="view-favorites" class="view" style="display:none;">
+  <div class="panel">
+    <h2>Favorites</h2>
+    <div id="favorites-list"></div>
+  </div>
+</div>
+
+<div id="view-all" class="view" style="display:none;">
+  <div class="panel">
+    <h2>All quotes</h2>
+    <div class="filter-row" id="filter-row">
+      <button class="active" data-f="">All</button>
+      <button data-f="proverbs">Proverbs</button>
+      <button data-f="christian">Christian tradition</button>
+      <button data-f="classical">Classical</button>
+      <button data-f="modern">Modern</button>
+    </div>
+    <input type="text" id="all-search" placeholder="Search text or source" style="width:100%;border:1px solid var(--border);background:#fff;border-radius:6px;padding:0.7rem 0.95rem;color:var(--ink);font-family:inherit;font-size:0.95rem;margin-bottom:1rem;">
+    <div id="all-list"></div>
+  </div>
+</div>
+
+<div id="view-manage" class="view" style="display:none;">
+  <div class="panel">
+    <h2>Manage</h2>
+    <div class="row">
+      <button class="ghost" id="export-btn">Export reflections + favorites</button>
+      <button class="ghost" id="reset-btn" style="color:#b04a4a;border-color:#d8b6b6;">Reset user data</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>The opposite of doom-scrolling.<br>
+  <a href="https://github.com/thebigjah/solomon">source</a></p>
+</footer>
+
+</div>
+
+<script>
+'use strict';
+
+const QUOTES = [
+  // Proverbs (Hebrew wisdom)
+  { type:'proverbs', text:'The fear of the Lord is the beginning of wisdom; all who follow His precepts have good understanding.', source:'Proverbs 9:10' },
+  { type:'proverbs', text:'A gentle answer turns away wrath, but a harsh word stirs up anger.', source:'Proverbs 15:1' },
+  { type:'proverbs', text:'As iron sharpens iron, so one person sharpens another.', source:'Proverbs 27:17' },
+  { type:'proverbs', text:'The plans of the diligent lead to profit as surely as haste leads to poverty.', source:'Proverbs 21:5' },
+  { type:'proverbs', text:'Better is a dry morsel with quiet than a house full of feasting with strife.', source:'Proverbs 17:1' },
+  { type:'proverbs', text:'A good name is more desirable than great riches; to be esteemed is better than silver or gold.', source:'Proverbs 22:1' },
+  { type:'proverbs', text:'It is the glory of God to conceal a thing; but the honour of kings is to search out a matter.', source:'Proverbs 25:2', context:'The motto verse for serious learners.' },
+  { type:'proverbs', text:'Trust in the Lord with all your heart and lean not on your own understanding; in all your ways submit to him, and he will make your paths straight.', source:'Proverbs 3:5-6' },
+  { type:'proverbs', text:'Whoever guards his mouth and tongue keeps himself out of trouble.', source:'Proverbs 21:23' },
+  { type:'proverbs', text:'Train up a child in the way he should go; even when he is old he will not depart from it.', source:'Proverbs 22:6' },
+  { type:'proverbs', text:'The simple believe anything, but the prudent give thought to their steps.', source:'Proverbs 14:15' },
+  { type:'proverbs', text:'Pride goes before destruction, a haughty spirit before a fall.', source:'Proverbs 16:18' },
+  { type:'proverbs', text:'Faithful are the wounds of a friend; profuse are the kisses of an enemy.', source:'Proverbs 27:6' },
+
+  // Christian tradition
+  { type:'christian', text:'You have made us for yourself, O Lord, and our hearts are restless until they find their rest in you.', source:'Augustine, Confessions' },
+  { type:'christian', text:'Aim at heaven and you will get earth thrown in. Aim at earth and you will get neither.', source:'C.S. Lewis, Mere Christianity' },
+  { type:'christian', text:'The Christian shoemaker does his duty not by putting little crosses on the shoes, but by making good shoes.', source:'Martin Luther' },
+  { type:'christian', text:'You can give without loving, but you cannot love without giving.', source:'Amy Carmichael' },
+  { type:'christian', text:'I have decided to follow Jesus; no turning back, no turning back.', source:'Sadhu Sundar Singh (Indian convert), 19th c.' },
+  { type:'christian', text:'A man who is not on fire for something is not on fire for anything.', source:'attributed Søren Kierkegaard' },
+  { type:'christian', text:'It is impossible to be a Christian and not be persecuted.', source:'John Chrysostom' },
+  { type:'christian', text:'Faith is taking the first step even when you don\'t see the whole staircase.', source:'Martin Luther King Jr.' },
+  { type:'christian', text:'The cross is the lightning rod of grace.', source:'A.W. Tozer' },
+  { type:'christian', text:'Pain insists upon being attended to. God whispers to us in our pleasures, speaks in our conscience, but shouts in our pains: it is His megaphone to rouse a deaf world.', source:'C.S. Lewis, The Problem of Pain' },
+  { type:'christian', text:'There are far, far better things ahead than any we leave behind.', source:'C.S. Lewis' },
+  { type:'christian', text:'Worship is the submission of all our nature to God. It is the quickening of conscience by His holiness, the nourishment of mind with His truth, the purifying of imagination by His beauty, the opening of the heart to His love, the surrender of will to His purpose.', source:'William Temple' },
+  { type:'christian', text:'God can\'t give us peace and happiness apart from Himself, because there is no such thing.', source:'C.S. Lewis, Mere Christianity' },
+  { type:'christian', text:'When Christ calls a man, he bids him come and die.', source:'Dietrich Bonhoeffer, The Cost of Discipleship' },
+  { type:'christian', text:'In your love you have set me in a place of honor, but it is from the heart that you do all your work.', source:'Augustine, Confessions (paraphrase)' },
+  { type:'christian', text:'It is better to be in chains with Christ than free without Him.', source:'Madame Guyon' },
+  { type:'christian', text:'Holiness consists in doing the will of God with a smile.', source:'Teresa of Calcutta' },
+  { type:'christian', text:'God created us out of nothing, and so long as we are not nothing, He cannot make something of us.', source:'Martin Luther' },
+
+  // Classical (pre-Christian + early)
+  { type:'classical', text:'The unexamined life is not worth living.', source:'Socrates, from Plato\'s Apology' },
+  { type:'classical', text:'We suffer more in imagination than in reality.', source:'Seneca, Letters to Lucilius' },
+  { type:'classical', text:'You have power over your mind — not outside events. Realize this, and you will find strength.', source:'Marcus Aurelius, Meditations' },
+  { type:'classical', text:'It is not death that a man should fear, but he should fear never beginning to live.', source:'Marcus Aurelius' },
+  { type:'classical', text:'No man ever steps in the same river twice, for it\'s not the same river and he\'s not the same man.', source:'Heraclitus' },
+  { type:'classical', text:'Time is the wisest of all counselors.', source:'Plutarch' },
+  { type:'classical', text:'We are what we repeatedly do. Excellence, then, is not an act, but a habit.', source:'often attributed Aristotle (more accurately Will Durant on Aristotle)' },
+  { type:'classical', text:'The wisest mind has something yet to learn.', source:'George Santayana (modern but follows the lineage)' },
+  { type:'classical', text:'Anyone can hold the helm when the sea is calm.', source:'Publilius Syrus' },
+
+  // Modern (20th-21st c. non-explicitly-religious wisdom)
+  { type:'modern', text:'Between stimulus and response there is a space. In that space is our power to choose our response. In our response lies our growth and our freedom.', source:'Viktor Frankl, Man\'s Search for Meaning' },
+  { type:'modern', text:'Discipline equals freedom.', source:'Jocko Willink' },
+  { type:'modern', text:'The two most important days in your life are the day you are born and the day you find out why.', source:'often attributed Mark Twain' },
+  { type:'modern', text:'You don\'t rise to the level of your goals. You fall to the level of your systems.', source:'James Clear, Atomic Habits' },
+  { type:'modern', text:'Stand up straight with your shoulders back.', source:'Jordan Peterson, 12 Rules for Life' },
+  { type:'modern', text:'Compare yourself to who you were yesterday, not to who someone else is today.', source:'Jordan Peterson, 12 Rules for Life' },
+  { type:'modern', text:'Try not to become a man of success. Rather become a man of value.', source:'Albert Einstein' },
+  { type:'modern', text:'The best time to plant a tree was 20 years ago. The second best time is now.', source:'Chinese proverb, popular in modern usage' },
+  { type:'modern', text:'Hard times create hard men. Hard men create good times. Good times create weak men. Weak men create hard times.', source:'G. Michael Hopf' },
+  { type:'modern', text:'If you want to know the past, look at your present. If you want to know your future, look at your present.', source:'Buddhist proverb in modern circulation' },
+];
+
+const KEY = 'solomon.v1';
+let state = load();
+
+function load() { try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch { return {}; } }
+function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
+function escapeHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function todayIndex() {
+  // Deterministic per day — won't change on reload
+  const seed = todayKey().split('-').reduce((a, b) => a + parseInt(b, 10), 0);
+  return seed % QUOTES.length;
+}
+
+let currentIdx = todayIndex();
+let activeFilter = '';
+
+function quoteKey(idx) {
+  // Stable key per quote — use text hash-ish
+  const q = QUOTES[idx];
+  return (q.source + '|' + q.text.slice(0, 32)).replace(/\s+/g, '-').toLowerCase();
+}
+
+function renderQuote() {
+  const q = QUOTES[currentIdx];
+  const key = quoteKey(currentIdx);
+  const reflection = (state.reflections || {})[key] || '';
+  const isFav = (state.favorites || []).includes(key);
+
+  document.getElementById('quote-display').innerHTML = `
+    <span class="source-tag ${q.type}">${q.type === 'proverbs' ? 'Proverbs' : q.type === 'christian' ? 'Christian tradition' : q.type === 'classical' ? 'Classical' : 'Modern'}</span>
+    <div class="quote-text">"${escapeHtml(q.text)}"</div>
+    <div class="quote-source">— ${escapeHtml(q.source)}</div>
+    ${q.context ? `<div class="quote-context">${escapeHtml(q.context)}</div>` : ''}
+  `;
+  document.getElementById('reflection').value = reflection;
+  const favBtn = document.getElementById('fav-btn');
+  favBtn.classList.toggle('is-fav', isFav);
+  favBtn.textContent = isFav ? '★ favorited' : '☆ favorite';
+}
+
+window.nextQuote = () => { currentIdx = (currentIdx + 1) % QUOTES.length; renderQuote(); };
+window.prevQuote = () => { currentIdx = (currentIdx - 1 + QUOTES.length) % QUOTES.length; renderQuote(); };
+window.randomQuote = () => { currentIdx = Math.floor(Math.random() * QUOTES.length); renderQuote(); };
+
+window.toggleFav = () => {
+  const key = quoteKey(currentIdx);
+  if (!state.favorites) state.favorites = [];
+  if (state.favorites.includes(key)) {
+    state.favorites = state.favorites.filter(k => k !== key);
+  } else {
+    state.favorites.push(key);
+  }
+  save();
+  renderQuote();
+};
+
+window.saveReflection = () => {
+  const key = quoteKey(currentIdx);
+  if (!state.reflections) state.reflections = {};
+  state.reflections[key] = document.getElementById('reflection').value;
+  state.reflections[key + ':at'] = new Date().toISOString();
+  save();
+  alert('Saved.');
+};
+
+function renderQuoteCard(idx) {
+  const q = QUOTES[idx];
+  const key = quoteKey(idx);
+  const reflection = (state.reflections || {})[key] || '';
+  const isFav = (state.favorites || []).includes(key);
+  const typeLabel = q.type === 'proverbs' ? 'Proverbs' : q.type === 'christian' ? 'Christian' : q.type === 'classical' ? 'Classical' : 'Modern';
+  return `
+    <div class="quote-card">
+      <div class="src">
+        <span class="src-tag ${q.type}">${typeLabel}</span>
+        ${isFav ? '<span style="color:var(--gold);">★</span>' : ''}
+      </div>
+      <div class="text">"${escapeHtml(q.text)}"</div>
+      <div class="src">— ${escapeHtml(q.source)}</div>
+      ${reflection ? `<div class="reflection">${escapeHtml(reflection)}</div>` : ''}
+      <div style="margin-top:0.5rem;">
+        <button class="ghost" onclick="goTo(${idx})" style="padding:0.3rem 0.7rem;font-size:0.78rem;">Open</button>
+      </div>
+    </div>
+  `;
+}
+
+window.goTo = (idx) => {
+  currentIdx = idx;
+  renderQuote();
+  showView('today');
+};
+
+function renderFavorites() {
+  const el = document.getElementById('favorites-list');
+  const favs = (state.favorites || []);
+  if (!favs.length) { el.innerHTML = '<div class="empty">No favorites yet. Star one to keep it.</div>'; return; }
+  const indexes = favs.map(key => QUOTES.findIndex(q => quoteKey(QUOTES.indexOf(q)) === key)).filter(i => i >= 0);
+  el.innerHTML = indexes.map(renderQuoteCard).join('');
+}
+
+function renderAll() {
+  const q = (document.getElementById('all-search')?.value || '').toLowerCase().trim();
+  let indexes = QUOTES.map((_, i) => i);
+  if (activeFilter) indexes = indexes.filter(i => QUOTES[i].type === activeFilter);
+  if (q) {
+    indexes = indexes.filter(i =>
+      QUOTES[i].text.toLowerCase().includes(q) ||
+      QUOTES[i].source.toLowerCase().includes(q)
+    );
+  }
+  const el = document.getElementById('all-list');
+  if (!indexes.length) { el.innerHTML = '<div class="empty">No matches.</div>'; return; }
+  el.innerHTML = indexes.map(renderQuoteCard).join('');
+}
+
+document.getElementById('filter-row').addEventListener('click', (e) => {
+  if (e.target.tagName !== 'BUTTON') return;
+  document.querySelectorAll('#filter-row button').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  activeFilter = e.target.dataset.f;
+  renderAll();
+});
+
+function exportData() {
+  const out = { favorites: state.favorites || [], reflections: state.reflections || {} };
+  const blob = new Blob([JSON.stringify(out, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'solomon-' + todayKey() + '.json';
+  a.click();
+}
+
+function resetData() {
+  if (!confirm('Erase your favorites + reflections?')) return;
+  localStorage.removeItem(KEY); state = {};
+  renderQuote(); renderFavorites(); renderAll();
+}
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + name).style.display = '';
+  document.querySelector(`.tab[data-view="${name}"]`).classList.add('active');
+  if (name === 'today') renderQuote();
+  if (name === 'favorites') renderFavorites();
+  if (name === 'all') renderAll();
+}
+
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
+document.getElementById('all-search').addEventListener('input', renderAll);
+document.getElementById('export-btn').addEventListener('click', exportData);
+document.getElementById('reset-btn').addEventListener('click', resetData);
+
+renderQuote();
+renderFavorites();
+renderAll();
+</script>
+
+</body>
+</html>

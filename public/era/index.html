@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Era — drop into a year, no hindsight</title>
+<meta name="description" content="Pick or roll a year. See it as the people who lived it did — top headlines, music, film, tech, cultural moment. No 'looking back from now.'">
+<meta property="og:title" content="Era — drop into a year, no hindsight">
+<meta property="og:description" content="Pick or roll a year. See it as people who lived it did.">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --bg: #0f0d0a;
+    --panel: #1b1814;
+    --panel-2: #25211c;
+    --ink: #e8e0d0;
+    --ink-soft: #9a8e7a;
+    --ink-faint: #6b5e4a;
+    --accent: #c2a173;
+    --accent-deep: #8a6a3a;
+    --border: #34302a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    min-height: 100vh;
+    padding: 1rem;
+  }
+  .container { max-width: 720px; margin: 0 auto; }
+  header { text-align: center; padding: 2rem 0 2.5rem; }
+  header h1 {
+    font-family: "Times New Roman", Georgia, serif;
+    font-size: clamp(2rem, 6vw, 3rem);
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.4rem;
+  }
+  header p {
+    color: var(--ink-soft);
+    font-style: italic;
+    font-size: 0.95rem;
+  }
+
+  .picker {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+  }
+  .picker label {
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  select, button {
+    background: var(--panel-2);
+    color: var(--ink);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.6rem 1rem;
+    font-family: inherit;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+  button.primary {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+  button.primary:hover { background: var(--accent-deep); border-color: var(--accent-deep); }
+  button:hover { border-color: var(--accent); }
+
+  .year-display {
+    background: linear-gradient(135deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  .year-display .y {
+    font-family: "Times New Roman", Georgia, serif;
+    font-size: clamp(4rem, 14vw, 6rem);
+    line-height: 1;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+  }
+  .year-display .y-sub {
+    color: var(--ink-soft);
+    font-style: italic;
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+  }
+  .year-display .age {
+    color: var(--ink-faint);
+    font-size: 0.85rem;
+    margin-top: 0.4rem;
+  }
+
+  .feed {
+    display: grid;
+    gap: 1rem;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+  }
+  .card .head {
+    color: var(--accent);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+  }
+  .card .item {
+    margin-bottom: 0.4rem;
+    color: var(--ink);
+  }
+  .card .item small {
+    color: var(--ink-faint);
+    margin-left: 0.4rem;
+    font-style: italic;
+  }
+  .card .quote {
+    font-family: Georgia, serif;
+    font-style: italic;
+    color: var(--ink-soft);
+    border-left: 3px solid var(--accent-deep);
+    padding-left: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  .row-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .row-actions .ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+  }
+  .row-actions .ghost:hover {
+    color: var(--ink);
+    border-color: var(--accent);
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+  }
+  footer a { color: var(--accent-deep); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Era</h1>
+  <p>drop into a year, no hindsight</p>
+</header>
+
+<div class="picker">
+  <label for="year-select">Year</label>
+  <select id="year-select"></select>
+  <button class="primary" id="go-btn">Go</button>
+  <button id="random-btn">Surprise me</button>
+</div>
+
+<div class="picker" style="font-size:0.85rem;">
+  <label for="birth-input" style="text-transform:none;letter-spacing:0;font-size:0.85rem;color:var(--ink-soft);">Born in...</label>
+  <input type="number" id="birth-input" placeholder="2007" min="1900" max="2026" style="background:var(--panel-2);color:var(--ink);border:1px solid var(--border);border-radius:6px;padding:0.5rem 0.75rem;font-family:inherit;width:100px;">
+  <button id="my-year-btn">Year I was 16</button>
+</div>
+
+<div id="content"></div>
+
+<div class="row-actions">
+  <button class="ghost" id="share-btn">Share this year</button>
+  <button class="ghost" id="next-btn">Next year →</button>
+</div>
+
+<footer>
+  <p>The point: see history as the people who were there did.<br>
+  No "looking back from now." Just the era as it was.<br>
+  <a href="https://github.com/thebigjah/era">source</a>
+  </p>
+</footer>
+
+</div>
+
+<script>
+'use strict';
+
+const ERAS = [
+  {
+    year: 1945,
+    sub: "The war ends. The world starts over.",
+    headlines: [
+      { t: "Franklin D. Roosevelt dies, Truman becomes president", note: "Apr 12" },
+      { t: "VE Day — Germany surrenders unconditionally", note: "May 8" },
+      { t: "Atomic bombs dropped on Hiroshima and Nagasaki", note: "Aug 6, Aug 9" },
+      { t: "VJ Day — Japan surrenders. World War II ends.", note: "Aug 15" },
+      { t: "United Nations charter signed in San Francisco", note: "Jun 26" },
+    ],
+    music: [
+      { t: "Till the End of Time — Perry Como", note: "#1 of year" },
+      { t: "Sentimental Journey — Les Brown w/ Doris Day" },
+      { t: "Rum and Coca-Cola — The Andrews Sisters" },
+    ],
+    film: [
+      { t: "The Lost Weekend", note: "Best Picture" },
+      { t: "Mildred Pierce", note: "Joan Crawford comeback" },
+      { t: "Anchors Aweigh", note: "Sinatra + Kelly + a dancing cartoon mouse" },
+    ],
+    tech: [
+      { t: "ENIAC, the first general-purpose electronic computer, is being built (operational Feb 1946)" },
+      { t: "Microwave oven invented after Percy Spencer melts a chocolate bar near a magnetron" },
+    ],
+    culture: [
+      { t: "Levittown — first mass-produced American suburb — begins planning" },
+      { t: "Boomer generation begins (post-war baby boom kicks off mid-year)" },
+    ],
+    quote: "\"We've got peace.\" — heard in Times Square, August 15, said about ten million times",
+  },
+  {
+    year: 1955,
+    sub: "America at the height of post-war prosperity",
+    headlines: [
+      { t: "Rosa Parks refuses to give up her seat in Montgomery", note: "Dec 1" },
+      { t: "Salk polio vaccine declared safe and effective", note: "Apr 12" },
+      { t: "Soviet Union signs Warsaw Pact with seven Eastern Bloc nations" },
+      { t: "Walt Disney opens Disneyland in Anaheim", note: "Jul 17" },
+    ],
+    music: [
+      { t: "Rock Around the Clock — Bill Haley & His Comets", note: "#1 of year" },
+      { t: "Cherry Pink and Apple Blossom White — Pérez Prado" },
+      { t: "Sixteen Tons — Tennessee Ernie Ford" },
+    ],
+    film: [
+      { t: "Rebel Without a Cause", note: "James Dean, released weeks after his death" },
+      { t: "The Seven Year Itch", note: "Marilyn Monroe over the subway grate" },
+      { t: "Lady and the Tramp", note: "Disney" },
+    ],
+    tech: [
+      { t: "First Volkswagen Beetles arrive in the U.S. in volume" },
+      { t: "Bell Labs demonstrates first solar cell battery" },
+    ],
+    culture: [
+      { t: "McDonald's incorporates under Ray Kroc, Des Plaines IL", note: "Apr 15" },
+      { t: "Television sets in 65% of American homes — up from 9% five years prior" },
+    ],
+    quote: "\"The future is something which everyone reaches at the rate of sixty minutes an hour.\" — C.S. Lewis, 1955",
+  },
+  {
+    year: 1963,
+    sub: "The year the long peace ended",
+    headlines: [
+      { t: "Martin Luther King Jr. delivers 'I Have a Dream' at the March on Washington", note: "Aug 28" },
+      { t: "President John F. Kennedy assassinated in Dallas", note: "Nov 22" },
+      { t: "First Beatles album released in the UK" },
+      { t: "ZIP codes introduced by the U.S. Postal Service" },
+    ],
+    music: [
+      { t: "Sugar Shack — Jimmy Gilmer & The Fireballs", note: "#1 of year" },
+      { t: "Surfin' U.S.A. — The Beach Boys" },
+      { t: "He's So Fine — The Chiffons" },
+    ],
+    film: [
+      { t: "Cleopatra", note: "Most expensive film ever made at the time" },
+      { t: "The Birds", note: "Hitchcock" },
+      { t: "Dr. No → followed by From Russia With Love", note: "Bond is now a phenomenon" },
+    ],
+    tech: [
+      { t: "First touch-tone telephones in commercial use" },
+      { t: "Audiocassette tape introduced by Philips" },
+    ],
+    culture: [
+      { t: "Pop Art is the dominant force in fine art — Warhol's Marilyn series" },
+      { t: "Vatican II reshapes the Catholic Church" },
+    ],
+    quote: "\"Ask not what your country can do for you...\" — JFK's 1961 inaugural still ringing two years later",
+  },
+  {
+    year: 1969,
+    sub: "Moon landing, Manson, Woodstock — the year America cracked",
+    headlines: [
+      { t: "Apollo 11 lands. Neil Armstrong walks on the moon", note: "Jul 20" },
+      { t: "Woodstock Music Festival, 400,000 attend", note: "Aug 15–18" },
+      { t: "Stonewall riots ignite the gay rights movement", note: "Jun 28" },
+      { t: "Charles Manson family commits Tate-LaBianca murders", note: "Aug" },
+      { t: "ARPANET — the precursor to the internet — sends first message", note: "Oct 29" },
+    ],
+    music: [
+      { t: "Sugar, Sugar — The Archies", note: "#1 of year" },
+      { t: "Honky Tonk Women — Rolling Stones" },
+      { t: "Suspicious Minds — Elvis Presley" },
+      { t: "Aquarius/Let the Sunshine In — The Fifth Dimension" },
+    ],
+    film: [
+      { t: "Midnight Cowboy", note: "First X-rated film to win Best Picture" },
+      { t: "Easy Rider", note: "Counterculture lands in the multiplex" },
+      { t: "Butch Cassidy and the Sundance Kid" },
+    ],
+    tech: [
+      { t: "First message sent between two computers over ARPANET", note: "system crashed after 'LO' — meant to be 'LOGIN'" },
+      { t: "Boeing 747 first flies" },
+    ],
+    culture: [
+      { t: "Vietnam War casualties peak. Draft lottery introduced." },
+      { t: "Sesame Street debuts on November 10" },
+    ],
+    quote: "\"That's one small step for man, one giant leap for mankind.\" — Neil Armstrong, July 20",
+  },
+  {
+    year: 1977,
+    sub: "Star Wars and Elvis — the year the modern blockbuster was born",
+    headlines: [
+      { t: "Star Wars opens, becomes highest-grossing film ever made", note: "May 25" },
+      { t: "Elvis Presley dies at Graceland, age 42", note: "Aug 16" },
+      { t: "First Apple II computer ships" },
+      { t: "Voyager 1 and 2 launched to the outer planets" },
+      { t: "New York City blackout — 25 hours, 1,600 stores looted", note: "Jul 13" },
+    ],
+    music: [
+      { t: "Tonight's the Night — Rod Stewart", note: "#1 of year" },
+      { t: "Hotel California — Eagles" },
+      { t: "Dreams — Fleetwood Mac" },
+      { t: "Sex Pistols release 'Never Mind the Bollocks'" },
+    ],
+    film: [
+      { t: "Star Wars" },
+      { t: "Saturday Night Fever", note: "Disco at its peak" },
+      { t: "Annie Hall", note: "Woody Allen's best picture" },
+    ],
+    tech: [
+      { t: "Apple II released — first mass-market personal computer" },
+      { t: "Atari 2600 launches the home video game industry" },
+    ],
+    culture: [
+      { t: "Studio 54 opens in NYC" },
+      { t: "'Roots' miniseries draws 130 million American viewers" },
+    ],
+    quote: "\"In a galaxy far, far away...\" — every kid in America starts a Saturday with the same sentence",
+  },
+  {
+    year: 1975,
+    sub: "Vietnam ends, the malaise begins, Saturday Night Live arrives",
+    headlines: [
+      { t: "Saigon falls. U.S. evacuates by helicopter from the embassy roof.", note: "Apr 30" },
+      { t: "Microsoft founded by Bill Gates and Paul Allen", note: "Apr 4" },
+      { t: "Jaws becomes the first summer blockbuster", note: "Jun 20" },
+      { t: "New York City nearly bankrupt — 'FORD TO CITY: DROP DEAD'" },
+      { t: "Saturday Night Live debuts on NBC", note: "Oct 11" },
+    ],
+    music: [
+      { t: "Love Will Keep Us Together — Captain & Tennille", note: "#1 of year" },
+      { t: "Bohemian Rhapsody released — Queen", note: "single in UK Oct 31" },
+      { t: "Born to Run — Bruce Springsteen" },
+      { t: "Wish You Were Here — Pink Floyd" },
+    ],
+    film: [
+      { t: "Jaws" },
+      { t: "One Flew Over the Cuckoo's Nest", note: "Best Picture" },
+      { t: "Dog Day Afternoon" },
+      { t: "Monty Python and the Holy Grail" },
+    ],
+    tech: [
+      { t: "Altair 8800 — first practical personal computer kit — covers Popular Electronics in January" },
+      { t: "First video cassette recorders (Betamax) ship in Japan" },
+    ],
+    culture: [
+      { t: "Disco overtakes radio" },
+      { t: "Patty Hearst captured by FBI in San Francisco" },
+    ],
+    quote: "\"Live from New York, it's Saturday Night!\" — Chevy Chase, Oct 11",
+  },
+  {
+    year: 1985,
+    sub: "The American suburb's golden hour — neon, MTV, Back to the Future",
+    headlines: [
+      { t: "Live Aid concerts raise $127M for African famine", note: "Jul 13" },
+      { t: "Microsoft releases Windows 1.0", note: "Nov 20" },
+      { t: "Gorbachev becomes Soviet leader, signaling end of the Cold War" },
+      { t: "New Coke launched, then withdrawn after 79 days" },
+      { t: "Titanic wreckage discovered on the floor of the Atlantic" },
+    ],
+    music: [
+      { t: "Careless Whisper — Wham!", note: "#1 of year" },
+      { t: "Take On Me — a-ha" },
+      { t: "We Are the World — USA for Africa" },
+      { t: "Money for Nothing — Dire Straits" },
+    ],
+    film: [
+      { t: "Back to the Future", note: "Marty McFly travels to 1955" },
+      { t: "The Breakfast Club" },
+      { t: "Out of Africa", note: "Best Picture" },
+    ],
+    tech: [
+      { t: "Windows 1.0, Atari ST, Commodore Amiga all launch" },
+      { t: "First .com domain registered (symbolics.com)", note: "Mar 15" },
+    ],
+    culture: [
+      { t: "MTV is now central. Music video is THE marketing form." },
+      { t: "Nintendo Entertainment System launches in U.S." },
+    ],
+    quote: "\"Where we're going, we don't need roads.\" — Doc Brown, Back to the Future",
+  },
+  {
+    year: 1991,
+    sub: "Soviet Union dissolves. Web invented. New world quietly begins.",
+    headlines: [
+      { t: "Soviet Union officially dissolved", note: "Dec 26" },
+      { t: "Tim Berners-Lee makes the World Wide Web publicly available", note: "Aug 6" },
+      { t: "Operation Desert Storm — Gulf War", note: "Jan-Feb" },
+      { t: "South Africa repeals apartheid laws" },
+      { t: "Linux 0.01 released by Linus Torvalds" },
+    ],
+    music: [
+      { t: "(Everything I Do) I Do It for You — Bryan Adams", note: "#1, 7 weeks straight" },
+      { t: "Smells Like Teen Spirit — Nirvana", note: "Sep — grunge arrives" },
+      { t: "Black or White — Michael Jackson" },
+      { t: "Losing My Religion — R.E.M." },
+    ],
+    film: [
+      { t: "The Silence of the Lambs", note: "Best Picture sweep" },
+      { t: "Terminator 2: Judgment Day" },
+      { t: "Beauty and the Beast", note: "First animated Best Picture nominee" },
+    ],
+    tech: [
+      { t: "World Wide Web becomes publicly accessible" },
+      { t: "Linux kernel first released" },
+    ],
+    culture: [
+      { t: "Magic Johnson announces HIV-positive status, retires from NBA" },
+      { t: "Generation X published by Douglas Coupland — names the generation" },
+    ],
+    quote: "\"Info.cern.ch — the world's first website goes live\" — most people will not hear about this for 4 more years",
+  },
+  {
+    year: 1995,
+    sub: "DVD invented. Netscape IPOs. The internet is now a thing.",
+    headlines: [
+      { t: "Oklahoma City bombing kills 168", note: "Apr 19" },
+      { t: "O.J. Simpson acquitted in 'trial of the century'", note: "Oct 3" },
+      { t: "Netscape IPO — the moment the internet becomes a Wall Street story", note: "Aug 9" },
+      { t: "Windows 95 launches with overwhelming hype and a Rolling Stones theme song", note: "Aug 24" },
+      { t: "Dayton Accords signed, ending the Bosnian War" },
+    ],
+    music: [
+      { t: "Gangsta's Paradise — Coolio feat. L.V.", note: "#1 of year" },
+      { t: "Wonderwall — Oasis" },
+      { t: "Waterfalls — TLC" },
+      { t: "Kiss From a Rose — Seal (from Batman Forever)" },
+    ],
+    film: [
+      { t: "Toy Story", note: "First fully computer-animated feature film" },
+      { t: "Braveheart", note: "Best Picture" },
+      { t: "Apollo 13" },
+      { t: "Se7en" },
+    ],
+    tech: [
+      { t: "Windows 95, Internet Explorer 1, JavaScript, eBay, Amazon book sales, DVD spec — all 1995" },
+      { t: "PlayStation launches in U.S. (Sep 9)" },
+    ],
+    culture: [
+      { t: "Friends and Seinfeld are NBC's must-see-TV centerpiece" },
+      { t: "'You've got mail!' — AOL is now in 5M households" },
+    ],
+    quote: "\"This is the internet. We're going to do this whether you want us to or not.\" — Marc Andreessen, in spirit",
+  },
+  {
+    year: 1998,
+    sub: "Pre-everything. Pre-9/11, pre-iPhone, pre-social. The last summer of the 20th century.",
+    headlines: [
+      { t: "Bill Clinton impeached over Monica Lewinsky affair" },
+      { t: "Google founded by Larry Page and Sergey Brin", note: "Sep 4" },
+      { t: "Mark McGwire breaks home run record (70)" },
+      { t: "Good Friday Agreement signed in Northern Ireland" },
+      { t: "International Space Station construction begins" },
+    ],
+    music: [
+      { t: "Too Close — Next", note: "#1 of year" },
+      { t: "...Baby One More Time — Britney Spears (late '98)" },
+      { t: "My Heart Will Go On — Celine Dion (Titanic carries over)" },
+      { t: "Brick — Ben Folds Five" },
+    ],
+    film: [
+      { t: "Titanic still in theaters from December '97 release" },
+      { t: "Saving Private Ryan", note: "Spielberg" },
+      { t: "The Big Lebowski" },
+      { t: "The Truman Show" },
+    ],
+    tech: [
+      { t: "iMac launches — Apple's first major comeback hit" },
+      { t: "Google goes live at google.com" },
+      { t: "AOL Instant Messenger explodes among teens" },
+    ],
+    culture: [
+      { t: "Seinfeld series finale — 76M viewers", note: "May 14" },
+      { t: "Beanie Babies, Tamagotchis, Furbies, AIM screen names" },
+    ],
+    quote: "\"You've got mail.\" — the line you'd hear from AOL 30 times a day",
+  },
+  {
+    year: 2001,
+    sub: "The year America stopped, and then never restarted the same way",
+    headlines: [
+      { t: "September 11 attacks — 2,977 killed", note: "Sep 11" },
+      { t: "U.S. invades Afghanistan, October 7" },
+      { t: "Apple launches the iPod", note: "Oct 23" },
+      { t: "Wikipedia goes live", note: "Jan 15" },
+      { t: "Enron files for bankruptcy — largest in U.S. history at the time" },
+    ],
+    music: [
+      { t: "Hanging by a Moment — Lifehouse", note: "#1 of year" },
+      { t: "Drops of Jupiter — Train" },
+      { t: "Survivor — Destiny's Child" },
+      { t: "Fallin' — Alicia Keys" },
+    ],
+    film: [
+      { t: "The Lord of the Rings: The Fellowship of the Ring" },
+      { t: "Harry Potter and the Sorcerer's Stone" },
+      { t: "Shrek" },
+      { t: "Monsters, Inc." },
+    ],
+    tech: [
+      { t: "iPod ships — 1,000 songs in your pocket" },
+      { t: "Wikipedia launches" },
+      { t: "Windows XP released" },
+    ],
+    culture: [
+      { t: "Pre-9/11: Friends, Survivor, Limp Bizkit" },
+      { t: "Post-9/11: 'United We Stand' signs in every yard, flags on every porch" },
+    ],
+    quote: "\"In the air, on the ground, and where we live and play, life will never be the same.\" — anonymous newspaper editorial, Sep 12",
+  },
+  {
+    year: 2007,
+    sub: "iPhone launches. The smartphone era begins. Everything quietly changes.",
+    headlines: [
+      { t: "Steve Jobs unveils the iPhone", note: "Jan 9, ships Jun 29" },
+      { t: "Netflix launches streaming (still mostly DVD-by-mail)", note: "Jan 16" },
+      { t: "Subprime mortgage crisis quietly accelerates" },
+      { t: "Harry Potter and the Deathly Hallows released — the series ends" },
+      { t: "Virginia Tech shooting — 33 killed, deadliest in U.S. history at the time" },
+    ],
+    music: [
+      { t: "Irreplaceable — Beyoncé", note: "#1 of year" },
+      { t: "Umbrella — Rihanna" },
+      { t: "Hey There Delilah — Plain White T's" },
+      { t: "Apologize — Timbaland feat. OneRepublic" },
+    ],
+    film: [
+      { t: "No Country for Old Men", note: "Best Picture" },
+      { t: "Transformers", note: "Bay's blockbuster era" },
+      { t: "Juno" },
+      { t: "Ratatouille" },
+    ],
+    tech: [
+      { t: "iPhone launches" },
+      { t: "Facebook opens to anyone with an email address (2006), and explodes in 2007" },
+      { t: "Twitter launches independently (post-SXSW)" },
+      { t: "Amazon Kindle released" },
+    ],
+    culture: [
+      { t: "Last year before the financial crisis broke into public view" },
+      { t: "Heroes, Lost, 30 Rock dominate TV" },
+    ],
+    quote: "\"And boy, have we patented it.\" — Steve Jobs, Jan 9, introducing the iPhone",
+  },
+  {
+    year: 2010,
+    sub: "iPad launches. Instagram launches. Streaming kills cable in slow motion.",
+    headlines: [
+      { t: "Apple unveils the iPad", note: "Jan 27" },
+      { t: "Instagram launches on iOS", note: "Oct 6" },
+      { t: "Deepwater Horizon oil spill — 87-day disaster in the Gulf", note: "Apr 20 - Jul 15" },
+      { t: "Chilean miners rescued after 69 days underground", note: "Oct 13" },
+      { t: "WikiLeaks publishes 250,000+ U.S. diplomatic cables" },
+    ],
+    music: [
+      { t: "Tik Tok — Kesha", note: "#1 of year, the song not the app" },
+      { t: "Bad Romance — Lady Gaga" },
+      { t: "Empire State of Mind — Jay-Z & Alicia Keys (still on heavy rotation)" },
+      { t: "Love the Way You Lie — Eminem feat. Rihanna" },
+    ],
+    film: [
+      { t: "The Social Network", note: "Aaron Sorkin's Facebook origin movie" },
+      { t: "The King's Speech", note: "Best Picture" },
+      { t: "Inception" },
+      { t: "Toy Story 3" },
+    ],
+    tech: [
+      { t: "iPad launches" },
+      { t: "Instagram, Pinterest, Snapchat (2011), all queued up in this window" },
+      { t: "4G LTE networks begin commercial rollout in U.S." },
+    ],
+    culture: [
+      { t: "The Hunger Games (book) sells across high schools" },
+      { t: "Tea Party midterm wave reshapes Congress" },
+    ],
+    quote: "\"There's an app for that.\" — Apple's tagline for the year",
+  },
+  {
+    year: 2012,
+    sub: "Peak Facebook. Pre-political-meltdown. The last shared internet.",
+    headlines: [
+      { t: "Barack Obama re-elected over Mitt Romney", note: "Nov 6" },
+      { t: "Curiosity rover lands on Mars", note: "Aug 6" },
+      { t: "Sandy Hook elementary shooting", note: "Dec 14" },
+      { t: "London Summer Olympics" },
+      { t: "Hurricane Sandy hits Northeast U.S." },
+    ],
+    music: [
+      { t: "Somebody That I Used to Know — Gotye", note: "#1 of year" },
+      { t: "Call Me Maybe — Carly Rae Jepsen" },
+      { t: "Gangnam Style — PSY", note: "First YouTube video to hit 1 billion views" },
+      { t: "Thrift Shop — Macklemore & Ryan Lewis" },
+    ],
+    film: [
+      { t: "The Avengers", note: "Marvel cinematic universe arrives in force" },
+      { t: "The Hunger Games" },
+      { t: "Argo", note: "Best Picture" },
+      { t: "Django Unchained" },
+    ],
+    tech: [
+      { t: "Facebook IPO at $38, drops to $20 within months" },
+      { t: "Raspberry Pi launches" },
+      { t: "Instagram acquired by Facebook for $1 billion (still photo-only)" },
+    ],
+    culture: [
+      { t: "Mayan calendar 'end' predicted Dec 21 — everyone makes jokes" },
+      { t: "Gangnam Style is the internet's first truly global meme" },
+    ],
+    quote: "\"This is the way the world ends — not with a bang but with a Korean dance song.\"",
+  },
+  {
+    year: 2016,
+    sub: "Brexit. Trump. The shared internet ends.",
+    headlines: [
+      { t: "Donald Trump elected U.S. president", note: "Nov 8" },
+      { t: "UK votes to leave the European Union (Brexit)", note: "Jun 23" },
+      { t: "Pokemon Go releases, briefly tops every metric" },
+      { t: "Cubs win the World Series, breaking a 108-year drought" },
+      { t: "Pulse nightclub shooting in Orlando" },
+    ],
+    music: [
+      { t: "Love Yourself — Justin Bieber", note: "#1 of year" },
+      { t: "One Dance — Drake" },
+      { t: "Lemonade — Beyoncé (album)" },
+      { t: "Hamilton — original cast recording sweeps cultural moment" },
+    ],
+    film: [
+      { t: "Moonlight", note: "Best Picture in the envelope mix-up" },
+      { t: "La La Land", note: "the OTHER envelope" },
+      { t: "Arrival" },
+      { t: "Rogue One: A Star Wars Story" },
+    ],
+    tech: [
+      { t: "Tesla unveils Model 3" },
+      { t: "AlphaGo defeats Lee Sedol — AI/ML moment arrives" },
+      { t: "Snapchat dominates teen attention before Stories spread" },
+    ],
+    culture: [
+      { t: "Stranger Things season 1 lands on Netflix" },
+      { t: "Many friendships strained by election; group chats fracture" },
+    ],
+    quote: "\"What just happened?\" — every media person, Nov 9 morning",
+  },
+  {
+    year: 2017,
+    sub: "Trump's first year. #MeToo. Crypto's first mainstream moment.",
+    headlines: [
+      { t: "Donald Trump inaugurated", note: "Jan 20" },
+      { t: "#MeToo movement explodes after Weinstein revelations", note: "Oct" },
+      { t: "Bitcoin hits $20,000 briefly, then collapses", note: "Dec" },
+      { t: "Hurricane Harvey + Irma + Maria — record back-to-back season" },
+      { t: "Las Vegas shooting — 60 killed at country music festival", note: "Oct 1" },
+    ],
+    music: [
+      { t: "Shape of You — Ed Sheeran", note: "#1 of year" },
+      { t: "Despacito — Luis Fonsi feat. Daddy Yankee + Justin Bieber" },
+      { t: "HUMBLE. — Kendrick Lamar" },
+      { t: "Old Town Road on the horizon..." },
+    ],
+    film: [
+      { t: "Get Out", note: "Jordan Peele directorial debut" },
+      { t: "The Shape of Water", note: "Best Picture" },
+      { t: "Dunkirk" },
+      { t: "Lady Bird" },
+    ],
+    tech: [
+      { t: "iPhone X removes the home button, introduces Face ID" },
+      { t: "Bitcoin briefly the cocktail-party topic" },
+      { t: "Net neutrality repealed by FCC (Dec)" },
+    ],
+    culture: [
+      { t: "Stranger Things season 2 lands. Black Mirror is the show people quote." },
+      { t: "Fidget spinners. Everywhere." },
+    ],
+    quote: "\"That moment when the system glitched at the Oscars.\" — Moonlight/La La Land mixup, the meta-cultural moment of the year",
+  },
+  {
+    year: 2020,
+    sub: "The year everything stopped",
+    headlines: [
+      { t: "COVID-19 declared a pandemic by WHO", note: "Mar 11" },
+      { t: "George Floyd killed in Minneapolis, sparking global protests", note: "May 25" },
+      { t: "Joe Biden defeats Donald Trump", note: "Nov 3" },
+      { t: "Kobe Bryant dies in helicopter crash", note: "Jan 26" },
+      { t: "SpaceX launches first manned mission with NASA", note: "May 30" },
+    ],
+    music: [
+      { t: "Blinding Lights — The Weeknd", note: "#1 of year, became most-streamed song of decade" },
+      { t: "WAP — Cardi B feat. Megan Thee Stallion" },
+      { t: "Watermelon Sugar — Harry Styles" },
+      { t: "Folklore + evermore — Taylor Swift in a single year" },
+    ],
+    film: [
+      { t: "Most cinemas closed for most of the year" },
+      { t: "Tenet — Christopher Nolan tries to save theaters" },
+      { t: "Hamilton on Disney+ (Jul 3) becomes the year's cultural event" },
+      { t: "Soul — Pixar, released straight to streaming" },
+    ],
+    tech: [
+      { t: "Zoom becomes a verb" },
+      { t: "TikTok overtakes Instagram for Gen Z attention" },
+      { t: "Apple Silicon — M1 Macs launch" },
+    ],
+    culture: [
+      { t: "Tiger King, sourdough starters, Among Us, animal crossing" },
+      { t: "Working from home becomes default for white-collar America" },
+    ],
+    quote: "\"You're on mute.\" — said 14 billion times",
+  },
+];
+
+const yearSelect = document.getElementById('year-select');
+const content = document.getElementById('content');
+
+ERAS.forEach(e => {
+  const opt = document.createElement('option');
+  opt.value = e.year;
+  opt.textContent = e.year + ' — ' + e.sub.substring(0, 60) + (e.sub.length > 60 ? '...' : '');
+  yearSelect.appendChild(opt);
+});
+
+let currentIndex = 0;
+
+function renderEra(idx) {
+  currentIndex = idx;
+  const era = ERAS[idx];
+  yearSelect.value = era.year;
+
+  const ageNow = 2026 - era.year;
+  const ageNote = ageNow > 0 ? `That was ${ageNow} years ago. Someone born then is ${ageNow} today.` : '';
+
+  let html = `
+    <div class="year-display">
+      <div class="y">${era.year}</div>
+      <div class="y-sub">${escapeHtml(era.sub)}</div>
+      <div class="age">${ageNote}</div>
+    </div>
+    <div class="feed">
+      ${renderCard('Headlines', era.headlines)}
+      ${renderCard('Top of the charts', era.music)}
+      ${renderCard('At the movies', era.film)}
+      ${renderCard('Tech of the moment', era.tech)}
+      ${renderCard('Cultural air', era.culture)}
+      ${era.quote ? `<div class="card"><div class="head">A voice from the year</div><div class="quote">${escapeHtml(era.quote)}</div></div>` : ''}
+    </div>
+  `;
+  content.innerHTML = html;
+  window.scrollTo({ top: document.querySelector('.year-display').offsetTop - 20, behavior: 'smooth' });
+}
+
+function renderCard(heading, items) {
+  if (!items || !items.length) return '';
+  return `
+    <div class="card">
+      <div class="head">${escapeHtml(heading)}</div>
+      ${items.map(i => `<div class="item">${escapeHtml(i.t)}${i.note ? `<small>${escapeHtml(i.note)}</small>` : ''}</div>`).join('')}
+    </div>
+  `;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function jumpToYear(year) {
+  const idx = ERAS.findIndex(e => e.year === parseInt(year, 10));
+  if (idx >= 0) renderEra(idx);
+}
+
+function randomEra() {
+  const idx = Math.floor(Math.random() * ERAS.length);
+  renderEra(idx);
+}
+
+function nextEra() {
+  renderEra((currentIndex + 1) % ERAS.length);
+}
+
+function shareYear() {
+  const era = ERAS[currentIndex];
+  const url = new URL(location.href);
+  url.hash = 'y=' + era.year;
+  const link = url.toString();
+
+  if (navigator.share) {
+    navigator.share({
+      title: 'Era — ' + era.year,
+      text: 'Step into ' + era.year + ': ' + era.sub,
+      url: link,
+    }).catch(() => copyLink(link));
+  } else {
+    copyLink(link);
+  }
+}
+
+function copyLink(link) {
+  navigator.clipboard.writeText(link).then(() => {
+    alert('Link copied:\n' + link);
+  }).catch(() => {
+    prompt('Copy this link:', link);
+  });
+}
+
+function checkHash() {
+  const hash = location.hash;
+  if (hash.startsWith('#y=')) {
+    const y = parseInt(hash.slice(3), 10);
+    if (!isNaN(y)) jumpToYear(y);
+  } else {
+    // Default to a random year on first load
+    randomEra();
+  }
+}
+
+function jumpToYearIWas16() {
+  const birth = parseInt(document.getElementById('birth-input').value, 10);
+  if (isNaN(birth) || birth < 1900 || birth > 2026) {
+    alert('Enter your birth year.');
+    return;
+  }
+  const targetYear = birth + 16;
+  // Find the closest year in our list
+  const closest = ERAS.reduce((c, e) => Math.abs(e.year - targetYear) < Math.abs(c.year - targetYear) ? e : c);
+  jumpToYear(closest.year);
+  if (closest.year !== targetYear) {
+    setTimeout(() => alert("Closest year we have: " + closest.year + " (you were " + (closest.year - birth) + " then)"), 100);
+  }
+}
+
+document.getElementById('my-year-btn').addEventListener('click', jumpToYearIWas16);
+document.getElementById('birth-input').addEventListener('keypress', e => { if (e.key === 'Enter') jumpToYearIWas16(); });
+document.getElementById('go-btn').addEventListener('click', () => jumpToYear(yearSelect.value));
+document.getElementById('random-btn').addEventListener('click', randomEra);
+document.getElementById('share-btn').addEventListener('click', shareYear);
+document.getElementById('next-btn').addEventListener('click', nextEra);
+yearSelect.addEventListener('change', () => jumpToYear(yearSelect.value));
+
+checkHash();
+</script>
+
+</body>
+</html>

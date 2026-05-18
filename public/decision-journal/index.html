@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Decision Journal — what you decided, what you predicted, what actually happened</title>
+<meta name="description" content="Log non-trivial decisions with predictions, alternatives, and review dates. Compare prediction vs outcome over time to calibrate your judgment.">
+<meta property="og:title" content="Decision Journal — what you decided, what you predicted, what actually happened">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --bg: #f5f1ea;
+    --panel: #fffcf6;
+    --ink: #1d1812;
+    --ink-soft: #6b5a44;
+    --ink-faint: #a89880;
+    --accent: #3a5c4a;
+    --accent-light: #6d8b7a;
+    --warn: #b85c2e;
+    --done: #4a7c3d;
+    --border: #ddd3c0;
+    --serif: Georgia, "Times New Roman", serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 1rem;
+  }
+  .container { max-width: 720px; margin: 0 auto; }
+  header { text-align: center; padding: 2rem 0; }
+  header h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 6vw, 2.6rem);
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+    letter-spacing: -0.01em;
+  }
+  header p {
+    color: var(--ink-soft);
+    font-style: italic;
+    font-size: 0.95rem;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .tab {
+    padding: 0.55rem 1.1rem;
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .tab.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+  .tab:hover:not(.active) { border-color: var(--accent); color: var(--ink); }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(29,24,18,0.06);
+  }
+  .panel h2 {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+
+  label {
+    display: block;
+    color: var(--accent);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin: 1.25rem 0 0.4rem;
+    font-weight: 600;
+  }
+  label:first-child { margin-top: 0; }
+  label .helper {
+    color: var(--ink-faint);
+    font-size: 0.7rem;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: normal;
+    font-style: italic;
+    margin-left: 0.4rem;
+  }
+
+  input[type="text"], input[type="date"], input[type="number"], textarea, select {
+    width: 100%;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 6px;
+    padding: 0.7rem 0.95rem;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  textarea { min-height: 80px; resize: vertical; }
+  input:focus, textarea:focus, select:focus {
+    outline: none; border-color: var(--accent);
+  }
+
+  button {
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    padding: 0.7rem 1.3rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  button:hover { background: var(--accent); }
+  button.ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+  }
+  button.ghost:hover { background: var(--bg); color: var(--ink); border-color: var(--accent); }
+
+  .row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
+
+  .confidence-row {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-top: 0.4rem;
+  }
+  .confidence-row button {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--border);
+    padding: 0.4rem 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 400;
+  }
+  .confidence-row button.selected {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+
+  .card {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .card:last-child { border-bottom: none; }
+  .card .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+    gap: 0.5rem;
+  }
+  .card .header .title {
+    font-family: var(--serif);
+    color: var(--accent);
+    font-size: 1.1rem;
+    flex: 1;
+  }
+  .card .meta {
+    color: var(--ink-faint);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.5rem;
+  }
+  .card .body { color: var(--ink); margin-bottom: 0.6rem; }
+  .card .body .label {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 0.6rem;
+    display: block;
+  }
+  .card .body .content {
+    white-space: pre-wrap;
+    color: var(--ink);
+    font-size: 0.95rem;
+  }
+  .card .status-pill {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+  .status-pill.pending { background: #f0e5dc; color: var(--warn); }
+  .status-pill.reviewed { background: #e8f0e2; color: var(--done); }
+  .status-pill.due { background: #fde8a8; color: #8a6a1a; }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.6rem;
+  }
+  @media (max-width: 480px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  .stat {
+    text-align: center;
+    padding: 0.85rem 0.4rem;
+    background: var(--bg);
+    border-radius: 8px;
+  }
+  .stat .n {
+    font-family: var(--serif);
+    font-size: 1.6rem;
+    color: var(--accent);
+    line-height: 1.1;
+  }
+  .stat .l {
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0.25rem;
+  }
+
+  .empty {
+    text-align: center;
+    color: var(--ink-faint);
+    padding: 1.5rem 0;
+    font-style: italic;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+    line-height: 1.6;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  .quote {
+    background: var(--bg);
+    border-left: 3px solid var(--accent);
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 0.88rem;
+    margin: 1rem 0;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Decision Journal</h1>
+  <p>what you decided, what you predicted, what actually happened</p>
+</header>
+
+<div class="tabs">
+  <button class="tab active" data-view="log">Log decision</button>
+  <button class="tab" data-view="due">Due for review</button>
+  <button class="tab" data-view="all">All decisions</button>
+  <button class="tab" data-view="stats">Calibration</button>
+  <button class="tab" data-view="manage">Manage</button>
+</div>
+
+<div id="view-log" class="view">
+  <div class="panel">
+    <h2>Log a decision</h2>
+    <div class="quote">"In retrospect, every decision looked obvious. But before you knew the outcome, it didn't. Write down what you were thinking when you only had what you had."</div>
+
+    <label>Date <span class="helper">when did you make this decision?</span></label>
+    <input type="date" id="d-date">
+
+    <label>The decision in one sentence</label>
+    <input type="text" id="d-title" placeholder="e.g., Accept the UA offer over the Bama appeal">
+
+    <label>What you decided + what you decided AGAINST</label>
+    <textarea id="d-decision" placeholder="The choice, and the live alternatives you ruled out."></textarea>
+
+    <label>Why <span class="helper">the actual reasoning, not the post-hoc story</span></label>
+    <textarea id="d-why" placeholder="What evidence + values drove this?"></textarea>
+
+    <label>What you're predicting will happen</label>
+    <textarea id="d-prediction" placeholder="Be specific. Numbers if you have them. Time-bound."></textarea>
+
+    <label>How confident? <span class="helper">be honest — calibration only works if you're honest</span></label>
+    <div class="confidence-row" id="confidence-row">
+      <button data-c="20">20% — long shot</button>
+      <button data-c="40">40% — leaning</button>
+      <button data-c="55">55% — slight edge</button>
+      <button data-c="70">70% — likely</button>
+      <button data-c="85">85% — quite confident</button>
+      <button data-c="95">95% — very confident</button>
+    </div>
+
+    <label>Review date <span class="helper">when can you tell how it turned out?</span></label>
+    <input type="date" id="d-reviewdate">
+
+    <label>Tag (optional)</label>
+    <input type="text" id="d-tag" placeholder="e.g., career, money, relationship, business, faith">
+
+    <button id="save-btn" style="margin-top:1.5rem;">Log this decision</button>
+  </div>
+</div>
+
+<div id="view-due" class="view" style="display:none;">
+  <div class="panel">
+    <h2>Decisions due for review</h2>
+    <div id="due-list"></div>
+  </div>
+</div>
+
+<div id="view-all" class="view" style="display:none;">
+  <div class="panel">
+    <h2>All decisions</h2>
+    <input type="text" id="all-search" placeholder="Search title, decision, prediction, tag" style="margin-bottom:1rem;">
+    <div id="all-list"></div>
+  </div>
+</div>
+
+<div id="view-stats" class="view" style="display:none;">
+  <div class="panel">
+    <h2>Your calibration</h2>
+    <p style="color:var(--ink-soft);font-size:0.88rem;margin-bottom:1rem;">When you said 70%, were you right ~70% of the time? Compare confidence vs actual hit rate across reviewed decisions.</p>
+    <div class="stats" id="stats-grid"></div>
+    <div style="margin-top:1.5rem;">
+      <h2>By confidence bucket</h2>
+      <div id="cal-table"></div>
+    </div>
+    <div style="margin-top:1.5rem;">
+      <h2>By tag</h2>
+      <div id="cal-by-tag"></div>
+    </div>
+  </div>
+</div>
+
+<div id="view-manage" class="view" style="display:none;">
+  <div class="panel">
+    <h2>Manage</h2>
+    <div class="row">
+      <button class="ghost" id="export-btn">Export JSON</button>
+      <button class="ghost" id="import-btn">Import JSON</button>
+      <button class="ghost" id="reset-btn" style="color:#b04a4a;border-color:#d8b6b6;">Reset all</button>
+      <input type="file" id="import-file" accept=".json" style="display:none;">
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>Inspired by Annie Duke (Thinking in Bets) and Shane Parrish's decision journal.<br>
+  <a href="https://github.com/thebigjah/decision-journal">source</a></p>
+</footer>
+
+</div>
+
+<script>
+'use strict';
+
+const KEY = 'decisionjournal.v1';
+let decisions = load();
+let selectedConfidence = null;
+
+function load() {
+  try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; }
+}
+function save() { localStorage.setItem(KEY, JSON.stringify(decisions)); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function escapeHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function fmtDate(d) {
+  const dt = new Date(d + 'T00:00:00');
+  if (isNaN(dt)) return d;
+  return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function initLog() {
+  document.getElementById('d-date').value = todayKey();
+  // Default review date to 60 days out
+  const r = new Date();
+  r.setDate(r.getDate() + 60);
+  document.getElementById('d-reviewdate').value = r.toISOString().split('T')[0];
+}
+
+document.getElementById('confidence-row').addEventListener('click', (e) => {
+  if (e.target.tagName !== 'BUTTON') return;
+  document.querySelectorAll('#confidence-row button').forEach(b => b.classList.remove('selected'));
+  e.target.classList.add('selected');
+  selectedConfidence = parseInt(e.target.dataset.c, 10);
+});
+
+function saveDecision() {
+  const d = {
+    id: uid(),
+    date: document.getElementById('d-date').value,
+    title: document.getElementById('d-title').value.trim(),
+    decision: document.getElementById('d-decision').value.trim(),
+    why: document.getElementById('d-why').value.trim(),
+    prediction: document.getElementById('d-prediction').value.trim(),
+    confidence: selectedConfidence,
+    reviewDate: document.getElementById('d-reviewdate').value,
+    tag: document.getElementById('d-tag').value.trim(),
+    reviewed: false,
+    outcome: null,
+    outcomeAt: null,
+    correct: null,
+    loggedAt: new Date().toISOString(),
+  };
+  if (!d.title || !d.date || !d.reviewDate || d.confidence == null) {
+    alert('Need at minimum: date, title, confidence, and review date.');
+    return;
+  }
+  decisions.push(d);
+  save();
+  alert('Logged. Comes back to you on ' + fmtDate(d.reviewDate) + '.');
+  clearLog();
+  initLog();
+}
+
+function clearLog() {
+  ['d-title','d-decision','d-why','d-prediction','d-tag'].forEach(id => document.getElementById(id).value = '');
+  selectedConfidence = null;
+  document.querySelectorAll('#confidence-row button').forEach(b => b.classList.remove('selected'));
+}
+
+function renderDue() {
+  const today = todayKey();
+  const due = decisions.filter(d => !d.reviewed && (d.reviewDate || '') <= today).sort((a, b) => a.reviewDate.localeCompare(b.reviewDate));
+  const el = document.getElementById('due-list');
+  if (!due.length) { el.innerHTML = '<div class="empty">Nothing due for review. Come back another day.</div>'; return; }
+  el.innerHTML = due.map(d => renderCard(d, true)).join('');
+}
+
+function renderAll() {
+  const q = (document.getElementById('all-search')?.value || '').toLowerCase().trim();
+  let list = [...decisions].sort((a, b) => b.date.localeCompare(a.date));
+  if (q) {
+    list = list.filter(d =>
+      (d.title || '').toLowerCase().includes(q) ||
+      (d.decision || '').toLowerCase().includes(q) ||
+      (d.prediction || '').toLowerCase().includes(q) ||
+      (d.outcome || '').toLowerCase().includes(q) ||
+      (d.tag || '').toLowerCase().includes(q)
+    );
+  }
+  const el = document.getElementById('all-list');
+  if (!list.length) { el.innerHTML = q ? '<div class="empty">No matches.</div>' : '<div class="empty">No decisions logged yet.</div>'; return; }
+  el.innerHTML = list.map(d => renderCard(d, false)).join('');
+}
+
+function renderCard(d, dueMode) {
+  const today = todayKey();
+  const isDue = !d.reviewed && (d.reviewDate || '') <= today;
+  const pill = d.reviewed ? `<span class="status-pill reviewed">reviewed${d.correct != null ? (d.correct ? ' · correct' : ' · wrong') : ''}</span>`
+    : isDue ? '<span class="status-pill due">due now</span>'
+    : '<span class="status-pill pending">pending</span>';
+  return `
+    <div class="card">
+      <div class="header">
+        <div class="title">${escapeHtml(d.title)}</div>
+        ${pill}
+      </div>
+      <div class="meta">decided ${fmtDate(d.date)} · review ${fmtDate(d.reviewDate)} · ${d.confidence}% confident${d.tag ? ' · ' + escapeHtml(d.tag) : ''}</div>
+      <div class="body">
+        ${d.decision ? `<span class="label">Decision</span><div class="content">${escapeHtml(d.decision)}</div>` : ''}
+        ${d.why ? `<span class="label">Why</span><div class="content">${escapeHtml(d.why)}</div>` : ''}
+        ${d.prediction ? `<span class="label">Predicted</span><div class="content">${escapeHtml(d.prediction)}</div>` : ''}
+        ${d.outcome ? `<span class="label">Outcome</span><div class="content">${escapeHtml(d.outcome)}</div>` : ''}
+      </div>
+      <div class="row">
+        ${!d.reviewed ? `<button onclick="reviewDecision('${d.id}')" style="padding:0.4rem 0.9rem;font-size:0.85rem;">Review now</button>` : ''}
+        <button class="ghost" onclick="deleteDecision('${d.id}')" style="padding:0.4rem 0.9rem;font-size:0.85rem;">Delete</button>
+      </div>
+    </div>
+  `;
+}
+
+window.reviewDecision = (id) => {
+  const d = decisions.find(x => x.id === id);
+  if (!d) return;
+  const outcome = prompt('What actually happened? Be specific.', d.outcome || '');
+  if (outcome === null) return;
+  const correctStr = prompt('Did your prediction come true? Answer y / n / partial', 'partial');
+  if (correctStr === null) return;
+  const c = correctStr.trim().toLowerCase();
+  d.outcome = outcome.trim();
+  d.outcomeAt = new Date().toISOString();
+  d.reviewed = true;
+  d.correct = c.startsWith('y') ? true : c.startsWith('n') ? false : null;
+  save();
+  renderDue();
+  renderAll();
+  renderStats();
+  alert('Review saved. Your calibration page will reflect this.');
+};
+
+window.deleteDecision = (id) => {
+  if (!confirm('Delete this decision?')) return;
+  decisions = decisions.filter(d => d.id !== id);
+  save();
+  renderDue(); renderAll(); renderStats();
+};
+
+function renderStats() {
+  const total = decisions.length;
+  const reviewed = decisions.filter(d => d.reviewed).length;
+  const correct = decisions.filter(d => d.reviewed && d.correct === true).length;
+  const dueNow = decisions.filter(d => !d.reviewed && (d.reviewDate || '') <= todayKey()).length;
+
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat"><div class="n">${total}</div><div class="l">logged</div></div>
+    <div class="stat"><div class="n">${reviewed}</div><div class="l">reviewed</div></div>
+    <div class="stat"><div class="n">${reviewed ? Math.round(correct / reviewed * 100) : 0}%</div><div class="l">accuracy</div></div>
+    <div class="stat"><div class="n">${dueNow}</div><div class="l">due now</div></div>
+  `;
+
+  // Calibration by bucket
+  const buckets = [20, 40, 55, 70, 85, 95];
+  const rows = buckets.map(b => {
+    const inBucket = decisions.filter(d => d.reviewed && d.confidence === b);
+    const hits = inBucket.filter(d => d.correct === true).length;
+    const total = inBucket.length;
+    const actual = total ? Math.round(hits / total * 100) : null;
+    return { b, total, hits, actual };
+  });
+  document.getElementById('cal-table').innerHTML = `
+    <div style="font-family:ui-monospace,monospace;font-size:0.85rem;">
+      <div style="display:grid;grid-template-columns:auto 1fr auto auto;gap:0.5rem;padding:0.4rem 0;color:var(--ink-faint);font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--border);">
+        <span>You said</span><span></span><span>Actual</span><span>N</span>
+      </div>
+      ${rows.map(r => `
+        <div style="display:grid;grid-template-columns:auto 1fr auto auto;gap:0.5rem;padding:0.4rem 0;border-bottom:1px solid var(--border);align-items:center;">
+          <span style="color:var(--accent);">${r.b}%</span>
+          <span style="color:var(--ink-faint);">${r.total ? '·'.repeat(Math.min(r.total, 30)) : ''}</span>
+          <span style="color:${r.actual == null ? 'var(--ink-faint)' : (Math.abs(r.actual - r.b) < 15 ? 'var(--done)' : 'var(--warn)')};">${r.actual == null ? '—' : r.actual + '%'}</span>
+          <span style="color:var(--ink-soft);">${r.total}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  // By tag
+  const tagStats = {};
+  decisions.filter(d => d.reviewed).forEach(d => {
+    const t = d.tag || '(untagged)';
+    if (!tagStats[t]) tagStats[t] = { total: 0, correct: 0 };
+    tagStats[t].total++;
+    if (d.correct === true) tagStats[t].correct++;
+  });
+  const sortedTags = Object.entries(tagStats).sort((a, b) => b[1].total - a[1].total);
+  document.getElementById('cal-by-tag').innerHTML = sortedTags.length ? sortedTags.map(([t, s]) => `
+    <div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.88rem;">
+      <span>${escapeHtml(t)}</span>
+      <span style="color:var(--ink-soft);">${Math.round(s.correct/s.total*100)}% (${s.correct}/${s.total})</span>
+    </div>
+  `).join('') : '<div class="empty">No reviewed decisions with tags yet.</div>';
+}
+
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(decisions, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'decision-journal-' + todayKey() + '.json';
+  a.click();
+}
+
+function importJSON(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!Array.isArray(data)) throw new Error('not array');
+      if (!confirm('Merge ' + data.length + ' decisions?')) return;
+      const existing = new Set(decisions.map(d => d.id));
+      let added = 0;
+      data.forEach(d => { if (!existing.has(d.id)) { decisions.push(d); added++; } });
+      save();
+      renderAll(); renderDue(); renderStats();
+      alert('Added ' + added + ' decisions.');
+    } catch (err) { alert('Bad JSON: ' + err.message); }
+  };
+  r.readAsText(file);
+}
+
+function resetAll() {
+  if (!confirm('Erase all decisions?')) return;
+  if (!confirm('Really?')) return;
+  localStorage.removeItem(KEY); decisions = [];
+  renderAll(); renderDue(); renderStats();
+}
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + name).style.display = '';
+  document.querySelector(`.tab[data-view="${name}"]`).classList.add('active');
+  if (name === 'log') initLog();
+  if (name === 'due') renderDue();
+  if (name === 'all') renderAll();
+  if (name === 'stats') renderStats();
+}
+
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
+document.getElementById('save-btn').addEventListener('click', saveDecision);
+document.getElementById('all-search').addEventListener('input', renderAll);
+document.getElementById('export-btn').addEventListener('click', exportJSON);
+document.getElementById('import-btn').addEventListener('click', () => document.getElementById('import-file').click());
+document.getElementById('import-file').addEventListener('change', importJSON);
+document.getElementById('reset-btn').addEventListener('click', resetAll);
+
+initLog();
+renderDue();
+renderAll();
+renderStats();
+</script>
+
+</body>
+</html>

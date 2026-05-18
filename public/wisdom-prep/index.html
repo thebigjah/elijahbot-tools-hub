@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wisdom Conversation Prep</title>
+<meta name="description" content="A 5-minute prep tool for a conversation with someone wiser than you. Pick the mentor + topic, get customized questions + pre-call thinking + post-call reflection template.">
+<meta property="og:title" content="Wisdom Conversation Prep — 5-min mentor-call generator">
+<meta property="og:description" content="Pick the mentor + the question. Get customized opener, 7 questions, closing move, post-call template.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://thebigjah.github.io/wisdom-prep/">
+<meta name="twitter:card" content="summary">
+<style>
+  :root {
+    --bg: #f8f3e6;
+    --bg-alt: #ede4d0;
+    --card: #fffdf2;
+    --border: #c9b890;
+    --accent: #5a4022;
+    --accent-light: #8b6a3d;
+    --gold: #9a7a2e;
+    --text: #2d1f0e;
+    --text-muted: #6b5444;
+    --text-light: #9a8270;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    min-height: 100vh;
+  }
+  .container { max-width: 780px; margin: 0 auto; padding: 48px 24px 80px; }
+  header { text-align: center; margin-bottom: 32px; }
+  .label-tag {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+  }
+  h1 {
+    font-family: "Cinzel", Georgia, serif;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 700; line-height: 1.15; margin-bottom: 16px;
+  }
+  .subtitle {
+    font-size: 16px; color: var(--text-muted);
+    max-width: 600px; margin: 0 auto;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px 28px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    margin-bottom: 20px;
+  }
+  .card h2 {
+    font-family: "Cinzel", Georgia, serif;
+    font-size: 22px; margin-bottom: 20px;
+    color: var(--text);
+  }
+  label { display: block; font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px; letter-spacing: 0.02em; }
+  .hint { font-size: 12px; color: var(--text-light); margin-bottom: 10px; font-style: italic; }
+  input, select, textarea {
+    width: 100%; padding: 12px 14px;
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: 6px; font-size: 15px;
+    color: var(--text); font-family: inherit;
+    margin-bottom: 18px;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none; border-color: var(--accent);
+    background: var(--card);
+  }
+  textarea { min-height: 80px; resize: vertical; }
+  .domain-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px; margin-bottom: 18px;
+  }
+  .domain-btn {
+    padding: 12px 8px;
+    background: var(--bg-alt);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--text);
+    transition: all 0.15s ease;
+    text-align: center;
+    font-weight: 600;
+  }
+  .domain-btn:hover { border-color: var(--accent-light); background: var(--bg); }
+  .domain-btn.selected { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .btn-primary {
+    display: block; width: 100%;
+    padding: 14px 24px;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    letter-spacing: 0.05em;
+  }
+  .btn-primary:hover { background: var(--accent-light); }
+  .output-section {
+    margin-bottom: 28px;
+  }
+  .output-label {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 14px;
+  }
+  .q-list { list-style: none; padding: 0; }
+  .q-list li {
+    padding: 14px 18px;
+    background: var(--bg-alt);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    margin-bottom: 10px;
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .q-list li strong { color: var(--accent); }
+  .prep-block {
+    background: var(--bg-alt);
+    border-left: 3px solid var(--gold);
+    padding: 16px 20px;
+    border-radius: 6px;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.7;
+  }
+  .prep-block strong { color: var(--text); }
+  .copyable {
+    background: #f7f0dc;
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    padding: 16px 20px;
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    margin-bottom: 14px;
+  }
+  .copy-btn {
+    padding: 8px 16px;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 8px;
+  }
+  .meta {
+    text-align: center; color: var(--text-light);
+    font-size: 13px; margin-top: 32px;
+  }
+  .meta a { color: inherit; }
+  .restart {
+    display: block; text-align: center;
+    margin-top: 24px; color: var(--text-light);
+    text-decoration: underline; font-size: 13px; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="label-tag">Wisdom-asking practice · prep tool</div>
+    <h1>Conversation Prep</h1>
+    <p class="subtitle">A 5-minute prep before a conversation with someone wiser than you. Pick the mentor + topic. Get customized questions + pre-call thinking + post-call reflection.</p>
+  </header>
+
+  <div id="app"></div>
+
+  <p class="meta">Built by <a href="https://purcellventures.co" style="color:inherit">Elijah Purcell</a> · Companion to the <a href="../calvinism-test/index.html" style="color:inherit">Calvinism TULIP test</a> and other tools · No data leaves your browser</p>
+</div>
+
+<script>
+// Question library — generated per (domain × mentor type) combination.
+// Each domain has 12-15 questions; the tool picks 5-7 calibrated to mentor.
+
+const QUESTIONS = {
+  marriage: [
+    "What's the thing you wish you'd known before getting married?",
+    "Looking back at the first 5 years of marriage — what was the hardest, and what got you through it?",
+    "What's a marriage rule you live by that other couples don't know about?",
+    "How did you and your spouse align on money in the first 5 years?",
+    "What's something you used to fight about that you now don't — what changed?",
+    "Looking at couples you've watched marry — what early signs of trouble do people miss?",
+    "What does 'submission' actually look like in real Tuesday-morning life, not theory?",
+    "When did you realize your spouse wasn't perfect, and how did you metabolize it?",
+    "What's a non-obvious yellow flag in dating that turns out to matter?",
+    "What did your parents' marriage teach you, intentionally or unintentionally?",
+    "Have you ever told a friend 'I don't think you should marry this person' — what happened?",
+    "What did you NOT learn from premarital counseling that you wish you had?",
+    "How do you handle a season where you're not feeling close to your spouse?",
+    "What's the most important habit in marriage that nobody talks about?",
+  ],
+  career: [
+    "Looking back at age 30, what would you tell your 20-year-old self about choosing work?",
+    "What's something you said no to that you're glad you said no to?",
+    "What's something you said yes to that compounded in ways you didn't expect?",
+    "How did you decide when to leave a job vs. stay and fix it?",
+    "What did you do in your 20s that built credibility you're now drawing on?",
+    "If you had to start over in your industry tomorrow, what would you do differently in the first 3 years?",
+    "What's a skill you developed early that turned out to matter way more than expected?",
+    "Who's a mentor of yours I should know about, even from a distance?",
+    "What's the gap between what people see of your job and what it actually is?",
+    "When did your work become a calling vs. a job vs. a transaction?",
+    "What's a career decision that looked dumb at the time but turned out wise?",
+    "How did you handle the years when you weren't getting recognition for the work?",
+  ],
+  faith: [
+    "When have you been most sure of your faith, and when has it been most fragile?",
+    "Who shaped your theology that I should be reading?",
+    "What's a spiritual practice you've kept for 10+ years that's still alive?",
+    "What's a part of your tradition you've rejected — and what replaced it?",
+    "How do you read scripture daily without it becoming a checkbox?",
+    "When you've been wrong about God, how did you find out?",
+    "What's a prayer that's been answered slowly?",
+    "What's the role of your church community in your faith now vs. 20 years ago?",
+    "What's something you used to believe theologically that you've changed on?",
+    "What's a heresy you find tempting that the church handles badly?",
+    "How do you talk to your kids about hard things in the Bible?",
+    "What's your stance on Calvinism / Arminianism / Molinism — and how did you land there?",
+  ],
+  money: [
+    "What's the financial decision in your 20s that you most regret?",
+    "What's a financial habit you wish you'd started at 21?",
+    "How did you and your spouse align on money — or do you still not?",
+    "When did you start saving for retirement — too late, too early, about right?",
+    "What's your relationship with debt — what would you tell your younger self?",
+    "How do you decide when to spend money on convenience vs. doing it yourself?",
+    "What's the most you've ever lost on a financial decision, and what did you learn?",
+    "How do you think about generosity vs. saving in your current season?",
+    "What's a money belief from your family of origin that you had to unlearn?",
+    "If you had $10k right now you couldn't spend on essentials, what would you do with it?",
+  ],
+  parenting: [
+    "What's the parenting decision you'd make differently if you could redo it?",
+    "What's one habit you instilled early that paid off?",
+    "How did you balance your marriage vs. your parenting?",
+    "What did your kids see you do that you wish they hadn't?",
+    "When did you stop trying to control their decisions and start trusting them?",
+    "What's a discipline approach that worked for one kid and not another?",
+    "How do you talk to your kids about your own failures?",
+    "What's the hardest age, in your experience — and why?",
+    "What's something you said as a parent that you regret?",
+    "What would you tell yourself in your first year of parenting?",
+  ],
+  friendship: [
+    "How did you keep your closest friendships across decades?",
+    "Who's a friend you let go of — was that the right call?",
+    "What's the role of church community in your friendships now vs. 20 years ago?",
+    "How do you handle a friendship where one of you grew and the other didn't?",
+    "What's the most important habit for staying close to people who move away?",
+    "Have you ever rebuilt a friendship after a fight? What did it take?",
+    "What's a friendship that surprised you with how important it became?",
+  ],
+  mental_health: [
+    "When did you first see a therapist, and what triggered it?",
+    "What's something you used to think was a personality trait that turned out to be a wound?",
+    "How do you handle anxiety / depression / the hard stuff — what's worked?",
+    "What's a part of yourself you've made peace with that you used to fight?",
+    "What's something a counselor or pastor told you that changed the way you saw yourself?",
+    "How do you know when you need help vs. when you can push through?",
+    "What's your relationship with rest and sabbath — has it changed?",
+  ],
+  failure: [
+    "Tell me about the hardest year of your life. What did you learn?",
+    "What's a public failure you've had, and what did it teach you?",
+    "When you've been wronged, how do you decide whether to forgive vs. set a boundary?",
+    "What's something that felt like the end of the world at 25 that you barely remember now?",
+    "What's the most expensive lesson you've ever learned?",
+    "How do you decide when to push through resistance vs. take it as a signal?",
+    "What's a time you thought God was silent — and what was actually happening?",
+  ],
+  vocation: [
+    "When did you know what you were supposed to do with your life?",
+    "How did you discern between things you WANT and things you're CALLED to?",
+    "What's a path you considered and didn't take — do you ever wonder about it?",
+    "Have you had a 'pivot' season? What did it look like?",
+    "How do you handle seasons when the work feels meaningless?",
+    "What's the relationship between your gifts and your obedience?",
+  ],
+  time: [
+    "What's a time-management discipline you've kept for years?",
+    "What's a meeting / commitment / standing thing you cut that gave you life back?",
+    "How do you decide what to say no to?",
+    "What's the gap between what you SAY your priorities are and what your CALENDAR says — and how do you close it?",
+    "What's a daily rhythm that compounds for you?",
+    "How do you handle a season when you're over-committed and can't see a way out?",
+  ],
+};
+
+const DOMAINS = [
+  { key: "marriage", label: "Marriage" },
+  { key: "career", label: "Career" },
+  { key: "faith", label: "Faith" },
+  { key: "money", label: "Money" },
+  { key: "parenting", label: "Parenting" },
+  { key: "friendship", label: "Friendship" },
+  { key: "mental_health", label: "Mental health" },
+  { key: "failure", label: "Failure / adversity" },
+  { key: "vocation", label: "Vocation / calling" },
+  { key: "time", label: "Time / discipline" },
+];
+
+let state = {
+  step: 1,
+  mentorName: "",
+  mentorRole: "",
+  yearsAhead: "",
+  domain: "",
+  specificQuestion: "",
+  contextNote: "",
+};
+
+const app = document.getElementById("app");
+
+// Profile persistence — saves reusable mentor profiles so you don't re-type next time
+const PROFILES_KEY = "wisdom.profiles.v1";
+function loadProfiles() {
+  try { return JSON.parse(localStorage.getItem(PROFILES_KEY) || "[]"); } catch { return []; }
+}
+function saveProfiles(p) { localStorage.setItem(PROFILES_KEY, JSON.stringify(p)); }
+function saveCurrentAsProfile() {
+  if (!state.mentorName.trim()) { alert("Add a mentor name first."); return; }
+  const profiles = loadProfiles();
+  const existing = profiles.findIndex(p => p.name.toLowerCase() === state.mentorName.toLowerCase());
+  const profile = {
+    name: state.mentorName,
+    role: state.mentorRole,
+    yearsAhead: state.yearsAhead,
+    lastUsed: Date.now(),
+  };
+  if (existing >= 0) profiles[existing] = profile;
+  else profiles.push(profile);
+  saveProfiles(profiles);
+  showToast(`Saved profile: ${profile.name}`);
+}
+function loadProfile(name) {
+  const p = loadProfiles().find(p => p.name === name);
+  if (!p) return;
+  state.mentorName = p.name;
+  state.mentorRole = p.role;
+  state.yearsAhead = p.yearsAhead;
+  p.lastUsed = Date.now();
+  const all = loadProfiles().filter(x => x.name !== name).concat([p]);
+  saveProfiles(all);
+  render();
+}
+function deleteProfile(name) {
+  if (!confirm(`Delete profile for ${name}?`)) return;
+  saveProfiles(loadProfiles().filter(p => p.name !== name));
+  render();
+}
+
+function showToast(msg) {
+  let t = document.getElementById('wp-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'wp-toast';
+    t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:var(--accent);color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,0.2);z-index:200;opacity:0;transition:opacity 200ms;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(window.__wpToastTimer);
+  window.__wpToastTimer = setTimeout(() => { t.style.opacity = '0'; }, 1500);
+}
+
+function render() {
+  if (state.step === 1) renderStep1();
+  else if (state.step === 2) renderStep2();
+  else renderOutput();
+}
+
+function renderStep1() {
+  const profiles = loadProfiles().sort((a, b) => (b.lastUsed || 0) - (a.lastUsed || 0));
+  const profilesHtml = profiles.length === 0 ? '' : `
+    <div style="background:var(--bg-alt);border-radius:8px;padding:14px 16px;margin-bottom:18px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--accent-light);text-transform:uppercase;margin-bottom:8px;">Saved mentors</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${profiles.map(p => `
+          <div style="display:inline-flex;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:999px;padding:4px 4px 4px 12px;font-size:13px;">
+            <button onclick="loadProfile('${p.name.replace(/'/g, "\\'")}')" style="background:none;border:none;cursor:pointer;color:var(--accent);font-family:inherit;padding:2px 4px;">${p.name}</button>
+            <button onclick="deleteProfile('${p.name.replace(/'/g, "\\'")}')" style="background:none;border:none;cursor:pointer;color:var(--accent-light);font-size:14px;padding:2px 8px;line-height:1;" title="Delete profile">×</button>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  app.innerHTML = `
+    <div class="card">
+      <h2>1. Who are you talking to?</h2>
+      ${profilesHtml}
+      <label>Mentor name</label>
+      <input id="mentorName" type="text" placeholder="e.g. Pastor Matt" value="${state.mentorName}" />
+
+      <label>Their role / domain expertise</label>
+      <p class="hint">Be specific. "Pastor at my church for 12 years" beats "pastor."</p>
+      <input id="mentorRole" type="text" placeholder="e.g. Pastor at Stonebridge, 12+ years married" value="${state.mentorRole}" />
+
+      <label>Years they're ahead of you</label>
+      <select id="yearsAhead">
+        <option value="">— pick —</option>
+        <option ${state.yearsAhead === '5-10' ? 'selected' : ''} value="5-10">5-10 years</option>
+        <option ${state.yearsAhead === '10-20' ? 'selected' : ''} value="10-20">10-20 years</option>
+        <option ${state.yearsAhead === '20-30' ? 'selected' : ''} value="20-30">20-30 years</option>
+        <option ${state.yearsAhead === '30+' ? 'selected' : ''} value="30+">30+ years</option>
+      </select>
+
+      <label>What's the one specific thing you're wrestling with?</label>
+      <p class="hint">This is the question YOU bring. The 5 generated questions are scaffolding around it.</p>
+      <textarea id="specificQuestion" placeholder="e.g. I have a close friend getting married in 10 weeks and I'm worried about it. How do I help without overstepping?">${state.specificQuestion}</textarea>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+        <button class="btn-primary" onclick="goStep2()">Next →</button>
+        <button onclick="state.mentorName=document.getElementById('mentorName').value.trim();state.mentorRole=document.getElementById('mentorRole').value.trim();state.yearsAhead=document.getElementById('yearsAhead').value;saveCurrentAsProfile();" style="background:transparent;color:var(--accent);border:1px solid var(--border);padding:10px 18px;border-radius:6px;font-family:inherit;font-size:13px;cursor:pointer;">Save mentor profile</button>
+      </div>
+    </div>
+  `;
+}
+
+function goStep2() {
+  state.mentorName = document.getElementById('mentorName').value.trim();
+  state.mentorRole = document.getElementById('mentorRole').value.trim();
+  state.yearsAhead = document.getElementById('yearsAhead').value;
+  state.specificQuestion = document.getElementById('specificQuestion').value.trim();
+  state.step = 2;
+  render();
+}
+
+function renderStep2() {
+  app.innerHTML = `
+    <div class="card">
+      <h2>2. What domain(s) does this conversation touch?</h2>
+      <p class="hint">Pick 1-2. The generated questions will weight toward these.</p>
+      <div class="domain-grid" id="domainGrid"></div>
+
+      <label>Any context I should know? (optional)</label>
+      <p class="hint">Stuff like "they don't know I'm asking for someone else" or "we've never had a deep conversation before" — affects the framing.</p>
+      <textarea id="contextNote" placeholder="optional">${state.contextNote}</textarea>
+
+      <button class="btn-primary" onclick="goOutput()">Generate conversation prep →</button>
+      <span class="restart" onclick="state.step=1;render();">← Back</span>
+    </div>
+  `;
+  const grid = document.getElementById('domainGrid');
+  const selected = state.domain ? state.domain.split(',') : [];
+  DOMAINS.forEach(d => {
+    const b = document.createElement('button');
+    b.className = 'domain-btn' + (selected.includes(d.key) ? ' selected' : '');
+    b.textContent = d.label;
+    b.onclick = () => {
+      const idx = selected.indexOf(d.key);
+      if (idx >= 0) selected.splice(idx, 1);
+      else selected.push(d.key);
+      state.domain = selected.join(',');
+      renderStep2();
+    };
+    grid.appendChild(b);
+  });
+}
+
+function goOutput() {
+  state.contextNote = document.getElementById('contextNote').value.trim();
+  state.step = 3;
+  render();
+}
+
+function generateQuestions() {
+  const domains = state.domain.split(',').filter(Boolean);
+  if (domains.length === 0) {
+    // Default to career + faith
+    return [...QUESTIONS.career, ...QUESTIONS.faith].slice(0, 5);
+  }
+  // Pull questions from selected domains
+  let pool = [];
+  domains.forEach(d => { pool = pool.concat(QUESTIONS[d] || []); });
+  // Shuffle + take 5-7
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(0, 7);
+}
+
+function renderOutput() {
+  const questions = generateQuestions();
+  const m = state.mentorName || "your mentor";
+
+  const opener = `Hey ${m} — I have a specific thing I've been wrestling with and I'd love your read on it. Got 30 min sometime this week?`;
+
+  const introOnSite = `Thanks for making the time. I've been thinking about [${state.specificQuestion || 'the question I brought you'}]. You've lived something like this — and I'd rather ask you and listen than figure it out myself by trial and error. I have a few questions I came with, but I mostly want to follow what you have to say.`;
+
+  const closingMove = `Before I go — what's the question I should have asked you but didn't?`;
+
+  const postCallSummary = `## ${new Date().toISOString().slice(0,10)} — ${state.mentorName || '(name)'} — ${(state.domain || 'multi').split(',').join(', ')}
+
+**Question I brought:** ${state.specificQuestion || '(fill in)'}
+
+**Context I noted before:** ${state.contextNote || '(none)'}
+
+**What they said (gist):**
+-
+
+**Specific quotes worth keeping:**
+>
+
+**The question I should have asked (their answer to my closing move):**
+
+
+**What I'll do with this:**
+- [ ]
+- [ ] (30-day followup: text them with what I tried)
+`;
+
+  app.innerHTML = `
+    <div class="card">
+      <div class="output-section">
+        <div class="output-label">📞 The ask (text or DM to send first)</div>
+        <div class="copyable" id="opener">${opener}</div>
+        <button class="copy-btn" onclick="copyText('opener')">Copy</button>
+      </div>
+
+      <div class="output-section">
+        <div class="output-label">🎯 What to say in the first 60 seconds</div>
+        <div class="prep-block">${introOnSite}</div>
+      </div>
+
+      <div class="output-section">
+        <div class="output-label">❓ Your 7 questions (pick 3-5 to actually use; keep the rest as backup)</div>
+        <ol class="q-list">
+          ${questions.map(q => `<li>${q}</li>`).join('')}
+        </ol>
+      </div>
+
+      <div class="output-section">
+        <div class="output-label">🎬 The closing move (don't skip this)</div>
+        <div class="prep-block"><strong>"${closingMove}"</strong><br><br>This is the question that surfaces the thing they wanted to say but you didn't ask. Almost always the most valuable answer of the conversation.</div>
+      </div>
+
+      <div class="output-section">
+        <div class="output-label">📝 Post-call reflection template — paste into wisdom-log.md</div>
+        <div class="copyable" id="postCall">${postCallSummary}</div>
+        <button class="copy-btn" onclick="copyText('postCall')">Copy</button>
+      </div>
+
+      <div class="output-section">
+        <div class="output-label">✅ Follow-through reminders</div>
+        <div class="prep-block">
+          <strong>Within 24 hours:</strong> Send thank-you text. ONE specific thing you took away.<br><br>
+          <strong>At 30 days:</strong> Send a 2-sentence follow-up. "Tried X. Here's what happened." This single message converts wisdom-receivers into ongoing mentors.<br><br>
+          <strong>At 1 year:</strong> Thank-you note. Handwritten if you can.
+        </div>
+      </div>
+
+      <span class="restart" onclick="state={step:1,mentorName:'',mentorRole:'',yearsAhead:'',domain:'',specificQuestion:'',contextNote:''};render();">Start over for a new conversation</span>
+    </div>
+  `;
+}
+
+function copyText(id) {
+  const el = document.getElementById(id);
+  const text = el.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target;
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = orig; }, 1500);
+  });
+}
+
+render();
+</script>
+</body>
+</html>

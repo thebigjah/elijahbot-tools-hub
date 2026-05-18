@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reading Log — books, kept honest</title>
+<meta name="description" content="A personal reading log with stats. No social feed, no algorithmic shoves. Books in, books out, ratings, notes, and a year-end picture of what you read.">
+<meta property="og:title" content="Reading Log — books, kept honest">
+<meta property="og:description" content="Personal reading log + stats. No social. No algorithm. Just what you read.">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --bg: #f7f2e9;
+    --panel: #fffcf5;
+    --ink: #1d1814;
+    --ink-soft: #6b5a44;
+    --ink-faint: #a89880;
+    --accent: #8a6a3a;
+    --accent-light: #c2a173;
+    --done: #4a7c3d;
+    --reading: #c98e3a;
+    --wishlist: #6b6b8c;
+    --border: #e5d9c3;
+    --shadow: 0 2px 4px rgba(29,24,20,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    min-height: 100vh;
+    padding: 1rem;
+  }
+  .container { max-width: 720px; margin: 0 auto; }
+  header { text-align: center; padding: 1.5rem 0 2rem; }
+  header h1 {
+    font-family: "Cinzel", Georgia, serif;
+    font-size: clamp(2rem, 6vw, 2.75rem);
+    color: var(--accent);
+    letter-spacing: 0.04em;
+    margin-bottom: 0.3rem;
+  }
+  header p {
+    color: var(--ink-soft);
+    font-style: italic;
+    font-size: 0.95rem;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  .tab {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ink-soft);
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .tab.active {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
+  }
+  .tab:hover:not(.active) {
+    border-color: var(--accent);
+    color: var(--ink);
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+  }
+  .panel h2 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    margin-bottom: 1rem;
+  }
+
+  input, select, textarea, button {
+    font-family: inherit;
+    font-size: 0.95rem;
+  }
+  input[type="text"], input[type="date"], select, textarea {
+    width: 100%;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 6px;
+    padding: 0.6rem 0.85rem;
+    color: var(--ink);
+    margin-bottom: 0.6rem;
+  }
+  textarea { resize: vertical; min-height: 60px; }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+  }
+  @media (max-width: 480px) { .form-grid { grid-template-columns: 1fr; } }
+
+  button {
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    padding: 0.65rem 1.2rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  button:hover { background: var(--accent); }
+  button.ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+  }
+  button.ghost:hover { background: var(--bg); color: var(--ink); border-color: var(--accent); }
+  button.danger {
+    background: transparent;
+    color: #b04a4a;
+    border: 1px solid #d8b6b6;
+  }
+  button.danger:hover { background: #fde8e8; }
+
+  .row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+  .stars {
+    display: inline-flex;
+    gap: 2px;
+    font-size: 1.1rem;
+    color: var(--accent-light);
+    cursor: pointer;
+    user-select: none;
+  }
+  .stars .star { padding: 0 1px; }
+  .stars .star.filled { color: var(--accent); }
+  .stars-display { color: var(--accent); letter-spacing: 1px; font-size: 0.95rem; }
+  .stars-faint { color: var(--ink-faint); }
+
+  .book {
+    display: flex;
+    gap: 1rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+  .book:last-child { border-bottom: none; }
+  .book .badge {
+    flex-shrink: 0;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    margin-top: 0.55rem;
+  }
+  .badge.done { background: var(--done); }
+  .badge.reading { background: var(--reading); }
+  .badge.wishlist { background: var(--wishlist); }
+  .book .body { flex: 1; min-width: 0; }
+  .book .title {
+    font-weight: 600;
+    color: var(--ink);
+    font-size: 1.02rem;
+  }
+  .book .by {
+    color: var(--ink-soft);
+    font-size: 0.88rem;
+    font-style: italic;
+  }
+  .book .meta {
+    color: var(--ink-faint);
+    font-size: 0.78rem;
+    margin-top: 0.25rem;
+  }
+  .book .notes {
+    color: var(--ink-soft);
+    font-size: 0.88rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem 0.85rem;
+    background: var(--bg);
+    border-radius: 6px;
+    border-left: 2px solid var(--accent);
+  }
+  .book .actions {
+    display: flex;
+    gap: 0.3rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .book .actions button {
+    padding: 0.3rem 0.7rem;
+    font-size: 0.78rem;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.6rem;
+  }
+  @media (max-width: 480px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  .stat {
+    text-align: center;
+    padding: 0.85rem 0.4rem;
+    background: var(--bg);
+    border-radius: 8px;
+  }
+  .stat .n {
+    font-family: Georgia, serif;
+    font-size: 1.6rem;
+    color: var(--accent);
+    line-height: 1.1;
+  }
+  .stat .l {
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-top: 0.25rem;
+  }
+
+  .author-list { font-size: 0.88rem; }
+  .author-list .row-author {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .author-list .row-author:last-child { border-bottom: none; }
+  .author-list .row-author .name { color: var(--ink); }
+  .author-list .row-author .meta { color: var(--ink-soft); font-size: 0.85rem; }
+
+  .empty {
+    color: var(--ink-faint);
+    text-align: center;
+    padding: 1.5rem 0;
+    font-style: italic;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Reading Log</h1>
+  <p>books, kept honest</p>
+</header>
+
+<div class="tabs">
+  <button class="tab active" data-view="add">Add</button>
+  <button class="tab" data-view="reading">Reading</button>
+  <button class="tab" data-view="finished">Finished</button>
+  <button class="tab" data-view="wishlist">Wishlist</button>
+  <button class="tab" data-view="stats">Stats</button>
+  <button class="tab" data-view="manage">Manage</button>
+</div>
+
+<div id="view-add" class="panel view">
+  <h2>Add a book</h2>
+  <input type="text" id="add-title" placeholder="Title">
+  <input type="text" id="add-author" placeholder="Author">
+  <div class="form-grid">
+    <input type="number" id="add-pages" placeholder="Page count (optional)" min="1" max="9999">
+    <input type="text" id="add-genre" placeholder="Genre or tag (optional)">
+  </div>
+  <div class="form-grid">
+    <input type="date" id="add-started" title="Started">
+    <input type="date" id="add-finished" title="Finished (leave blank if reading)">
+  </div>
+  <select id="add-status">
+    <option value="reading">Reading now</option>
+    <option value="finished">Finished</option>
+    <option value="wishlist">Want to read</option>
+  </select>
+  <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+    <span style="color:var(--ink-soft);font-size:0.88rem;">Rating:</span>
+    <div class="stars" id="add-stars" data-rating="0"></div>
+  </div>
+  <textarea id="add-notes" placeholder="Notes (optional — the part you'll forget in a year)"></textarea>
+  <button id="add-btn">Add book</button>
+</div>
+
+<div id="view-reading" class="panel view" style="display:none;">
+  <h2>Reading now</h2>
+  <div id="reading-list"></div>
+</div>
+
+<div id="view-finished" class="panel view" style="display:none;">
+  <h2>Finished</h2>
+  <div id="finished-list"></div>
+</div>
+
+<div id="view-wishlist" class="panel view" style="display:none;">
+  <h2>Want to read</h2>
+  <div id="wishlist-list"></div>
+</div>
+
+<div id="view-stats" class="panel view" style="display:none;">
+  <h2>Stats</h2>
+  <div class="stats" id="stats-grid"></div>
+  <div style="margin-top:1.5rem;">
+    <h2>Favorite authors (by avg rating, min 2 books)</h2>
+    <div id="fav-authors" class="author-list"></div>
+  </div>
+  <div style="margin-top:1.5rem;">
+    <h2>This year, by month</h2>
+    <div id="year-by-month" class="author-list"></div>
+  </div>
+</div>
+
+<div id="view-manage" class="panel view" style="display:none;">
+  <h2>Manage</h2>
+  <div class="row">
+    <button class="ghost" id="export-btn">Export JSON</button>
+    <button class="ghost" id="export-csv-btn">Export CSV</button>
+    <button class="ghost" id="import-btn">Import JSON</button>
+    <button class="danger" id="reset-btn">Reset all</button>
+    <input type="file" id="import-file" accept=".json" style="display:none;">
+  </div>
+</div>
+
+<footer>
+  <p>No algorithm. No leaderboards. Just what you read.<br>
+  <a href="https://github.com/thebigjah/reading-log">source</a>
+  </p>
+</footer>
+
+</div>
+
+<script>
+'use strict';
+
+const STORAGE_KEY = 'readinglog.v1';
+
+let books = loadBooks();
+let editingRating = 0;
+
+function loadBooks() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw);
+  } catch { return []; }
+}
+function saveBooks() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(books));
+}
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function fmtDate(d) {
+  if (!d) return '';
+  const dt = new Date(d);
+  if (isNaN(dt)) return d;
+  return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function renderStars(rating, interactive=false, id='') {
+  let html = '';
+  for (let i=1; i<=5; i++) {
+    const filled = i <= rating ? ' filled' : '';
+    if (interactive) {
+      html += `<span class="star${filled}" data-v="${i}" data-book="${id}">★</span>`;
+    } else {
+      html += `<span class="star${filled}">★</span>`;
+    }
+  }
+  return html;
+}
+
+function bindAddStars() {
+  const el = document.getElementById('add-stars');
+  el.innerHTML = renderStars(0);
+  el.addEventListener('click', e => {
+    if (!e.target.classList.contains('star')) return;
+    const v = parseInt(e.target.dataset.v, 10);
+    editingRating = (editingRating === v) ? 0 : v;
+    el.innerHTML = renderStars(editingRating);
+  });
+}
+
+function addBook() {
+  const title = document.getElementById('add-title').value.trim();
+  const author = document.getElementById('add-author').value.trim();
+  const pages = parseInt(document.getElementById('add-pages').value, 10) || null;
+  const genre = document.getElementById('add-genre').value.trim();
+  const started = document.getElementById('add-started').value;
+  const finished = document.getElementById('add-finished').value;
+  const status = document.getElementById('add-status').value;
+  const notes = document.getElementById('add-notes').value.trim();
+
+  if (!title) { alert('Title required.'); return; }
+
+  // Auto-promote if finished date set
+  let s = status;
+  if (finished && s !== 'finished') s = 'finished';
+
+  books.push({
+    id: uid(),
+    title, author,
+    pages, genre,
+    started: started || null,
+    finished: finished || null,
+    status: s,
+    rating: editingRating,
+    notes,
+    addedAt: new Date().toISOString(),
+  });
+  saveBooks();
+
+  // Reset
+  document.getElementById('add-title').value = '';
+  document.getElementById('add-author').value = '';
+  document.getElementById('add-pages').value = '';
+  document.getElementById('add-genre').value = '';
+  document.getElementById('add-started').value = '';
+  document.getElementById('add-finished').value = '';
+  document.getElementById('add-notes').value = '';
+  editingRating = 0;
+  document.getElementById('add-stars').innerHTML = renderStars(0);
+
+  renderAll();
+  // Switch to the right view
+  showView(s);
+}
+
+function renderBookList(filter, listEl) {
+  const filtered = books.filter(b => b.status === filter);
+  if (!filtered.length) {
+    listEl.innerHTML = '<div class="empty">Nothing here yet.</div>';
+    return;
+  }
+  // Sort: finished by finished desc; reading by started desc; wishlist by added desc
+  filtered.sort((a, b) => {
+    if (filter === 'finished') return (b.finished || '').localeCompare(a.finished || '');
+    if (filter === 'reading') return (b.started || '').localeCompare(a.started || '');
+    return (b.addedAt || '').localeCompare(a.addedAt || '');
+  });
+
+  listEl.innerHTML = filtered.map(b => {
+    const showProgress = filter === 'reading' && b.pages && b.pages > 0;
+    const currentPage = b.currentPage || 0;
+    const pct = showProgress ? Math.round((currentPage / b.pages) * 100) : 0;
+    return `
+    <div class="book">
+      <div class="badge ${b.status}"></div>
+      <div class="body">
+        <div class="title">${escapeHtml(b.title)}</div>
+        <div class="by">${b.author ? 'by ' + escapeHtml(b.author) : '<span class="stars-faint">unknown author</span>'}</div>
+        <div class="meta">
+          ${b.started ? 'started ' + fmtDate(b.started) : ''}
+          ${b.started && b.finished ? ' • ' : ''}
+          ${b.finished ? 'finished ' + fmtDate(b.finished) : ''}
+          ${b.pages ? ' • ' + b.pages + ' pp' : ''}
+          ${b.genre ? ' • <em>' + escapeHtml(b.genre) + '</em>' : ''}
+          ${b.rating ? ' • <span class="stars-display">' + '★'.repeat(b.rating) + '</span>' : ''}
+        </div>
+        ${showProgress ? `
+          <div style="margin-top:0.5rem;display:flex;gap:0.5rem;align-items:center;">
+            <input type="number" data-progress-id="${b.id}" value="${currentPage}" min="0" max="${b.pages}"
+              style="width:70px;border:1px solid var(--border);background:#fff;border-radius:4px;padding:0.3rem 0.5rem;font-family:inherit;font-size:0.85rem;">
+            <span style="color:var(--ink-faint);font-size:0.78rem;">/ ${b.pages} pp</span>
+            <div style="flex:1;height:4px;background:var(--bg);border-radius:2px;overflow:hidden;margin-left:0.5rem;">
+              <div style="width:${pct}%;height:100%;background:var(--accent);"></div>
+            </div>
+            <span style="color:var(--accent);font-size:0.78rem;font-weight:600;min-width:38px;text-align:right;">${pct}%</span>
+          </div>
+        ` : ''}
+        ${b.notes ? `<div class="notes">${escapeHtml(b.notes)}</div>` : ''}
+        <div class="actions">
+          ${b.status !== 'finished' ? `<button class="ghost" data-action="finish" data-id="${b.id}">Mark finished</button>` : ''}
+          ${b.status === 'wishlist' ? `<button class="ghost" data-action="start" data-id="${b.id}">Start reading</button>` : ''}
+          <button class="ghost" data-action="edit" data-id="${b.id}">Edit</button>
+          <button class="ghost" data-action="delete" data-id="${b.id}">Delete</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Wire progress inputs
+  listEl.querySelectorAll('[data-progress-id]').forEach(el => {
+    el.addEventListener('change', e => {
+      const id = e.target.dataset.progressId;
+      const book = books.find(b => b.id === id);
+      if (!book) return;
+      const newPage = parseInt(e.target.value, 10) || 0;
+      book.currentPage = Math.max(0, Math.min(book.pages, newPage));
+      saveBooks();
+      // Auto-mark finished if reached end
+      if (book.currentPage === book.pages && book.status !== 'finished') {
+        if (confirm('You finished "' + book.title + '"! Mark as finished?')) {
+          book.status = 'finished';
+          book.finished = new Date().toISOString().split('T')[0];
+          saveBooks();
+          renderAll();
+          return;
+        }
+      }
+      renderBookList('reading', listEl);
+    });
+  });
+}
+
+function renderReading() { renderBookList('reading', document.getElementById('reading-list')); }
+function renderFinished() { renderBookList('finished', document.getElementById('finished-list')); }
+function renderWishlist() { renderBookList('wishlist', document.getElementById('wishlist-list')); }
+
+function handleListClick(e) {
+  if (e.target.tagName !== 'BUTTON') return;
+  const id = e.target.dataset.id;
+  const action = e.target.dataset.action;
+  const book = books.find(b => b.id === id);
+  if (!book) return;
+
+  if (action === 'finish') {
+    book.status = 'finished';
+    book.finished = new Date().toISOString().split('T')[0];
+    if (!book.rating) {
+      const r = prompt('Rating 1-5? (or blank)');
+      if (r && r >= 1 && r <= 5) book.rating = parseInt(r, 10);
+    }
+    saveBooks();
+    renderAll();
+  } else if (action === 'start') {
+    book.status = 'reading';
+    if (!book.started) book.started = new Date().toISOString().split('T')[0];
+    saveBooks();
+    renderAll();
+  } else if (action === 'delete') {
+    if (confirm('Delete "' + book.title + '"?')) {
+      books = books.filter(b => b.id !== id);
+      saveBooks();
+      renderAll();
+    }
+  } else if (action === 'edit') {
+    editBook(book);
+  }
+}
+
+function editBook(book) {
+  const newTitle = prompt('Title:', book.title);
+  if (newTitle === null) return;
+  const newAuthor = prompt('Author:', book.author || '');
+  if (newAuthor === null) return;
+  const newRatingStr = prompt('Rating 1-5 (blank to clear):', book.rating || '');
+  if (newRatingStr === null) return;
+  const newNotes = prompt('Notes:', book.notes || '');
+  if (newNotes === null) return;
+
+  book.title = newTitle.trim() || book.title;
+  book.author = newAuthor.trim();
+  const r = parseInt(newRatingStr, 10);
+  book.rating = (r >= 1 && r <= 5) ? r : 0;
+  book.notes = newNotes.trim();
+  saveBooks();
+  renderAll();
+}
+
+function renderStats() {
+  const finished = books.filter(b => b.status === 'finished');
+  const reading = books.filter(b => b.status === 'reading');
+  const wishlist = books.filter(b => b.status === 'wishlist');
+
+  const thisYear = new Date().getFullYear();
+  const thisYearFinished = finished.filter(b => b.finished && b.finished.startsWith(String(thisYear)));
+
+  const rated = finished.filter(b => b.rating > 0);
+  const avgRating = rated.length ? (rated.reduce((s, b) => s + b.rating, 0) / rated.length).toFixed(2) : '–';
+
+  const totalPages = finished.reduce((s, b) => s + (b.pages || 0), 0);
+  const thisYearPages = thisYearFinished.reduce((s, b) => s + (b.pages || 0), 0);
+  const goal = parseInt(localStorage.getItem('readinglog.goal.' + thisYear), 10) || 0;
+  const goalPct = goal ? Math.round((thisYearFinished.length / goal) * 100) : 0;
+  const goalDisplay = goal
+    ? `${thisYearFinished.length}/${goal} <span style="font-size:0.7rem;color:var(--ink-soft);">(${goalPct}%)</span>`
+    : `<button class="ghost" style="padding:0.25rem 0.6rem;font-size:0.7rem;" onclick="setYearGoal()">Set goal</button>`;
+
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat"><div class="n">${finished.length}</div><div class="l">total read</div></div>
+    <div class="stat"><div class="n">${thisYearFinished.length}</div><div class="l">${thisYear}</div></div>
+    <div class="stat"><div class="n">${reading.length}</div><div class="l">reading</div></div>
+    <div class="stat"><div class="n">${wishlist.length}</div><div class="l">wishlist</div></div>
+    <div class="stat"><div class="n">${avgRating}</div><div class="l">avg ★</div></div>
+    <div class="stat"><div class="n">${finished.filter(b => b.rating === 5).length}</div><div class="l">5★ reads</div></div>
+    <div class="stat"><div class="n">${totalPages || '–'}</div><div class="l">total pages</div></div>
+    <div class="stat"><div class="n" style="font-size:1.05rem;line-height:1.6;">${goalDisplay}</div><div class="l">${thisYear} goal</div></div>
+  `;
+
+  // Favorite authors
+  const byAuthor = {};
+  finished.filter(b => b.author && b.rating > 0).forEach(b => {
+    if (!byAuthor[b.author]) byAuthor[b.author] = { count: 0, sum: 0 };
+    byAuthor[b.author].count++;
+    byAuthor[b.author].sum += b.rating;
+  });
+  const favs = Object.entries(byAuthor)
+    .filter(([, v]) => v.count >= 2)
+    .map(([name, v]) => ({ name, avg: (v.sum / v.count), count: v.count }))
+    .sort((a, b) => b.avg - a.avg)
+    .slice(0, 10);
+  document.getElementById('fav-authors').innerHTML = favs.length ? favs.map(f => `
+    <div class="row-author">
+      <span class="name">${escapeHtml(f.name)}</span>
+      <span class="meta">${'★'.repeat(Math.round(f.avg))} ${f.avg.toFixed(2)} · ${f.count} books</span>
+    </div>
+  `).join('') : '<div class="empty">Rate 2+ books by the same author to see this.</div>';
+
+  // This year by month
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const byMonth = months.map((m, i) => ({ month: m, books: thisYearFinished.filter(b => b.finished && parseInt(b.finished.split('-')[1], 10) === i + 1) }));
+  document.getElementById('year-by-month').innerHTML = byMonth.map(m => `
+    <div class="row-author">
+      <span class="name">${m.month}</span>
+      <span class="meta">${m.books.length ? m.books.map(b => escapeHtml(b.title)).join(', ') : '—'}</span>
+    </div>
+  `).join('');
+}
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if (view) view.style.display = '';
+  const tab = document.querySelector(`.tab[data-view="${name}"]`);
+  if (tab) tab.classList.add('active');
+}
+
+function exportJSON() {
+  const data = JSON.stringify(books, null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'reading-log-' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+}
+
+function setYearGoal() {
+  const thisYear = new Date().getFullYear();
+  const current = parseInt(localStorage.getItem('readinglog.goal.' + thisYear), 10) || '';
+  const n = prompt(`How many books in ${thisYear}? (blank to clear)`, current);
+  if (n === null) return;
+  const v = parseInt(n, 10);
+  if (n === '' || isNaN(v)) {
+    localStorage.removeItem('readinglog.goal.' + thisYear);
+  } else {
+    localStorage.setItem('readinglog.goal.' + thisYear, String(v));
+  }
+  renderStats();
+}
+window.setYearGoal = setYearGoal;
+
+function exportCSV() {
+  const cols = ['title','author','pages','genre','status','started','finished','rating','notes'];
+  const lines = [cols.join(',')];
+  books.forEach(b => {
+    lines.push(cols.map(c => {
+      const v = b[c] == null ? '' : String(b[c]);
+      return '"' + v.replace(/"/g, '""') + '"';
+    }).join(','));
+  });
+  const blob = new Blob([lines.join('\n')], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'reading-log-' + new Date().toISOString().split('T')[0] + '.csv';
+  a.click();
+}
+
+function importJSON(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const incoming = JSON.parse(ev.target.result);
+      if (!Array.isArray(incoming)) throw new Error('not array');
+      if (!confirm('Merge ' + incoming.length + ' books with your current ' + books.length + '?')) return;
+      const existing = new Set(books.map(b => (b.title + '|' + (b.author || '')).toLowerCase()));
+      let added = 0;
+      incoming.forEach(b => {
+        const key = (b.title + '|' + (b.author || '')).toLowerCase();
+        if (!existing.has(key)) {
+          books.push({ ...b, id: b.id || uid() });
+          added++;
+        }
+      });
+      saveBooks();
+      renderAll();
+      alert('Added ' + added + ' new books.');
+    } catch (err) {
+      alert('Bad JSON file: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function resetAll() {
+  if (!confirm('Erase all ' + books.length + ' books?')) return;
+  if (!confirm('Really? This cannot be undone.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  books = [];
+  renderAll();
+}
+
+function renderAll() {
+  renderReading();
+  renderFinished();
+  renderWishlist();
+  renderStats();
+}
+
+// Wire up
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
+document.getElementById('add-btn').addEventListener('click', addBook);
+document.getElementById('reading-list').addEventListener('click', handleListClick);
+document.getElementById('finished-list').addEventListener('click', handleListClick);
+document.getElementById('wishlist-list').addEventListener('click', handleListClick);
+document.getElementById('export-btn').addEventListener('click', exportJSON);
+document.getElementById('export-csv-btn').addEventListener('click', exportCSV);
+document.getElementById('import-btn').addEventListener('click', () => document.getElementById('import-file').click());
+document.getElementById('import-file').addEventListener('change', importJSON);
+document.getElementById('reset-btn').addEventListener('click', resetAll);
+
+bindAddStars();
+renderAll();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Milestone — countdown to the next thing</title>
+<meta name="description" content="Visual countdown to your real upcoming milestones. Pre-loaded with Elijah's summer + freshman year dates. Add your own. Reorder by date.">
+<meta property="og:title" content="Milestone — countdown to the next thing">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --bg: #1a1a1a;
+    --bg-alt: #242424;
+    --panel: #1f1f1f;
+    --ink: #ece5d4;
+    --ink-soft: #999080;
+    --ink-faint: #5a5040;
+    --accent: #c2a173;
+    --accent-light: #d4b890;
+    --urgent: #d8703a;
+    --soon: #e0b04a;
+    --far: #6a8e4e;
+    --past: #4a4a4a;
+    --border: #2e2e2e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    min-height: 100vh;
+    padding: 1rem;
+  }
+  .container { max-width: 1000px; margin: 0 auto; }
+  header { text-align: center; padding: 2rem 0 1.5rem; }
+  header h1 {
+    font-family: inherit;
+    font-size: clamp(1.6rem, 5vw, 2.2rem);
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+  header p {
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0.3rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .tab {
+    padding: 0.55rem 1rem;
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    font-family: inherit;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+  }
+  .tab.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+  .tab:hover:not(.active) { border-color: var(--accent); color: var(--ink); }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.85rem;
+  }
+  .milestone {
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-left-width: 3px;
+    padding: 1rem 1.1rem;
+    transition: border-color 0.15s;
+  }
+  .milestone.urgent { border-left-color: var(--urgent); }
+  .milestone.soon { border-left-color: var(--soon); }
+  .milestone.far { border-left-color: var(--far); }
+  .milestone.past { border-left-color: var(--past); opacity: 0.55; }
+  .milestone .days {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 0.15rem;
+  }
+  .milestone.urgent .days { color: var(--urgent); }
+  .milestone.soon .days { color: var(--soon); }
+  .milestone.far .days { color: var(--far); }
+  .milestone.past .days { color: var(--past); }
+  .milestone .unit {
+    color: var(--ink-faint);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.5rem;
+  }
+  .milestone .label {
+    color: var(--ink);
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+  .milestone .date {
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+  }
+  .milestone .note {
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+    font-style: italic;
+    margin-top: 0.5rem;
+    line-height: 1.5;
+  }
+  .milestone .actions {
+    margin-top: 0.6rem;
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+  }
+  .milestone .actions button {
+    background: transparent;
+    color: var(--ink-faint);
+    border: 1px solid var(--border);
+    padding: 0.2rem 0.5rem;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .milestone .actions button:hover { border-color: var(--accent); color: var(--accent); }
+
+  label {
+    display: block;
+    color: var(--accent);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin: 1rem 0 0.4rem;
+  }
+  label:first-child { margin-top: 0; }
+
+  input[type="text"], input[type="date"], textarea {
+    width: 100%;
+    background: var(--bg-alt);
+    color: var(--ink);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.65rem 0.9rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+  }
+  textarea { min-height: 60px; resize: vertical; }
+  input:focus, textarea:focus { outline: none; border-color: var(--accent); }
+
+  button {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 0.65rem 1.2rem;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+  }
+  button:hover { background: var(--accent-light); }
+  button.ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+  }
+  button.ghost:hover { color: var(--ink); border-color: var(--accent); }
+
+  .row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
+
+  .legend {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    color: var(--ink-soft);
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .legend .bar {
+    display: inline-block;
+    width: 12px;
+    height: 3px;
+  }
+  .legend .urgent { background: var(--urgent); }
+  .legend .soon { background: var(--soon); }
+  .legend .far { background: var(--far); }
+  .legend .past { background: var(--past); }
+
+  .next-up {
+    text-align: center;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, var(--panel) 0%, var(--bg-alt) 100%);
+    border: 1px solid var(--accent);
+    margin-bottom: 1.5rem;
+  }
+  .next-up .ticker {
+    font-size: clamp(3rem, 12vw, 5rem);
+    color: var(--accent);
+    line-height: 1;
+    font-weight: 700;
+  }
+  .next-up .next-label {
+    color: var(--ink);
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+    letter-spacing: 0.05em;
+  }
+  .next-up .next-date {
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+    letter-spacing: 0.1em;
+  }
+
+  .empty {
+    text-align: center;
+    color: var(--ink-faint);
+    padding: 2rem 1rem;
+    font-style: italic;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--ink-faint);
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Milestone</h1>
+  <p>countdown to the next thing</p>
+</header>
+
+<div class="tabs">
+  <button class="tab active" data-view="grid">Grid</button>
+  <button class="tab" data-view="add">Add</button>
+  <button class="tab" data-view="manage">Manage</button>
+</div>
+
+<div id="view-grid" class="view">
+  <div id="next-up-container"></div>
+  <div class="legend">
+    <span><span class="bar urgent"></span> ≤ 14 days</span>
+    <span><span class="bar soon"></span> 15-60 days</span>
+    <span><span class="bar far"></span> > 60 days</span>
+    <span><span class="bar past"></span> past</span>
+  </div>
+  <div class="grid" id="milestone-grid"></div>
+</div>
+
+<div id="view-add" class="view" style="display:none;">
+  <div class="panel">
+    <label>Date</label>
+    <input type="date" id="m-date">
+    <label>Label</label>
+    <input type="text" id="m-label" placeholder="e.g., First day at UA / Cousin's wedding / Side project ship date">
+    <label>Note (optional)</label>
+    <textarea id="m-note" placeholder="Anything to remember about this milestone."></textarea>
+    <button id="add-btn" style="margin-top:1rem;">Add milestone</button>
+  </div>
+
+  <div class="panel">
+    <h2 style="color:var(--accent);font-family:inherit;font-size:0.85rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.85rem;">Re-seed Elijah's defaults</h2>
+    <p style="color:var(--ink-soft);font-size:0.85rem;margin-bottom:0.85rem;">Re-loads the pre-seeded summer + freshman milestones. Skips any milestones already present (by label).</p>
+    <button class="ghost" id="reseed-btn">Re-seed defaults</button>
+  </div>
+</div>
+
+<div id="view-manage" class="view" style="display:none;">
+  <div class="panel">
+    <div class="row">
+      <button class="ghost" id="export-btn">Export JSON</button>
+      <button class="ghost" id="import-btn">Import JSON</button>
+      <button class="ghost" id="reset-btn" style="color:#d8703a;border-color:#5a3a2a;">Reset all</button>
+      <input type="file" id="import-file" accept=".json" style="display:none;">
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>What's next, in days.<br>
+  <a href="https://github.com/thebigjah/milestone">source</a></p>
+</footer>
+
+</div>
+
+<script>
+'use strict';
+
+const KEY = 'milestone.v1';
+const SEEDED_KEY = 'milestone.seeded.v1';
+
+const DEFAULTS = [
+  { date: '2026-05-19', label: 'Reza call', note: '1 PM ET via Google Meet. Pre-call ammo doc ready.' },
+  { date: '2026-05-29', label: 'Lee Summer Honors — first $490 due', note: 'Mom arranged the payment plan.' },
+  { date: '2026-05-31', label: 'Beach trip starts', note: '8-day buffer to Lee move-in.' },
+  { date: '2026-06-10', label: 'Kiki UA freshmen gathering', note: 'Marietta. Pre-college networking event.' },
+  { date: '2026-06-14', label: 'Lee Summer Honors move-in', note: 'Cleveland TN, 3-5 PM check-in.' },
+  { date: '2026-06-20', label: 'Lee Summer Honors ends' },
+  { date: '2026-07-09', label: 'Bama Bound starts', note: 'UA orientation + advisor meeting + course registration.' },
+  { date: '2026-07-11', label: 'Bama Bound ends' },
+  { date: '2026-07-17', label: 'Alaska mission trip starts', note: 'Book return flight for Jul 22 not Jul 23.' },
+  { date: '2026-07-23', label: 'Alaska mission trip ends' },
+  { date: '2026-07-25', label: 'Addie\'s wedding' },
+  { date: '2026-08-08', label: 'Pre-pack week for UA move-in begins' },
+  { date: '2026-08-09', label: 'UA Honors Action starts', note: '$225 course, runs through Aug 14.' },
+  { date: '2026-08-14', label: 'UA Honors Action ends' },
+  { date: '2026-08-15', label: 'UA move-in day', note: 'Big day. Bring everything. Mom and Dad are coming.' },
+  { date: '2026-08-19', label: 'First day of classes — UA freshman year' },
+  { date: '2026-12-15', label: 'Freshman fall finals (est)' },
+  { date: '2026-12-31', label: 'End of 2026' },
+  { date: '2027-05-15', label: 'Freshman spring finals (est)' },
+  { date: '2027-05-30', label: 'End of freshman year (est)' },
+];
+
+let milestones = load();
+
+function load() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { return null; } }
+function save() { localStorage.setItem(KEY, JSON.stringify(milestones)); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function escapeHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function fmtDate(d) {
+  const dt = new Date(d + 'T00:00:00');
+  if (isNaN(dt)) return d;
+  return dt.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+}
+function daysUntil(dateStr) {
+  const target = new Date(dateStr + 'T00:00:00').getTime();
+  const now = new Date(todayKey() + 'T00:00:00').getTime();
+  return Math.floor((target - now) / (1000 * 60 * 60 * 24));
+}
+
+function ensureSeeded() {
+  if (milestones === null) {
+    // first run — seed
+    milestones = DEFAULTS.map(d => ({ id: uid(), ...d }));
+    localStorage.setItem(SEEDED_KEY, '1');
+    save();
+  }
+}
+
+function reseed() {
+  if (!confirm('Re-add defaults (skips any with matching labels)?')) return;
+  if (!milestones) milestones = [];
+  const existingLabels = new Set(milestones.map(m => m.label));
+  let added = 0;
+  DEFAULTS.forEach(d => {
+    if (!existingLabels.has(d.label)) {
+      milestones.push({ id: uid(), ...d });
+      added++;
+    }
+  });
+  save();
+  renderGrid();
+  alert('Re-seeded ' + added + ' milestones.');
+}
+
+function addMilestone() {
+  const date = document.getElementById('m-date').value;
+  const label = document.getElementById('m-label').value.trim();
+  const note = document.getElementById('m-note').value.trim();
+  if (!date || !label) { alert('Need date + label.'); return; }
+  if (!milestones) milestones = [];
+  milestones.push({ id: uid(), date, label, note });
+  save();
+  document.getElementById('m-date').value = '';
+  document.getElementById('m-label').value = '';
+  document.getElementById('m-note').value = '';
+  renderGrid();
+  showView('grid');
+}
+
+function categoryFor(days) {
+  if (days < 0) return 'past';
+  if (days <= 14) return 'urgent';
+  if (days <= 60) return 'soon';
+  return 'far';
+}
+
+function renderGrid() {
+  if (!milestones) milestones = [];
+  // Sort by date ascending
+  const sorted = [...milestones].sort((a, b) => a.date.localeCompare(b.date));
+
+  // Find next non-past
+  const next = sorted.find(m => daysUntil(m.date) >= 0);
+  const nextContainer = document.getElementById('next-up-container');
+  if (next) {
+    const d = daysUntil(next.date);
+    const dayLabel = d === 0 ? 'TODAY' : d === 1 ? 'TOMORROW' : d + ' DAYS';
+    nextContainer.innerHTML = `
+      <div class="next-up">
+        <div class="ticker">${d === 0 || d === 1 ? '' : d}<span style="font-size:0.4em;letter-spacing:0.1em;color:var(--ink-soft);"> ${d === 0 || d === 1 ? dayLabel : 'days'}</span></div>
+        <div class="next-label">${escapeHtml(next.label)}</div>
+        <div class="next-date">${fmtDate(next.date)}</div>
+      </div>
+    `;
+  } else {
+    nextContainer.innerHTML = '';
+  }
+
+  const grid = document.getElementById('milestone-grid');
+  if (!sorted.length) {
+    grid.innerHTML = '<div class="empty">No milestones yet. Add one or re-seed Elijah\'s defaults.</div>';
+    return;
+  }
+  grid.innerHTML = sorted.map(m => {
+    const d = daysUntil(m.date);
+    const cat = categoryFor(d);
+    const displayDays = Math.abs(d);
+    const unit = d < 0 ? 'days ago' : d === 1 ? 'day' : 'days';
+    return `
+      <div class="milestone ${cat}">
+        <div class="days">${displayDays}</div>
+        <div class="unit">${unit}</div>
+        <div class="label">${escapeHtml(m.label)}</div>
+        <div class="date">${fmtDate(m.date)}</div>
+        ${m.note ? `<div class="note">${escapeHtml(m.note)}</div>` : ''}
+        <div class="actions">
+          <button onclick="editMilestone('${m.id}')">Edit</button>
+          <button onclick="deleteMilestone('${m.id}')">Delete</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+window.editMilestone = (id) => {
+  const m = milestones.find(x => x.id === id);
+  if (!m) return;
+  const newLabel = prompt('Label:', m.label);
+  if (newLabel === null) return;
+  const newDate = prompt('Date (YYYY-MM-DD):', m.date);
+  if (newDate === null) return;
+  const newNote = prompt('Note:', m.note || '');
+  if (newNote === null) return;
+  m.label = newLabel.trim() || m.label;
+  m.date = newDate.trim() || m.date;
+  m.note = newNote.trim();
+  save();
+  renderGrid();
+};
+
+window.deleteMilestone = (id) => {
+  if (!confirm('Delete this milestone?')) return;
+  milestones = milestones.filter(m => m.id !== id);
+  save();
+  renderGrid();
+};
+
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(milestones || [], null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'milestones-' + todayKey() + '.json';
+  a.click();
+}
+function importJSON(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!Array.isArray(data)) throw new Error('not array');
+      if (!confirm('Merge ' + data.length + ' milestones?')) return;
+      if (!milestones) milestones = [];
+      const existing = new Set(milestones.map(m => m.id));
+      let added = 0;
+      data.forEach(m => { if (!existing.has(m.id)) { milestones.push(m); added++; } });
+      save();
+      renderGrid();
+      alert('Added ' + added + '.');
+    } catch (err) { alert('Bad JSON: ' + err.message); }
+  };
+  r.readAsText(file);
+}
+function resetAll() {
+  if (!confirm('Erase all milestones (including defaults)?')) return;
+  if (!confirm('Really?')) return;
+  localStorage.removeItem(KEY);
+  localStorage.removeItem(SEEDED_KEY);
+  milestones = [];
+  save();
+  renderGrid();
+}
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + name).style.display = '';
+  document.querySelector(`.tab[data-view="${name}"]`).classList.add('active');
+  if (name === 'grid') renderGrid();
+}
+
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
+document.getElementById('add-btn').addEventListener('click', addMilestone);
+document.getElementById('reseed-btn').addEventListener('click', reseed);
+document.getElementById('export-btn').addEventListener('click', exportJSON);
+document.getElementById('import-btn').addEventListener('click', () => document.getElementById('import-file').click());
+document.getElementById('import-file').addEventListener('change', importJSON);
+document.getElementById('reset-btn').addEventListener('click', resetAll);
+
+ensureSeeded();
+renderGrid();
+</script>
+
+</body>
+</html>

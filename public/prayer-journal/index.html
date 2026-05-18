@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prayer Journal — a record, not a performance</title>
+<meta name="description" content="Daily prayer journal with rotating scripture, ACTS-framework prompts, and an answered-prayer log. No streaks, no social, no algorithm. Just a place to write.">
+<meta property="og:title" content="Prayer Journal — a record, not a performance">
+<meta property="og:description" content="Daily prompts. Rotating scripture. Answered prayer log. Personal only.">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --bg: #f5efe3;
+    --panel: #fffdf6;
+    --ink: #1d1812;
+    --ink-soft: #6b5a44;
+    --ink-faint: #9e8e75;
+    --accent: #7a5a2e;
+    --accent-light: #b89370;
+    --highlight: #c2a173;
+    --answered: #4a7c3d;
+    --border: #e5d9c0;
+    --serif: Georgia, "Times New Roman", serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 1rem;
+  }
+  .container { max-width: 640px; margin: 0 auto; }
+  header { text-align: center; padding: 2rem 0 2rem; }
+  header h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 6vw, 2.75rem);
+    color: var(--accent);
+    letter-spacing: -0.01em;
+    margin-bottom: 0.4rem;
+  }
+  header p {
+    color: var(--ink-soft);
+    font-style: italic;
+    font-size: 0.95rem;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .tab {
+    padding: 0.55rem 1.1rem;
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .tab.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+  .tab:hover:not(.active) {
+    border-color: var(--accent);
+    color: var(--ink);
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(29,24,18,0.06);
+  }
+  .panel h2 {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+  .panel h2 small {
+    font-family: inherit;
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-left: 0.5rem;
+    font-weight: normal;
+  }
+
+  .verse {
+    background: var(--bg);
+    border-left: 3px solid var(--highlight);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--ink);
+    border-radius: 4px;
+  }
+  .verse .ref {
+    display: block;
+    margin-top: 0.5rem;
+    font-family: inherit;
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-style: normal;
+  }
+
+  .prompt {
+    color: var(--ink-soft);
+    font-style: italic;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+  }
+  textarea, input[type="text"] {
+    width: 100%;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 6px;
+    padding: 0.85rem 1rem;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.55;
+    resize: vertical;
+  }
+  textarea { min-height: 90px; margin-bottom: 0.75rem; }
+  textarea:focus, input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  button {
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    padding: 0.65rem 1.4rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  button:hover { background: var(--accent); }
+  button.ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+  }
+  button.ghost:hover { background: var(--bg); color: var(--ink); border-color: var(--accent); }
+  button.answered { background: var(--answered); }
+  button.answered:hover { background: #3a5c2d; }
+
+  .row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+
+  .entry-list { max-height: 500px; overflow-y: auto; }
+  .entry {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .entry:last-child { border-bottom: none; }
+  .entry .date {
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.4rem;
+  }
+  .entry .body {
+    color: var(--ink);
+    white-space: pre-wrap;
+    line-height: 1.6;
+  }
+  .entry .body .label {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0.5rem;
+    display: block;
+  }
+
+  .request {
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 0.6rem;
+    background: var(--bg);
+  }
+  .request.answered {
+    background: #e8f0e2;
+    border-color: #c4d4b8;
+    border-left: 3px solid var(--answered);
+  }
+  .request .meta {
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.4rem;
+  }
+  .request .text { color: var(--ink); }
+  .request .answer {
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+    border-top: 1px dashed var(--border);
+    color: var(--answered);
+    font-style: italic;
+  }
+  .request .actions {
+    display: flex;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .request .actions button {
+    padding: 0.3rem 0.7rem;
+    font-size: 0.78rem;
+  }
+
+  .empty {
+    text-align: center;
+    color: var(--ink-faint);
+    padding: 1.5rem 0;
+    font-style: italic;
+  }
+
+  .acts {
+    background: var(--bg);
+    border-radius: 6px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.85rem;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    line-height: 1.7;
+  }
+  .acts strong { color: var(--accent); display: inline-block; min-width: 5em; }
+
+  footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+    line-height: 1.7;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Prayer Journal</h1>
+  <p>a record, not a performance</p>
+</header>
+
+<div class="tabs">
+  <button class="tab active" data-view="today">Today</button>
+  <button class="tab" data-view="requests">Requests</button>
+  <button class="tab" data-view="answered">Answered</button>
+  <button class="tab" data-view="history">History</button>
+  <button class="tab" data-view="manage">Manage</button>
+</div>
+
+<div id="view-today" class="view">
+  <div class="panel">
+    <h2>For today <small id="today-date"></small></h2>
+    <div id="today-verse" class="verse"></div>
+    <div class="acts">
+      <strong>Adoration</strong> Who is God? What is true of Him today?<br>
+      <strong>Confession</strong> What needs to be named honestly?<br>
+      <strong>Thanksgiving</strong> What did He give that you didn't ask for?<br>
+      <strong>Supplication</strong> What are you bringing? For yourself, for others.
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Adoration</h2>
+    <textarea id="t-adoration" placeholder="Who is God to you right now?"></textarea>
+  </div>
+
+  <div class="panel">
+    <h2>Confession</h2>
+    <textarea id="t-confession" placeholder="What do you need to name honestly?"></textarea>
+  </div>
+
+  <div class="panel">
+    <h2>Thanksgiving</h2>
+    <textarea id="t-thanks" placeholder="Three things you didn't earn today."></textarea>
+  </div>
+
+  <div class="panel">
+    <h2>Supplication</h2>
+    <textarea id="t-supp" placeholder="What are you bringing today? Be specific."></textarea>
+  </div>
+
+  <div class="row" style="justify-content:center;">
+    <button id="save-today-btn">Save today's prayer</button>
+    <button class="ghost" id="clear-btn">Clear</button>
+  </div>
+</div>
+
+<div id="view-requests" class="view" style="display:none;">
+  <div class="panel">
+    <h2>Open requests</h2>
+    <p class="prompt">Specific prayers waiting on God. The point of writing them down is so you remember to keep watching.</p>
+    <textarea id="new-request-text" placeholder="Pray for ___ that ___."></textarea>
+    <input type="text" id="new-request-tag" placeholder="Tag (e.g., family, work, faith, friend's name)">
+    <button id="add-request-btn">Add request</button>
+  </div>
+  <div class="panel">
+    <h2>Watching</h2>
+    <div id="open-requests"></div>
+  </div>
+</div>
+
+<div id="view-answered" class="view" style="display:none;">
+  <div class="panel" id="answered-stats-panel" style="display:none;">
+    <h2>Stats</h2>
+    <div id="answered-stats"></div>
+  </div>
+  <div class="panel">
+    <h2>Answered prayer log</h2>
+    <p class="prompt">The point of this list: when you doubt that anything is happening, scroll back through it.</p>
+    <div id="answered-requests"></div>
+  </div>
+</div>
+
+<div id="view-history" class="view" style="display:none;">
+  <div class="panel">
+    <h2>Past entries</h2>
+    <input type="text" id="history-search" placeholder="Search across past entries (any ACTS section)" style="margin-bottom:0.85rem;">
+    <div id="history-list" class="entry-list"></div>
+  </div>
+</div>
+
+<div id="view-manage" class="view" style="display:none;">
+  <div class="panel">
+    <h2>Manage</h2>
+    <div class="row">
+      <button class="ghost" id="export-btn">Export JSON</button>
+      <button class="ghost" id="import-btn">Import JSON</button>
+      <button class="ghost" id="reset-btn" style="color:#b04a4a;border-color:#d8b6b6;">Reset all</button>
+      <input type="file" id="import-file" accept=".json" style="display:none;">
+    </div>
+    <p class="prompt" style="margin-top:1rem;">Everything stays on your device. No cloud, no account, no shared anything. This is between you and God.</p>
+  </div>
+</div>
+
+<footer>
+  <p>No streaks, no social, no algorithm. Just a place to write.<br>
+  <a href="https://github.com/thebigjah/prayer-journal">source</a>
+  </p>
+</footer>
+
+</div>
+
+<script>
+'use strict';
+
+const KEY_ENTRIES = 'prayerjournal.entries.v1';
+const KEY_REQUESTS = 'prayerjournal.requests.v1';
+
+const VERSES = [
+  { t: "Cast all your anxiety on him because he cares for you.", r: "1 Peter 5:7" },
+  { t: "Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God.", r: "Philippians 4:6" },
+  { t: "Be still, and know that I am God.", r: "Psalm 46:10" },
+  { t: "The Lord is near to all who call on him, to all who call on him in truth.", r: "Psalm 145:18" },
+  { t: "If we confess our sins, he is faithful and just and will forgive us our sins and purify us from all unrighteousness.", r: "1 John 1:9" },
+  { t: "Search me, God, and know my heart; test me and know my anxious thoughts.", r: "Psalm 139:23" },
+  { t: "Trust in the Lord with all your heart, and do not lean on your own understanding.", r: "Proverbs 3:5" },
+  { t: "And we know that in all things God works for the good of those who love him.", r: "Romans 8:28" },
+  { t: "I lift up my eyes to the mountains — where does my help come from?", r: "Psalm 121:1" },
+  { t: "Pray continually, give thanks in all circumstances.", r: "1 Thessalonians 5:17-18" },
+  { t: "Ask and it will be given to you; seek and you will find; knock and the door will be opened to you.", r: "Matthew 7:7" },
+  { t: "Come to me, all you who are weary and burdened, and I will give you rest.", r: "Matthew 11:28" },
+  { t: "The Spirit himself intercedes for us through wordless groans.", r: "Romans 8:26" },
+  { t: "Now to him who is able to do immeasurably more than all we ask or imagine.", r: "Ephesians 3:20" },
+  { t: "His mercies are new every morning; great is your faithfulness.", r: "Lamentations 3:23" },
+  { t: "If my people, who are called by my name, will humble themselves and pray.", r: "2 Chronicles 7:14" },
+  { t: "This is the confidence we have in approaching God: that if we ask anything according to his will, he hears us.", r: "1 John 5:14" },
+  { t: "Yet not as I will, but as you will.", r: "Matthew 26:39" },
+  { t: "Therefore confess your sins to each other and pray for each other so that you may be healed.", r: "James 5:16" },
+  { t: "Be joyful in hope, patient in affliction, faithful in prayer.", r: "Romans 12:12" },
+];
+
+function load(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    return JSON.parse(raw);
+  } catch { return fallback; }
+}
+function save(key, data) {
+  localStorage.setItem(key, JSON.stringify(data));
+}
+
+let entries = load(KEY_ENTRIES, []);
+let requests = load(KEY_REQUESTS, []);
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function fmtDate(key) {
+  const dt = new Date(key + 'T00:00:00');
+  if (isNaN(dt)) return key;
+  return dt.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function todayVerse() {
+  const k = todayKey();
+  const seed = k.split('-').reduce((a,b) => a + parseInt(b,10), 0);
+  return VERSES[seed % VERSES.length];
+}
+
+function renderToday() {
+  document.getElementById('today-date').textContent = fmtDate(todayKey());
+  const v = todayVerse();
+  document.getElementById('today-verse').innerHTML = `"${escapeHtml(v.t)}"<span class="ref">${escapeHtml(v.r)}</span>`;
+
+  // If we already have a saved entry today, load it
+  const existing = entries.find(e => e.date === todayKey());
+  if (existing) {
+    document.getElementById('t-adoration').value = existing.adoration || '';
+    document.getElementById('t-confession').value = existing.confession || '';
+    document.getElementById('t-thanks').value = existing.thanks || '';
+    document.getElementById('t-supp').value = existing.supp || '';
+  }
+}
+
+function saveToday() {
+  const adoration = document.getElementById('t-adoration').value.trim();
+  const confession = document.getElementById('t-confession').value.trim();
+  const thanks = document.getElementById('t-thanks').value.trim();
+  const supp = document.getElementById('t-supp').value.trim();
+
+  if (!adoration && !confession && !thanks && !supp) {
+    alert('Nothing to save yet.');
+    return;
+  }
+
+  const k = todayKey();
+  const idx = entries.findIndex(e => e.date === k);
+  const entry = { id: idx >= 0 ? entries[idx].id : uid(), date: k, adoration, confession, thanks, supp, savedAt: new Date().toISOString() };
+  if (idx >= 0) entries[idx] = entry;
+  else entries.push(entry);
+  save(KEY_ENTRIES, entries);
+  alert('Saved.');
+}
+
+function clearToday() {
+  if (!confirm('Clear today\'s draft?')) return;
+  document.getElementById('t-adoration').value = '';
+  document.getElementById('t-confession').value = '';
+  document.getElementById('t-thanks').value = '';
+  document.getElementById('t-supp').value = '';
+}
+
+function addRequest() {
+  const text = document.getElementById('new-request-text').value.trim();
+  const tag = document.getElementById('new-request-tag').value.trim();
+  if (!text) { alert('Write the request first.'); return; }
+  requests.push({
+    id: uid(),
+    text, tag,
+    addedAt: new Date().toISOString(),
+    answered: null,
+    answerText: '',
+  });
+  save(KEY_REQUESTS, requests);
+  document.getElementById('new-request-text').value = '';
+  document.getElementById('new-request-tag').value = '';
+  renderRequests();
+}
+
+function renderRequests() {
+  const open = requests.filter(r => !r.answered).sort((a,b) => (b.addedAt || '').localeCompare(a.addedAt || ''));
+  const el = document.getElementById('open-requests');
+  if (!open.length) { el.innerHTML = '<div class="empty">No open requests. Add one above.</div>'; return; }
+  el.innerHTML = open.map(r => {
+    const days = Math.floor((Date.now() - new Date(r.addedAt).getTime()) / (1000 * 60 * 60 * 24));
+    const daysLabel = days === 0 ? 'today' : days === 1 ? '1 day' : days + ' days';
+    return `
+      <div class="request">
+        <div class="meta">added ${fmtDate(r.addedAt.split('T')[0])} · praying for ${daysLabel}${r.tag ? ' · ' + escapeHtml(r.tag) : ''}</div>
+        <div class="text">${escapeHtml(r.text)}</div>
+        <div class="actions">
+          <button class="answered" data-action="answer" data-id="${r.id}">Mark answered</button>
+          <button class="ghost" data-action="edit" data-id="${r.id}">Edit</button>
+          <button class="ghost" data-action="delete" data-id="${r.id}">Delete</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderAnswered() {
+  const ans = requests.filter(r => r.answered).sort((a,b) => (b.answered || '').localeCompare(a.answered || ''));
+  const el = document.getElementById('answered-requests');
+  const statsPanel = document.getElementById('answered-stats-panel');
+
+  if (ans.length) {
+    // Build stats
+    const open = requests.filter(r => !r.answered).length;
+    const total = requests.length;
+    const ratePct = total ? Math.round((ans.length / total) * 100) : 0;
+    // Avg + longest time to answer
+    const durations = ans.map(r => {
+      const start = new Date(r.addedAt).getTime();
+      const end = new Date(r.answered).getTime();
+      return Math.max(0, Math.floor((end - start) / (1000 * 60 * 60 * 24)));
+    });
+    const avgDays = durations.length ? Math.round(durations.reduce((s,d) => s+d, 0) / durations.length) : 0;
+    const maxDays = durations.length ? Math.max(...durations) : 0;
+    // By tag (answered)
+    const byTag = {};
+    ans.forEach(r => {
+      const t = r.tag || '(untagged)';
+      byTag[t] = (byTag[t] || 0) + 1;
+    });
+    const sortedTags = Object.entries(byTag).sort((a,b) => b[1] - a[1]).slice(0, 8);
+
+    statsPanel.style.display = '';
+    document.getElementById('answered-stats').innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.6rem;margin-bottom:1rem;">
+        <div style="text-align:center;padding:0.85rem 0.4rem;background:var(--bg);border-radius:8px;">
+          <div style="font-family:var(--serif);font-size:1.6rem;color:var(--answered);line-height:1.1;">${ans.length}</div>
+          <div style="font-size:0.72rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.05em;margin-top:0.25rem;">answered</div>
+        </div>
+        <div style="text-align:center;padding:0.85rem 0.4rem;background:var(--bg);border-radius:8px;">
+          <div style="font-family:var(--serif);font-size:1.6rem;color:var(--accent);line-height:1.1;">${ratePct}%</div>
+          <div style="font-size:0.72rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.05em;margin-top:0.25rem;">of all logged</div>
+        </div>
+        <div style="text-align:center;padding:0.85rem 0.4rem;background:var(--bg);border-radius:8px;">
+          <div style="font-family:var(--serif);font-size:1.6rem;color:var(--accent);line-height:1.1;">${avgDays}d</div>
+          <div style="font-size:0.72rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.05em;margin-top:0.25rem;">avg time</div>
+        </div>
+      </div>
+      <div style="color:var(--ink-soft);font-size:0.85rem;margin-bottom:0.5rem;">
+        Longest answer wait: <strong style="color:var(--ink);">${maxDays} day${maxDays===1?'':'s'}</strong>
+      </div>
+      <div style="margin-top:1rem;">
+        <div style="color:var(--accent);font-size:0.78rem;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;">Answered by tag</div>
+        ${sortedTags.map(([t,c]) => `
+          <div style="display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid var(--border);font-size:0.9rem;">
+            <span>${escapeHtml(t)}</span>
+            <span style="color:var(--ink-soft);">${c}</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  } else {
+    statsPanel.style.display = 'none';
+  }
+
+  if (!ans.length) { el.innerHTML = '<div class="empty">No answered prayers logged yet. They come.</div>'; return; }
+  el.innerHTML = ans.map(r => `
+    <div class="request answered">
+      <div class="meta">answered ${fmtDate(r.answered.split('T')[0])}${r.tag ? ' · ' + escapeHtml(r.tag) : ''}</div>
+      <div class="text">${escapeHtml(r.text)}</div>
+      ${r.answerText ? `<div class="answer">${escapeHtml(r.answerText)}</div>` : ''}
+      <div class="actions">
+        <button class="ghost" data-action="reopen" data-id="${r.id}">Re-open</button>
+        <button class="ghost" data-action="delete" data-id="${r.id}">Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function handleRequestClick(e) {
+  if (e.target.tagName !== 'BUTTON') return;
+  const id = e.target.dataset.id;
+  const action = e.target.dataset.action;
+  const r = requests.find(x => x.id === id);
+  if (!r) return;
+  if (action === 'answer') {
+    const note = prompt('How was it answered? (optional)', '');
+    r.answered = new Date().toISOString();
+    r.answerText = note || '';
+    save(KEY_REQUESTS, requests);
+    renderRequests();
+    renderAnswered();
+  } else if (action === 'reopen') {
+    if (!confirm('Move back to open?')) return;
+    r.answered = null;
+    r.answerText = '';
+    save(KEY_REQUESTS, requests);
+    renderRequests();
+    renderAnswered();
+  } else if (action === 'edit') {
+    const newText = prompt('Edit:', r.text);
+    if (newText === null) return;
+    r.text = newText.trim() || r.text;
+    save(KEY_REQUESTS, requests);
+    renderRequests();
+  } else if (action === 'delete') {
+    if (!confirm('Delete this request?')) return;
+    requests = requests.filter(x => x.id !== id);
+    save(KEY_REQUESTS, requests);
+    renderRequests();
+    renderAnswered();
+  }
+}
+
+function renderHistory() {
+  const el = document.getElementById('history-list');
+  const query = (document.getElementById('history-search')?.value || '').toLowerCase().trim();
+  if (!entries.length) { el.innerHTML = '<div class="empty">No entries yet.</div>'; return; }
+  let sorted = [...entries].sort((a,b) => b.date.localeCompare(a.date));
+  if (query) {
+    sorted = sorted.filter(e =>
+      (e.adoration && e.adoration.toLowerCase().includes(query)) ||
+      (e.confession && e.confession.toLowerCase().includes(query)) ||
+      (e.thanks && e.thanks.toLowerCase().includes(query)) ||
+      (e.supp && e.supp.toLowerCase().includes(query)) ||
+      e.date.includes(query)
+    );
+  }
+  if (!sorted.length) { el.innerHTML = '<div class="empty">No matches for "' + escapeHtml(query) + '".</div>'; return; }
+  el.innerHTML = sorted.map(e => `
+    <div class="entry">
+      <div class="date">${fmtDate(e.date)}</div>
+      <div class="body">
+        ${e.adoration ? `<span class="label">Adoration</span>${escapeHtml(e.adoration)}` : ''}
+        ${e.confession ? `<span class="label">Confession</span>${escapeHtml(e.confession)}` : ''}
+        ${e.thanks ? `<span class="label">Thanksgiving</span>${escapeHtml(e.thanks)}` : ''}
+        ${e.supp ? `<span class="label">Supplication</span>${escapeHtml(e.supp)}` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if (view) view.style.display = '';
+  const tab = document.querySelector(`.tab[data-view="${name}"]`);
+  if (tab) tab.classList.add('active');
+}
+
+function exportJSON() {
+  const data = JSON.stringify({ entries, requests }, null, 2);
+  const blob = new Blob([data], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'prayer-journal-' + todayKey() + '.json';
+  a.click();
+}
+
+function importJSON(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      const inE = Array.isArray(data.entries) ? data.entries : [];
+      const inR = Array.isArray(data.requests) ? data.requests : [];
+      if (!confirm('Merge ' + inE.length + ' entries + ' + inR.length + ' requests?')) return;
+      const eIds = new Set(entries.map(x => x.id));
+      const rIds = new Set(requests.map(x => x.id));
+      let addedE = 0, addedR = 0;
+      inE.forEach(x => { if (!eIds.has(x.id)) { entries.push(x); addedE++; } });
+      inR.forEach(x => { if (!rIds.has(x.id)) { requests.push(x); addedR++; } });
+      save(KEY_ENTRIES, entries);
+      save(KEY_REQUESTS, requests);
+      renderAll();
+      alert('Added ' + addedE + ' entries, ' + addedR + ' requests.');
+    } catch (err) {
+      alert('Bad JSON: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function resetAll() {
+  if (!confirm('Erase all entries and requests?')) return;
+  if (!confirm('Really? Cannot be undone.')) return;
+  localStorage.removeItem(KEY_ENTRIES);
+  localStorage.removeItem(KEY_REQUESTS);
+  entries = [];
+  requests = [];
+  renderAll();
+}
+
+function renderAll() {
+  renderToday();
+  renderRequests();
+  renderAnswered();
+  renderHistory();
+}
+
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
+document.getElementById('save-today-btn').addEventListener('click', saveToday);
+document.getElementById('clear-btn').addEventListener('click', clearToday);
+document.getElementById('add-request-btn').addEventListener('click', addRequest);
+document.getElementById('open-requests').addEventListener('click', handleRequestClick);
+document.getElementById('answered-requests').addEventListener('click', handleRequestClick);
+document.getElementById('export-btn').addEventListener('click', exportJSON);
+document.getElementById('import-btn').addEventListener('click', () => document.getElementById('import-file').click());
+document.getElementById('import-file').addEventListener('change', importJSON);
+document.getElementById('reset-btn').addEventListener('click', resetAll);
+document.getElementById('history-search').addEventListener('input', renderHistory);
+
+renderAll();
+</script>
+
+</body>
+</html>

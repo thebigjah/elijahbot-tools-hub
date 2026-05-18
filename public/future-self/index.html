@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Future Self — letters you can't read until the date arrives</title>
+<meta name="description" content="Write a letter to your future self. The app holds it sealed until the release date you set. Open Future Self on or after that date to read.">
+<meta property="og:title" content="Future Self — letters you can't read until the date arrives">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --bg: #ede5d2;
+    --panel: #fdf8e7;
+    --ink: #1d1812;
+    --ink-soft: #6b5a44;
+    --ink-faint: #a89880;
+    --accent: #8a4a4a;
+    --accent-light: #b06e6e;
+    --warn: #b85c2e;
+    --done: #4a7c3d;
+    --sealed: #c0a87a;
+    --border: #d6c8a6;
+    --serif: "Cinzel", Georgia, "Times New Roman", serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 1rem;
+  }
+  .container { max-width: 640px; margin: 0 auto; }
+  header { text-align: center; padding: 2rem 0; }
+  header h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 6vw, 2.6rem);
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+    letter-spacing: 0.03em;
+  }
+  header p {
+    color: var(--ink-soft);
+    font-style: italic;
+    font-size: 0.95rem;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .tab {
+    padding: 0.55rem 1.1rem;
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .tab.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+  .tab:hover:not(.active) { border-color: var(--accent); color: var(--ink); }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(29,24,18,0.06);
+  }
+  .panel h2 {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+
+  label {
+    display: block;
+    color: var(--accent);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin: 1rem 0 0.4rem;
+    font-weight: 600;
+  }
+  label:first-child { margin-top: 0; }
+
+  input[type="text"], input[type="date"], textarea {
+    width: 100%;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  textarea { min-height: 200px; resize: vertical; font-family: Georgia, serif; }
+  input:focus, textarea:focus { outline: none; border-color: var(--accent); }
+
+  .quick-row {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-top: 0.4rem;
+  }
+  .quick-row button {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--border);
+    padding: 0.35rem 0.7rem;
+    font-size: 0.78rem;
+    font-weight: 400;
+  }
+  .quick-row button:hover {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+
+  button {
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    padding: 0.7rem 1.3rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  button:hover { background: var(--accent); }
+  button.ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+  }
+  button.ghost:hover { background: var(--bg); color: var(--ink); border-color: var(--accent); }
+
+  .row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
+
+  .letter {
+    padding: 1.25rem;
+    background: var(--bg);
+    border-left: 4px solid var(--sealed);
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+  .letter.sealed { border-left-color: var(--sealed); }
+  .letter.unlocked { border-left-color: var(--done); }
+  .letter .meta {
+    color: var(--ink-faint);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.5rem;
+  }
+  .letter .title {
+    font-family: var(--serif);
+    color: var(--accent);
+    font-size: 1.1rem;
+    margin-bottom: 0.4rem;
+  }
+  .letter .countdown {
+    color: var(--sealed);
+    font-weight: 600;
+    margin: 0.5rem 0;
+    font-size: 0.95rem;
+  }
+  .letter .countdown.ready { color: var(--done); }
+  .letter .body-text {
+    font-family: var(--serif);
+    color: var(--ink);
+    white-space: pre-wrap;
+    line-height: 1.85;
+    margin-top: 1rem;
+    font-size: 1.05rem;
+  }
+  .letter .actions {
+    margin-top: 0.85rem;
+  }
+
+  .empty {
+    text-align: center;
+    color: var(--ink-faint);
+    padding: 1.5rem 0;
+    font-style: italic;
+  }
+
+  .quote {
+    background: var(--bg);
+    border-left: 3px solid var(--accent);
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 0.88rem;
+    margin: 1rem 0;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+    line-height: 1.6;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Future Self</h1>
+  <p>letters you can't read until the date arrives</p>
+</header>
+
+<div class="tabs">
+  <button class="tab active" data-view="write">Write</button>
+  <button class="tab" data-view="sealed">Sealed</button>
+  <button class="tab" data-view="open">Opened</button>
+  <button class="tab" data-view="manage">Manage</button>
+</div>
+
+<div id="view-write" class="view">
+  <div class="panel">
+    <h2>Write a letter to your future self</h2>
+    <div class="quote">"The you who reads this will not remember being the you who wrote it. Tell them what they need to know."</div>
+
+    <label>Subject — what's this letter about?</label>
+    <input type="text" id="w-subject" placeholder="e.g., First week of college / How freshman year ended / If you're about to quit">
+
+    <label>Letter</label>
+    <textarea id="w-body" placeholder="Address the future you directly. What did you want to remember? What were you afraid of? What were you hoping?"></textarea>
+
+    <label>Release on</label>
+    <input type="date" id="w-release">
+    <div class="quick-row">
+      <button data-days="30">+30d</button>
+      <button data-days="90">+90d</button>
+      <button data-days="180">+6mo</button>
+      <button data-days="365">+1yr</button>
+      <button data-days="730">+2yr</button>
+      <button data-date="2026-08-15">UA move-in 8/15</button>
+      <button data-date="2026-12-31">End of 2026</button>
+      <button data-date="2027-05-15">Freshman finals</button>
+    </div>
+
+    <button id="seal-btn" style="margin-top:1.5rem;">Seal until release date</button>
+  </div>
+</div>
+
+<div id="view-sealed" class="view" style="display:none;">
+  <div class="panel">
+    <h2>Sealed letters</h2>
+    <div id="sealed-list"></div>
+  </div>
+</div>
+
+<div id="view-open" class="view" style="display:none;">
+  <div class="panel">
+    <h2>Opened letters</h2>
+    <div id="open-list"></div>
+  </div>
+</div>
+
+<div id="view-manage" class="view" style="display:none;">
+  <div class="panel">
+    <h2>Manage</h2>
+    <div class="row">
+      <button class="ghost" id="export-btn">Export JSON</button>
+      <button class="ghost" id="import-btn">Import JSON</button>
+      <button class="ghost" id="reset-btn" style="color:#b04a4a;border-color:#d8b6b6;">Reset all</button>
+      <input type="file" id="import-file" accept=".json" style="display:none;">
+    </div>
+    <p style="color:var(--ink-soft);font-size:0.85rem;margin-top:1rem;">Letters are stored on your device only. Be careful with reset — sealed letters cannot be recovered.</p>
+  </div>
+</div>
+
+<footer>
+  <p>The simplest message machine. Write now, read later.<br>
+  <a href="https://github.com/thebigjah/future-self">source</a></p>
+</footer>
+
+</div>
+
+<script>
+'use strict';
+
+const KEY = 'futureself.v1';
+let letters = load();
+
+function load() {
+  try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; }
+}
+function save() { localStorage.setItem(KEY, JSON.stringify(letters)); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function escapeHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function fmtDate(d) {
+  const dt = new Date(d + 'T00:00:00');
+  if (isNaN(dt)) return d;
+  return dt.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+}
+function daysUntil(dateStr) {
+  const target = new Date(dateStr + 'T00:00:00').getTime();
+  const now = new Date(todayKey() + 'T00:00:00').getTime();
+  return Math.floor((target - now) / (1000 * 60 * 60 * 24));
+}
+
+document.querySelector('.quick-row').addEventListener('click', (e) => {
+  if (e.target.tagName !== 'BUTTON') return;
+  if (e.target.dataset.date) {
+    document.getElementById('w-release').value = e.target.dataset.date;
+  } else if (e.target.dataset.days) {
+    const d = new Date();
+    d.setDate(d.getDate() + parseInt(e.target.dataset.days, 10));
+    document.getElementById('w-release').value = d.toISOString().split('T')[0];
+  }
+});
+
+function sealLetter() {
+  const subject = document.getElementById('w-subject').value.trim();
+  const body = document.getElementById('w-body').value.trim();
+  const release = document.getElementById('w-release').value;
+  if (!subject || !body || !release) { alert('Need subject, body, and release date.'); return; }
+  if (daysUntil(release) <= 0) { alert('Release date must be in the future.'); return; }
+  letters.push({
+    id: uid(),
+    subject, body, release,
+    sealedAt: new Date().toISOString(),
+    opened: false,
+    openedAt: null,
+  });
+  save();
+  document.getElementById('w-subject').value = '';
+  document.getElementById('w-body').value = '';
+  document.getElementById('w-release').value = '';
+  alert('Sealed. You\'ll see it again on ' + fmtDate(release) + '.');
+  showView('sealed');
+}
+
+function renderSealed() {
+  const sealed = letters.filter(l => !l.opened).sort((a, b) => a.release.localeCompare(b.release));
+  const el = document.getElementById('sealed-list');
+  if (!sealed.length) { el.innerHTML = '<div class="empty">No sealed letters. Write one.</div>'; return; }
+  el.innerHTML = sealed.map(l => {
+    const days = daysUntil(l.release);
+    const ready = days <= 0;
+    return `
+      <div class="letter sealed">
+        <div class="meta">sealed ${fmtDate(l.sealedAt.split('T')[0])} · releases ${fmtDate(l.release)}</div>
+        <div class="title">${escapeHtml(l.subject)}</div>
+        <div class="countdown ${ready ? 'ready' : ''}">${ready ? 'READY TO OPEN' : days + ' day' + (days===1?'':'s') + ' to go'}</div>
+        <div class="actions">
+          ${ready
+            ? `<button onclick="openLetter('${l.id}')">Open this letter</button>`
+            : `<button class="ghost" onclick="alert('Not yet. ${days} day${days===1?'':'s'} to wait.')" style="font-size:0.85rem;padding:0.45rem 0.9rem;">Sealed until ${fmtDate(l.release)}</button>`}
+          <button class="ghost" onclick="deleteLetter('${l.id}')" style="font-size:0.85rem;padding:0.45rem 0.9rem;color:#b04a4a;border-color:#d8b6b6;">Destroy unread</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+window.openLetter = (id) => {
+  const l = letters.find(x => x.id === id);
+  if (!l) return;
+  const days = daysUntil(l.release);
+  if (days > 0) { alert('Cannot open yet. ' + days + ' day' + (days===1?'':'s') + ' to wait.'); return; }
+  if (!confirm('Open this letter? You can re-read it any time after.')) return;
+  l.opened = true;
+  l.openedAt = new Date().toISOString();
+  save();
+  showView('open');
+};
+
+window.deleteLetter = (id) => {
+  const l = letters.find(x => x.id === id);
+  if (!l) return;
+  if (!l.opened) {
+    if (!confirm('This letter is still sealed. Destroying it now means you never read it. Continue?')) return;
+    if (!confirm('Really sure?')) return;
+  } else {
+    if (!confirm('Delete this opened letter?')) return;
+  }
+  letters = letters.filter(x => x.id !== id);
+  save();
+  renderSealed(); renderOpen();
+};
+
+function renderOpen() {
+  const open = letters.filter(l => l.opened).sort((a, b) => (b.openedAt || '').localeCompare(a.openedAt || ''));
+  const el = document.getElementById('open-list');
+  if (!open.length) { el.innerHTML = '<div class="empty">No letters opened yet.</div>'; return; }
+  el.innerHTML = open.map(l => `
+    <div class="letter unlocked">
+      <div class="meta">sealed ${fmtDate(l.sealedAt.split('T')[0])} · opened ${fmtDate((l.openedAt || '').split('T')[0])}</div>
+      <div class="title">${escapeHtml(l.subject)}</div>
+      <div class="body-text">${escapeHtml(l.body)}</div>
+      <div class="actions">
+        <button class="ghost" onclick="deleteLetter('${l.id}')" style="font-size:0.85rem;padding:0.45rem 0.9rem;color:#b04a4a;border-color:#d8b6b6;">Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(letters, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'future-self-' + todayKey() + '.json';
+  a.click();
+}
+function importJSON(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!Array.isArray(data)) throw new Error('not array');
+      if (!confirm('Merge ' + data.length + ' letters?')) return;
+      const existing = new Set(letters.map(l => l.id));
+      let added = 0;
+      data.forEach(l => { if (!existing.has(l.id)) { letters.push(l); added++; } });
+      save();
+      renderSealed(); renderOpen();
+      alert('Added ' + added + '.');
+    } catch (err) { alert('Bad JSON: ' + err.message); }
+  };
+  r.readAsText(file);
+}
+function resetAll() {
+  if (!confirm('Erase ALL letters, including sealed ones you have never read?')) return;
+  if (!confirm('Really? Cannot be undone.')) return;
+  localStorage.removeItem(KEY); letters = [];
+  renderSealed(); renderOpen();
+}
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + name).style.display = '';
+  document.querySelector(`.tab[data-view="${name}"]`).classList.add('active');
+  if (name === 'sealed') renderSealed();
+  if (name === 'open') renderOpen();
+}
+
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
+document.getElementById('seal-btn').addEventListener('click', sealLetter);
+document.getElementById('export-btn').addEventListener('click', exportJSON);
+document.getElementById('import-btn').addEventListener('click', () => document.getElementById('import-file').click());
+document.getElementById('import-file').addEventListener('change', importJSON);
+document.getElementById('reset-btn').addEventListener('click', resetAll);
+
+renderSealed();
+renderOpen();
+</script>
+
+</body>
+</html>

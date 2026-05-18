@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dorm Pack — UA move-in checklist</title>
+<meta name="description" content="Pre-loaded packing checklist for UA freshman move-in. 130+ items across 11 categories. Check off as you pack. Add custom items.">
+<meta property="og:title" content="Dorm Pack — UA move-in checklist">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --bg: #f4f0e4;
+    --panel: #fdfaef;
+    --ink: #1d1812;
+    --ink-soft: #6b5a44;
+    --ink-faint: #a89880;
+    --accent: #8a2828;
+    --accent-light: #a85050;
+    --crimson: #9e1b32;
+    --done: #4a7c3d;
+    --border: #d8cbb0;
+    --serif: Georgia, "Times New Roman", serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    min-height: 100vh;
+    padding: 1rem;
+  }
+  .container { max-width: 760px; margin: 0 auto; }
+  header { text-align: center; padding: 2rem 0; }
+  header h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 6vw, 2.6rem);
+    color: var(--crimson);
+    margin-bottom: 0.4rem;
+  }
+  header p {
+    color: var(--ink-soft);
+    font-style: italic;
+    font-size: 0.95rem;
+  }
+
+  .stats {
+    display: flex;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .stat {
+    text-align: center;
+    padding: 0.75rem 1.25rem;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .stat .n {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    color: var(--crimson);
+    line-height: 1.1;
+  }
+  .stat .l {
+    font-size: 0.7rem;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 0.2rem;
+  }
+  .progress {
+    height: 6px;
+    background: var(--panel);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border);
+  }
+  .progress-bar {
+    height: 100%;
+    background: var(--crimson);
+    transition: width 0.3s;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .tab {
+    padding: 0.5rem 1rem;
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+  .tab.active {
+    background: var(--crimson);
+    color: var(--bg);
+    border-color: var(--crimson);
+  }
+  .tab:hover:not(.active) { border-color: var(--crimson); color: var(--ink); }
+
+  .category-section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .category-section h3 {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    color: var(--crimson);
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .category-section h3 .count {
+    color: var(--ink-soft);
+    font-family: inherit;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: normal;
+  }
+
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .item:last-child { border-bottom: none; }
+  .item input[type="checkbox"] {
+    width: 1.1rem;
+    height: 1.1rem;
+    accent-color: var(--crimson);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .item .text {
+    flex: 1;
+    color: var(--ink);
+    font-size: 0.95rem;
+  }
+  .item.packed .text {
+    color: var(--ink-faint);
+    text-decoration: line-through;
+  }
+  .item .note {
+    color: var(--ink-faint);
+    font-size: 0.78rem;
+    font-style: italic;
+  }
+  .item .delete {
+    background: transparent;
+    color: var(--ink-faint);
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 0.2rem 0.4rem;
+  }
+  .item .delete:hover { color: var(--accent); }
+
+  .add-item-form {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .add-item-form h3 {
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    color: var(--crimson);
+    margin-bottom: 0.85rem;
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    gap: 0.5rem;
+  }
+  @media (max-width: 540px) { .form-row { grid-template-columns: 1fr; } }
+
+  input[type="text"], select {
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 6px;
+    padding: 0.6rem 0.85rem;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 0.9rem;
+  }
+  input:focus, select:focus { outline: none; border-color: var(--crimson); }
+
+  button {
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    padding: 0.6rem 1.1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  button:hover { background: var(--crimson); }
+  button.ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+  }
+  button.ghost:hover { color: var(--ink); border-color: var(--crimson); }
+
+  .row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; justify-content: center; }
+
+  footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+  }
+  footer a { color: var(--crimson); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Dorm Pack</h1>
+  <p>UA move-in checklist · Tuscaloosa or bust</p>
+</header>
+
+<div class="stats" id="stats"></div>
+<div class="progress"><div class="progress-bar" id="progress-bar"></div></div>
+
+<div class="tabs">
+  <button class="tab active" data-view="list">List</button>
+  <button class="tab" data-view="add">Add item</button>
+  <button class="tab" data-view="manage">Manage</button>
+</div>
+
+<div id="view-list" class="view">
+  <div id="categories-container"></div>
+</div>
+
+<div id="view-add" class="view" style="display:none;">
+  <div class="add-item-form">
+    <h3>Add a custom item</h3>
+    <div class="form-row">
+      <input type="text" id="a-text" placeholder="e.g., Shure SM7B mic">
+      <select id="a-category"></select>
+      <input type="text" id="a-note" placeholder="note (optional)">
+      <button onclick="addItem()">Add</button>
+    </div>
+  </div>
+  <div class="add-item-form">
+    <h3>Reset to defaults</h3>
+    <p style="color:var(--ink-soft);font-size:0.85rem;margin-bottom:0.85rem;">Reloads the full UA pre-pack list. Skips items already in your list (by text match).</p>
+    <button class="ghost" onclick="reseed()">Reload defaults</button>
+  </div>
+</div>
+
+<div id="view-manage" class="view" style="display:none;">
+  <div class="add-item-form">
+    <div class="row" style="justify-content:flex-start;">
+      <button class="ghost" id="export-btn">Export JSON</button>
+      <button class="ghost" id="import-btn">Import JSON</button>
+      <button class="ghost" id="export-md-btn">Export checklist as Markdown</button>
+      <button class="ghost" id="reset-btn" style="color:#b04a4a;border-color:#d8b6b6;">Erase all</button>
+      <input type="file" id="import-file" accept=".json" style="display:none;">
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>Roll Tide · Built before move-in day so you don't forget the can opener.<br>
+  <a href="https://github.com/thebigjah/dorm-pack">source</a></p>
+</footer>
+
+</div>
+
+<script>
+'use strict';
+
+const KEY = 'dormpack.v1';
+
+const CATEGORIES = [
+  'Bedding & Linens',
+  'Clothing',
+  'Bathroom & Toiletries',
+  'Laundry',
+  'Storage & Organization',
+  'School Supplies',
+  'Tech & Electronics',
+  'Kitchen / Snacks',
+  'Cleaning & Tools',
+  'Health & First Aid',
+  'Documents & Money',
+  'Faith / Personal',
+];
+
+const DEFAULTS = [
+  // Bedding & Linens (UA dorm beds are XL twin)
+  { cat:'Bedding & Linens', text:'Twin XL mattress topper', note:'UA beds are twin XL — not regular twin' },
+  { cat:'Bedding & Linens', text:'Mattress protector (twin XL)' },
+  { cat:'Bedding & Linens', text:'Fitted sheets x2 (twin XL)' },
+  { cat:'Bedding & Linens', text:'Flat sheet (optional)' },
+  { cat:'Bedding & Linens', text:'Pillows x2' },
+  { cat:'Bedding & Linens', text:'Pillowcases x2-3' },
+  { cat:'Bedding & Linens', text:'Comforter or duvet' },
+  { cat:'Bedding & Linens', text:'Light blanket (for between seasons)' },
+  { cat:'Bedding & Linens', text:'Throw blanket for couch/floor' },
+
+  // Clothing (Alabama Aug = HOT, Dec = mild but cold mornings)
+  { cat:'Clothing', text:'Underwear x14+', note:'enough for 2 weeks between laundry' },
+  { cat:'Clothing', text:'Socks x14+ (mix athletic + dress)' },
+  { cat:'Clothing', text:'T-shirts x10' },
+  { cat:'Clothing', text:'Athletic shorts x5' },
+  { cat:'Clothing', text:'Jeans x3' },
+  { cat:'Clothing', text:'Athletic pants/sweatpants x2' },
+  { cat:'Clothing', text:'Hoodies / sweatshirts x3' },
+  { cat:'Clothing', text:'Light jacket' },
+  { cat:'Clothing', text:'Winter coat (for Dec-Feb)' },
+  { cat:'Clothing', text:'Button-downs x3', note:'church + first-impression meetings' },
+  { cat:'Clothing', text:'Khakis or chinos x2' },
+  { cat:'Clothing', text:'Suit + dress shirt + tie', note:'one full set — bama bound dress nights' },
+  { cat:'Clothing', text:'Dress shoes' },
+  { cat:'Clothing', text:'Sneakers x2 (one for walking, one for athletic)' },
+  { cat:'Clothing', text:'Slides / sandals' },
+  { cat:'Clothing', text:'Belt x2 (one casual, one dress)' },
+  { cat:'Clothing', text:'Sleepwear' },
+  { cat:'Clothing', text:'Swim trunks' },
+  { cat:'Clothing', text:'Hats / caps' },
+  { cat:'Clothing', text:'Gameday Bama gear (crimson)', note:'pickup at supply store or before move-in' },
+
+  // Bathroom & Toiletries
+  { cat:'Bathroom & Toiletries', text:'Shower caddy (mesh, drains well)' },
+  { cat:'Bathroom & Toiletries', text:'Shower shoes', note:'shared bathroom = mandatory' },
+  { cat:'Bathroom & Toiletries', text:'Bath towels x4' },
+  { cat:'Bathroom & Toiletries', text:'Hand towels x2' },
+  { cat:'Bathroom & Toiletries', text:'Washcloths x4' },
+  { cat:'Bathroom & Toiletries', text:'Robe' },
+  { cat:'Bathroom & Toiletries', text:'Toothbrush + toothpaste + floss' },
+  { cat:'Bathroom & Toiletries', text:'Shampoo + conditioner + body wash' },
+  { cat:'Bathroom & Toiletries', text:'Deodorant' },
+  { cat:'Bathroom & Toiletries', text:'Razor + shaving cream' },
+  { cat:'Bathroom & Toiletries', text:'Hair brush / comb' },
+  { cat:'Bathroom & Toiletries', text:'Nail clippers' },
+  { cat:'Bathroom & Toiletries', text:'Q-tips' },
+  { cat:'Bathroom & Toiletries', text:'Sunscreen (Alabama sun is real)' },
+  { cat:'Bathroom & Toiletries', text:'Bug spray' },
+
+  // Laundry
+  { cat:'Laundry', text:'Laundry basket / hamper' },
+  { cat:'Laundry', text:'Laundry detergent (pods are easier)' },
+  { cat:'Laundry', text:'Dryer sheets' },
+  { cat:'Laundry', text:'Stain remover stick' },
+  { cat:'Laundry', text:'Quarters / Bama Cash for laundry machines' },
+  { cat:'Laundry', text:'Iron + small ironing board (optional)' },
+  { cat:'Laundry', text:'Hangers x30' },
+  { cat:'Laundry', text:'Mesh delicates bag' },
+
+  // Storage & Organization
+  { cat:'Storage & Organization', text:'Under-bed storage bins x2' },
+  { cat:'Storage & Organization', text:'Drawer organizers' },
+  { cat:'Storage & Organization', text:'Closet shelves / hanging organizer' },
+  { cat:'Storage & Organization', text:'Bed risers (4)', note:'doubles your under-bed space' },
+  { cat:'Storage & Organization', text:'Trash can (small)' },
+  { cat:'Storage & Organization', text:'Command hooks / strips' },
+
+  // School Supplies
+  { cat:'School Supplies', text:'Backpack' },
+  { cat:'School Supplies', text:'Notebooks x3-4' },
+  { cat:'School Supplies', text:'Pens (10+)' },
+  { cat:'School Supplies', text:'Pencils + sharpener' },
+  { cat:'School Supplies', text:'Highlighters' },
+  { cat:'School Supplies', text:'Stapler' },
+  { cat:'School Supplies', text:'Index cards' },
+  { cat:'School Supplies', text:'Sticky notes' },
+  { cat:'School Supplies', text:'3-ring binder x2' },
+  { cat:'School Supplies', text:'Folders x5' },
+  { cat:'School Supplies', text:'Planner (paper)' },
+  { cat:'School Supplies', text:'Desk lamp' },
+  { cat:'School Supplies', text:'Stapler + paper clips' },
+
+  // Tech & Electronics
+  { cat:'Tech & Electronics', text:'Laptop + charger' },
+  { cat:'Tech & Electronics', text:'Phone + charger + cable x2' },
+  { cat:'Tech & Electronics', text:'Power strip (surge-protected, 6+ outlets)' },
+  { cat:'Tech & Electronics', text:'Extension cord' },
+  { cat:'Tech & Electronics', text:'Headphones (over-ear for studying)' },
+  { cat:'Tech & Electronics', text:'Earbuds (gym)' },
+  { cat:'Tech & Electronics', text:'External hard drive or backup' },
+  { cat:'Tech & Electronics', text:'Bluetooth speaker (small, dorm-friendly)' },
+  { cat:'Tech & Electronics', text:'USB-C adapter / multiport hub' },
+  { cat:'Tech & Electronics', text:'HDMI cable' },
+  { cat:'Tech & Electronics', text:'Shure mic + recording gear', note:'for content / worship recording' },
+
+  // Kitchen / Snacks
+  { cat:'Kitchen / Snacks', text:'Microwave (if dorm allows)', note:'check UA dorm rules first' },
+  { cat:'Kitchen / Snacks', text:'Mini fridge (if dorm allows)' },
+  { cat:'Kitchen / Snacks', text:'Reusable water bottle x2' },
+  { cat:'Kitchen / Snacks', text:'Coffee maker or French press' },
+  { cat:'Kitchen / Snacks', text:'Mug x2' },
+  { cat:'Kitchen / Snacks', text:'Plates x2 (microwave-safe)' },
+  { cat:'Kitchen / Snacks', text:'Bowls x2' },
+  { cat:'Kitchen / Snacks', text:'Silverware set (cheap)' },
+  { cat:'Kitchen / Snacks', text:'Can opener' },
+  { cat:'Kitchen / Snacks', text:'Tupperware x4' },
+  { cat:'Kitchen / Snacks', text:'Ziploc bags' },
+  { cat:'Kitchen / Snacks', text:'Snacks (granola, nuts, peanut butter, ramen)' },
+
+  // Cleaning & Tools
+  { cat:'Cleaning & Tools', text:'Lysol wipes' },
+  { cat:'Cleaning & Tools', text:'Trash bags (13 gal)' },
+  { cat:'Cleaning & Tools', text:'Paper towels' },
+  { cat:'Cleaning & Tools', text:'Tide pen' },
+  { cat:'Cleaning & Tools', text:'Mini tool kit (screwdriver, hammer, pliers)' },
+  { cat:'Cleaning & Tools', text:'Duct tape' },
+  { cat:'Cleaning & Tools', text:'Velcro strips' },
+  { cat:'Cleaning & Tools', text:'Lint roller' },
+  { cat:'Cleaning & Tools', text:'Air freshener' },
+
+  // Health & First Aid
+  { cat:'Health & First Aid', text:'Insurance card (copy)' },
+  { cat:'Health & First Aid', text:'Prescription medications' },
+  { cat:'Health & First Aid', text:'Tylenol / Advil' },
+  { cat:'Health & First Aid', text:'Cold/flu medicine' },
+  { cat:'Health & First Aid', text:'Bandaids' },
+  { cat:'Health & First Aid', text:'Hydrogen peroxide / Neosporin' },
+  { cat:'Health & First Aid', text:'Thermometer' },
+  { cat:'Health & First Aid', text:'Cough drops' },
+  { cat:'Health & First Aid', text:'Allergy medicine' },
+
+  // Documents & Money
+  { cat:'Documents & Money', text:'Driver\'s license' },
+  { cat:'Documents & Money', text:'Social Security card (copy, store safely)' },
+  { cat:'Documents & Money', text:'Health insurance info' },
+  { cat:'Documents & Money', text:'Birth certificate (copy)' },
+  { cat:'Documents & Money', text:'Debit card + backup card' },
+  { cat:'Documents & Money', text:'Small lockbox or safe' },
+  { cat:'Documents & Money', text:'Cash ($50 emergency)' },
+  { cat:'Documents & Money', text:'UA Action Card', note:'student ID; usually picked up at orientation' },
+  { cat:'Documents & Money', text:'Passport (for Spring Break / mission)' },
+
+  // Faith / Personal
+  { cat:'Faith / Personal', text:'Bible (the one you actually use)' },
+  { cat:'Faith / Personal', text:'Journal' },
+  { cat:'Faith / Personal', text:'Worship songbook / chord sheets' },
+  { cat:'Faith / Personal', text:'Books to read this semester (top 3)' },
+  { cat:'Faith / Personal', text:'Photos of family + close friends' },
+  { cat:'Faith / Personal', text:'Letters from people who matter' },
+  { cat:'Faith / Personal', text:'Wall art / posters' },
+  { cat:'Faith / Personal', text:'String lights (dorm vibe)' },
+];
+
+let state = load();
+
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch { return null; }
+}
+function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function escapeHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function ensureSeeded() {
+  if (state === null) {
+    state = { items: DEFAULTS.map(d => ({ id: uid(), ...d, packed: false })) };
+    save();
+  }
+}
+
+function populateCategories() {
+  const sel = document.getElementById('a-category');
+  sel.innerHTML = CATEGORIES.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+}
+
+function reseed() {
+  if (!confirm('Reload UA pre-pack defaults (skipping any items already in your list)?')) return;
+  if (!state.items) state.items = [];
+  const existingTexts = new Set(state.items.map(i => i.text.toLowerCase()));
+  let added = 0;
+  DEFAULTS.forEach(d => {
+    if (!existingTexts.has(d.text.toLowerCase())) {
+      state.items.push({ id: uid(), ...d, packed: false });
+      added++;
+    }
+  });
+  save();
+  renderList();
+  alert('Added ' + added + ' items.');
+}
+
+function addItem() {
+  const text = document.getElementById('a-text').value.trim();
+  const cat = document.getElementById('a-category').value;
+  const note = document.getElementById('a-note').value.trim();
+  if (!text) { alert('Need item text.'); return; }
+  if (!state.items) state.items = [];
+  state.items.push({ id: uid(), text, cat, note, packed: false });
+  save();
+  document.getElementById('a-text').value = '';
+  document.getElementById('a-note').value = '';
+  renderList();
+  alert('Added.');
+}
+
+window.toggleItem = (id) => {
+  const i = state.items.find(x => x.id === id);
+  if (!i) return;
+  i.packed = !i.packed;
+  save();
+  updateStats();
+  // Visual update only
+  const row = document.querySelector(`[data-id="${id}"]`);
+  if (row) row.classList.toggle('packed', i.packed);
+};
+
+window.deleteItem = (id) => {
+  if (!confirm('Remove this item from the list?')) return;
+  state.items = state.items.filter(i => i.id !== id);
+  save();
+  renderList();
+};
+
+function updateStats() {
+  if (!state.items) return;
+  const total = state.items.length;
+  const packed = state.items.filter(i => i.packed).length;
+  const remaining = total - packed;
+  const pct = total ? Math.round((packed / total) * 100) : 0;
+  document.getElementById('stats').innerHTML = `
+    <div class="stat"><div class="n">${packed}</div><div class="l">packed</div></div>
+    <div class="stat"><div class="n">${remaining}</div><div class="l">remaining</div></div>
+    <div class="stat"><div class="n">${pct}%</div><div class="l">done</div></div>
+  `;
+  document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+function renderList() {
+  if (!state.items) state.items = [];
+  // Group by category in CATEGORIES order
+  const grouped = {};
+  CATEGORIES.forEach(c => grouped[c] = []);
+  state.items.forEach(i => {
+    const c = i.cat || 'School Supplies';
+    if (!grouped[c]) grouped[c] = [];
+    grouped[c].push(i);
+  });
+
+  const container = document.getElementById('categories-container');
+  container.innerHTML = CATEGORIES.filter(c => grouped[c].length).map(c => {
+    const items = grouped[c];
+    const packed = items.filter(i => i.packed).length;
+    return `
+      <div class="category-section">
+        <h3>
+          <span>${escapeHtml(c)}</span>
+          <span class="count">${packed}/${items.length}</span>
+        </h3>
+        ${items.map(i => `
+          <div class="item ${i.packed ? 'packed' : ''}" data-id="${i.id}">
+            <input type="checkbox" ${i.packed ? 'checked' : ''} onchange="toggleItem('${i.id}')">
+            <div class="text">${escapeHtml(i.text)}${i.note ? ` <span class="note">— ${escapeHtml(i.note)}</span>` : ''}</div>
+            <button class="delete" onclick="deleteItem('${i.id}')">×</button>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }).join('');
+
+  updateStats();
+}
+
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'dorm-pack-' + todayKey() + '.json';
+  a.click();
+}
+function exportMd() {
+  let md = '# Dorm Pack — ' + todayKey() + '\n\n';
+  const grouped = {};
+  state.items.forEach(i => {
+    const c = i.cat || 'School Supplies';
+    if (!grouped[c]) grouped[c] = [];
+    grouped[c].push(i);
+  });
+  CATEGORIES.forEach(c => {
+    if (!grouped[c] || !grouped[c].length) return;
+    md += `## ${c}\n\n`;
+    grouped[c].forEach(i => {
+      md += `- [${i.packed ? 'x' : ' '}] ${i.text}`;
+      if (i.note) md += ` _${i.note}_`;
+      md += '\n';
+    });
+    md += '\n';
+  });
+  const blob = new Blob([md], { type:'text/markdown' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'dorm-pack-' + todayKey() + '.md';
+  a.click();
+}
+function importJSON(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      const inItems = data.items || (Array.isArray(data) ? data : []);
+      if (!confirm('Merge ' + inItems.length + ' items?')) return;
+      if (!state.items) state.items = [];
+      const existing = new Set(state.items.map(i => i.id));
+      let added = 0;
+      inItems.forEach(i => { if (!existing.has(i.id)) { state.items.push(i); added++; } });
+      save();
+      renderList();
+      alert('Added ' + added + '.');
+    } catch (err) { alert('Bad JSON: ' + err.message); }
+  };
+  r.readAsText(file);
+}
+function resetAll() {
+  if (!confirm('Erase EVERYTHING (including defaults)?')) return;
+  if (!confirm('Really?')) return;
+  localStorage.removeItem(KEY);
+  state = { items: [] };
+  save();
+  renderList();
+}
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + name).style.display = '';
+  document.querySelector(`.tab[data-view="${name}"]`).classList.add('active');
+}
+
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
+document.getElementById('export-btn').addEventListener('click', exportJSON);
+document.getElementById('export-md-btn').addEventListener('click', exportMd);
+document.getElementById('import-btn').addEventListener('click', () => document.getElementById('import-file').click());
+document.getElementById('import-file').addEventListener('change', importJSON);
+document.getElementById('reset-btn').addEventListener('click', resetAll);
+
+window.addItem = addItem;
+window.reseed = reseed;
+
+ensureSeeded();
+populateCategories();
+renderList();
+</script>
+
+</body>
+</html>

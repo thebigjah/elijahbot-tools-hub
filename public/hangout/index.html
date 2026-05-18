@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Steal My Hangout — better than scrolling for 20 minutes</title>
+<meta name="description" content="A list of actually-good hangout ideas other people have done. Browse, pick one, do it. Submit your own. No accounts, no algorithm.">
+<meta property="og:title" content="Steal My Hangout — better than scrolling for 20 minutes">
+<meta property="og:description" content="20 pre-seeded Atlanta-area hangout ideas. Map view + smart filters + share-my-list URLs.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://thebigjah.github.io/hangout/">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#0a0604">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
+<style>
+  :root {
+    --bg: #0a0604;
+    --bg-2: #16110b;
+    --card: #1b1510;
+    --border: #2e2820;
+    --border-light: #3a342a;
+    --text: #f5f0e0;
+    --text-muted: #b6a98e;
+    --text-light: #847b69;
+    --accent: #c2a173;
+    --accent-bright: #e8b968;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: Inter, system-ui, sans-serif; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 40px 24px 80px; }
+  .serif { font-family: 'Cinzel', Georgia, serif; }
+  .kicker { font-size: 12px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin: 0 0 14px; }
+  h1.title { font-family: 'Cinzel', Georgia, serif; font-size: clamp(40px, 6vw, 64px); font-weight: 700; margin: 0 0 12px; line-height: 1.04; }
+  p.lead { font-size: 18px; color: var(--text-muted); margin: 0 0 32px; max-width: 580px; line-height: 1.6; }
+  .toolbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 22px; }
+  .filters { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip {
+    padding: 6px 14px; border-radius: 999px;
+    background: transparent; border: 1px solid var(--border-light);
+    color: var(--text-muted); font-size: 13px; cursor: pointer;
+    transition: all 120ms;
+    font-family: inherit;
+  }
+  .chip.on { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 600; }
+  .chip:hover { border-color: var(--accent); }
+  .search {
+    margin-left: auto; flex: 1; min-width: 200px;
+    padding: 10px 14px; border: 1px solid var(--border-light); border-radius: 8px;
+    background: var(--bg-2); color: var(--text); font-size: 14px; outline: none; font-family: inherit;
+  }
+  .search:focus { border-color: var(--accent); }
+  .btn { appearance: none; border: none; cursor: pointer; padding: 10px 20px; border-radius: 8px; font-family: inherit; font-size: 14px; font-weight: 700; letter-spacing: .04em; transition: transform 80ms; }
+  .btn:active { transform: translateY(1px) scale(.99); }
+  .btn-primary { background: var(--accent); color: var(--bg); }
+  .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border-light); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; transition: border-color 120ms, transform 120ms; cursor: pointer; }
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .card-tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .12em; color: var(--accent); text-transform: uppercase; margin-bottom: 8px; }
+  .card-title { font-family: 'Cinzel', Georgia, serif; font-size: 19px; color: var(--text); margin: 0 0 10px; line-height: 1.25; }
+  .card-desc { font-size: 14px; color: var(--text-muted); line-height: 1.55; margin: 0 0 14px; }
+  .card-meta { font-size: 12px; color: var(--text-light); display: flex; gap: 12px; flex-wrap: wrap; }
+  .card-meta span { display: inline-flex; gap: 4px; align-items: center; }
+  .card.user { border-color: var(--accent-bright); }
+  .empty { text-align: center; padding: 40px 24px; color: var(--text-light); font-size: 15px; }
+  .view-toggle { display: inline-flex; border: 1px solid var(--border-light); border-radius: 6px; overflow: hidden; margin-right: 8px; }
+  .view-toggle button { background: transparent; border: none; padding: 8px 14px; color: var(--text-muted); cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; }
+  .view-toggle button.on { background: var(--accent); color: var(--bg); }
+  #map-view { display: none; height: 480px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 18px; overflow: hidden; }
+  #map-view.show { display: block; }
+  #grid.hidden { display: none; }
+  .leaflet-container { background: #14110b !important; }
+  .leaflet-tile { filter: brightness(0.7) saturate(0.85); }
+  .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--card); color: var(--text); border: 1px solid var(--border-light); }
+  .leaflet-popup-content { color: var(--text); margin: 12px 14px; font-family: Inter, sans-serif; font-size: 13px; line-height: 1.5; }
+  .leaflet-popup-content strong { color: var(--accent); }
+  .leaflet-control-zoom a { background: var(--card) !important; color: var(--accent) !important; border-color: var(--border) !important; }
+  .leaflet-control-attribution { background: rgba(10,6,4,0.7) !important; color: var(--text-light) !important; }
+  .leaflet-control-attribution a { color: var(--accent) !important; }
+  .picker { background: var(--bg-2); border: 1px solid var(--border-light); border-radius: 12px; padding: 24px; margin-bottom: 28px; }
+  .picker h2 { font-family: 'Cinzel', Georgia, serif; font-size: 20px; margin: 0 0 12px; color: var(--text); }
+  .picker p { color: var(--text-muted); font-size: 14px; margin: 0 0 16px; }
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: none; align-items: center; justify-content: center; z-index: 100; padding: 24px; }
+  .modal-bg.show { display: flex; }
+  .modal { background: var(--bg-2); border: 1px solid var(--border-light); border-radius: 12px; padding: 28px; max-width: 520px; width: 100%; max-height: 90vh; overflow-y: auto; }
+  .modal h3 { font-family: 'Cinzel', Georgia, serif; font-size: 22px; margin: 0 0 18px; color: var(--text); }
+  .modal label { display: block; font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 6px; margin-top: 14px; }
+  .modal input, .modal textarea, .modal select {
+    width: 100%; padding: 11px 14px; background: var(--card); color: var(--text);
+    border: 1px solid var(--border-light); border-radius: 8px;
+    font-family: inherit; font-size: 14px; outline: none;
+  }
+  .modal input:focus, .modal textarea:focus, .modal select:focus { border-color: var(--accent); }
+  .modal textarea { min-height: 80px; resize: vertical; }
+  .detail-modal .card-title { font-size: 26px; }
+  .detail-modal .card-desc { font-size: 16px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; flex-wrap: wrap; }
+  .footer { font-size: 13px; color: var(--text-light); text-align: center; margin-top: 50px; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <p class="kicker">A list of ideas you can actually go do</p>
+  <h1 class="title">Steal My Hangout.</h1>
+  <p class="lead">
+    Better than scrolling for 20 minutes asking each other what to do. Pick one. Go.
+  </p>
+
+  <div class="picker">
+    <h2>Pick something for me.</h2>
+    <p>Roll the dice. Random idea from whatever filter you have selected.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn btn-primary" id="random">Roll the dice →</button>
+      <button class="btn btn-ghost" id="for-tonight">For tonight ↗</button>
+      <button class="btn btn-ghost" id="for-weekend">For this weekend ↗</button>
+      <button class="btn btn-ghost" id="for-cheap">Under $10 ↗</button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="view-toggle">
+      <button id="view-list" class="on">List</button>
+      <button id="view-map">Map</button>
+    </div>
+    <div class="filters" id="filters"></div>
+    <input class="search" id="search" type="text" placeholder="search…">
+    <button class="btn btn-ghost" id="share-list" title="Share your custom-added ideas as a link">Share my list</button>
+    <button class="btn btn-primary" id="open-add">+ Add your own</button>
+  </div>
+
+  <div id="map-view"></div>
+  <div class="grid" id="grid"></div>
+
+  <p class="footer">Steal My Hangout v0.1 · saves locally · pre-seeded with Atlanta-area ideas · add your own to grow the list</p>
+</main>
+
+<!-- ADD MODAL -->
+<div class="modal-bg" id="modal-add">
+  <div class="modal">
+    <h3>Add a hangout idea</h3>
+    <label>One-line idea</label>
+    <input id="a-title" type="text" placeholder="e.g. Sunset at Kennesaw Mountain summit">
+    <label>What you actually do (1-2 sentences)</label>
+    <textarea id="a-desc" placeholder="e.g. Park at the visitor center, hike up the steep trail (45 min), watch the sun set over Atlanta from the bench at the top. Bring snacks."></textarea>
+    <label>Where</label>
+    <input id="a-where" type="text" placeholder="e.g. Kennesaw Mountain NBP">
+    <label>Category</label>
+    <select id="a-cat">
+      <option>Outdoors</option><option>Food</option><option>Adventure</option>
+      <option>Chill</option><option>Cheap/Free</option><option>Creative</option>
+      <option>Late Night</option><option>Weird</option><option>Date</option><option>Group</option>
+    </select>
+    <label>Vibe / who it's for (optional)</label>
+    <input id="a-vibe" type="text" placeholder="e.g. solo, two friends, group of 6, date night, etc.">
+    <label>Cost (per person)</label>
+    <select id="a-cost">
+      <option value="free">Free</option>
+      <option value="$">$ (under $10)</option>
+      <option value="$$">$$ ($10-$25)</option>
+      <option value="$$$">$$$ ($25+)</option>
+    </select>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="a-cancel">Cancel</button>
+      <button class="btn btn-primary" id="a-save">Add to list</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-bg" id="modal-detail">
+  <div class="modal detail-modal">
+    <span class="card-tag" id="d-tag"></span>
+    <h3 class="card-title" id="d-title"></h3>
+    <p class="card-desc" id="d-desc"></p>
+    <p class="card-meta" id="d-meta"></p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="d-share">Share</button>
+      <button class="btn btn-ghost" id="d-hide" style="display:none;">Hide</button>
+      <button class="btn btn-ghost" id="d-delete" style="display:none;">Delete</button>
+      <button class="btn btn-primary" id="d-mark-done">I did this!</button>
+      <button class="btn btn-ghost" id="d-close">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SEEDS = [
+  { title: "Sunset at Kennesaw Mountain summit", desc: "Park at the visitor center, hike up the steep trail (~45 min), watch the sun set over Atlanta from the bench at the top. Bring water and snacks.", where: "Kennesaw Mountain NBP", category: "Outdoors", vibe: "1-4 people, date", cost: "free", lat: 33.9777, lng: -84.5803 },
+  { title: "All-night Waffle House run", desc: "Pick the Waffle House at I-75 and Barrett Pkwy at 1 AM. Order the hash brown trio (scattered, smothered, covered, peppered, capped). Have the conversation you can\\'t have during the day.", where: "Waffle House, Kennesaw (I-75 + Barrett)", category: "Late Night", vibe: "2-3 close friends", cost: "$", lat: 34.0150, lng: -84.6189 },
+  { title: "Beltline + Ladybird Grove cocktails", desc: "Walk the eastside Beltline at dusk, end up at Ladybird Grove & Mess Hall for a drink on their patio. Plenty of dogs to pet.", where: "Atlanta Beltline (Eastside)", category: "Date", vibe: "date or 2 friends", cost: "$$", lat: 33.7787, lng: -84.3681 },
+  { title: "Drive-in movie at Starlight 6", desc: "Six screens, bring chairs, tune your car radio to the audio. Concession is cheap. Hits 3 movies in a night for the price of 1.", where: "Starlight Six Drive-In, Atlanta", category: "Chill", vibe: "group, family, date", cost: "$$", lat: 33.7223, lng: -84.3146 },
+  { title: "Get on the roof of the W parking garage", desc: "Park near the top of the W Atlanta Midtown garage (if open to public). Skyline view, free, takes 10 minutes from anywhere midtown.", where: "Midtown Atlanta", category: "Adventure", vibe: "2-4 friends", cost: "free", lat: 33.7838, lng: -84.3838 },
+  { title: "Coffee + Ponce City Market upstairs", desc: "Coffee at Spiller Park, browse the food hall, then take the elevator up to Skyline Park on the roof. Rides + minigolf + skyline.", where: "Ponce City Market, Atlanta", category: "Group", vibe: "group of 4-8", cost: "$$", lat: 33.7726, lng: -84.3656 },
+  { title: "Stone Mountain laser show + walk", desc: "Bring a blanket, get there an hour before sunset, walk the easy paved trail around the lake, settle in for the laser show on the carving face after dark.", where: "Stone Mountain Park", category: "Outdoors", vibe: "family, group, date", cost: "$", lat: 33.8053, lng: -84.1453 },
+  { title: "Cheap pottery date at JOY", desc: "Paint-your-own-pottery places. Pick the dumbest mug shape, paint it, fight about it, come back in a week to pick it up.", where: "Acworth / Marietta", category: "Date", vibe: "date, 2 friends", cost: "$$", lat: 34.0656, lng: -84.6788 },
+  { title: "Hike Sope Creek ruins", desc: "Old paper mill ruins on a creek, free, easy 1-2 mile loop. Climb on the ruins, throw rocks, take photos.", where: "Sope Creek Trail, Marietta", category: "Outdoors", vibe: "any group size", cost: "free", lat: 33.9533, lng: -84.4406 },
+  { title: "Build a pillow fort + theological argument", desc: "Move all the couch cushions into one room. Pick a real question (Calvinism, free will, hell, whatever). Have the argument. No phones.", where: "Anyone\\'s living room", category: "Chill", vibe: "2-5 close friends", cost: "free" },
+  { title: "Late-night Krispy Kreme HOT NOW", desc: "Drive past Krispy Kreme until the HOT NOW sign is lit. Buy a dozen. Eat the first one in the parking lot. Bring the rest home.", where: "Krispy Kreme, Marietta or wherever", category: "Late Night", vibe: "any", cost: "$", lat: 33.9526, lng: -84.5499 },
+  { title: "Walmart 2 AM challenge", desc: "Go to Walmart with one rule: buy a meal under $5 that you can eat in the parking lot. Eat it in the parking lot.", where: "Any 24-hr Walmart", category: "Weird", vibe: "2-3 friends", cost: "$" },
+  { title: "Drive to a town you\\'ve never been to", desc: "Pick a town within 30 minutes you\\'ve never been to. Drive there. Walk one street. Buy one thing. Come home.", where: "Anywhere within reach", category: "Adventure", vibe: "solo or 2 friends", cost: "$" },
+  { title: "Bookstore browse + journal at coffee shop", desc: "Hour at Barnes & Noble (or used bookstore). Buy one book. Coffee shop next door. Read first chapter, journal what you noticed.", where: "Anywhere", category: "Chill", vibe: "solo or with 1 friend", cost: "$$" },
+  { title: "Worship night at Stonebridge (Sun PM)", desc: "Stonebridge sometimes runs a Sunday evening worship + prayer night. Quieter than the morning service. Check the calendar.", where: "Stonebridge Church, Marietta", category: "Group", vibe: "anyone", cost: "free", lat: 33.9526, lng: -84.5499 },
+  { title: "Disc golf at Cauble Park", desc: "Cauble Park in Acworth has a free 18-hole disc golf course on the lake. Bring 3 discs, expect to lose at least one to the water.", where: "Cauble Park, Acworth", category: "Outdoors", vibe: "2-4 friends", cost: "free", lat: 34.0734, lng: -84.6788 },
+  { title: "Late night McDonalds drive thru philosophy", desc: "Drive thru, McFlurries, park anywhere quiet, ask one big question (\\'what scares you about the future?\\' / \\'what\\'s your unspoken regret?\\') and don\\'t leave until both people have answered.", where: "Anywhere", category: "Late Night", vibe: "1 close friend, date", cost: "$" },
+  { title: "Lake Allatoona kayak rental", desc: "Rent a tandem kayak from one of the marinas. Paddle to a quiet cove. Swim. Eat lunch on the boat.", where: "Lake Allatoona", category: "Adventure", vibe: "2-4 friends, date", cost: "$$$", lat: 34.1473, lng: -84.6938 },
+  { title: "Pick a stranger to bless", desc: "Go to a busy public place. Each person pays attention until someone catches their eye. Pay for their meal/coffee anonymously. Leave a note that says only \\'God sees you.\\'", where: "Anywhere", category: "Creative", vibe: "1-3 friends", cost: "$$" },
+  { title: "Backyard fire pit + Compline", desc: "Build a fire. At 10:00 PM open the Book of Common Prayer\\'s Compline service. Read it aloud. End in silence for 5 minutes. Talk after if you want.", where: "Backyard / patio", category: "Chill", vibe: "2-6 friends", cost: "free" },
+];
+
+const KEY = 'hangout.user.v1';
+const HIDDEN_KEY = 'hangout.hidden.v1';
+const DONE_KEY = 'hangout.done.v1';   // { ideaId: [{ ts, note, with }] }
+function loadUser() { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; } }
+function saveUser(arr) { localStorage.setItem(KEY, JSON.stringify(arr)); }
+function loadHidden() { try { return JSON.parse(localStorage.getItem(HIDDEN_KEY) || '[]'); } catch { return []; } }
+function saveHidden(arr) { localStorage.setItem(HIDDEN_KEY, JSON.stringify(arr)); }
+function loadDone() { try { return JSON.parse(localStorage.getItem(DONE_KEY) || '{}'); } catch { return {}; } }
+function saveDone(obj) { localStorage.setItem(DONE_KEY, JSON.stringify(obj)); }
+
+let userIdeas = loadUser();
+let hiddenSeeds = loadHidden();
+let doneLog = loadDone();
+let activeFilter = 'All';
+let searchTerm = '';
+
+// On load: if URL has #list=<base64>, offer to import
+(function checkUrlImport() {
+  const m = location.hash.match(/^#list=(.+)/);
+  if (!m) return;
+  try {
+    const decoded = decodeURIComponent(escape(atob(m[1])));
+    const incoming = JSON.parse(decoded);
+    if (!Array.isArray(incoming)) return;
+    const ok = confirm(`Someone shared ${incoming.length} hangout idea${incoming.length===1?'':'s'} with you. Add them to your list?`);
+    if (ok) {
+      // Re-id incoming ideas to avoid collisions
+      const reIdded = incoming.map(idea => ({ ...idea, id: 'u_shared_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6) }));
+      userIdeas = [...reIdded, ...userIdeas];
+      saveUser(userIdeas);
+      alert(`Added ${incoming.length} ideas.`);
+    }
+    // Clear hash either way
+    history.replaceState(null, '', location.pathname);
+  } catch (e) {
+    console.warn('shared list parse failed', e);
+  }
+})();
+
+const CATEGORIES = ['All','Outdoors','Food','Adventure','Chill','Cheap/Free','Creative','Late Night','Weird','Date','Group'];
+
+function allIdeas() {
+  const seeds = SEEDS
+    .filter((s, i) => !hiddenSeeds.includes(`seed-${i}`))
+    .map((s, i) => ({ ...s, id: `seed-${i}`, source: 'seed' }));
+  const user = userIdeas.map((u) => ({ ...u, source: 'user' }));
+  return [...user, ...seeds];
+}
+
+function matchesFilter(idea) {
+  if (activeFilter === 'All') return true;
+  if (activeFilter === 'Cheap/Free') return idea.cost === 'free' || idea.cost === '$';
+  return idea.category === activeFilter;
+}
+function matchesSearch(idea) {
+  if (!searchTerm) return true;
+  const s = searchTerm.toLowerCase();
+  return [idea.title, idea.desc, idea.where, idea.category, idea.vibe].some(x => (x||'').toLowerCase().includes(s));
+}
+
+function renderFilters() {
+  const f = document.getElementById('filters');
+  f.innerHTML = '';
+  CATEGORIES.forEach(c => {
+    const b = document.createElement('button');
+    b.className = 'chip' + (activeFilter === c ? ' on' : '');
+    b.textContent = c;
+    b.addEventListener('click', () => { activeFilter = c; render(); });
+    f.appendChild(b);
+  });
+}
+
+function renderGrid() {
+  const g = document.getElementById('grid');
+  g.innerHTML = '';
+  const list = allIdeas().filter(matchesFilter).filter(matchesSearch);
+  if (list.length === 0) {
+    g.innerHTML = `<div class="empty">No matches. Clear the filter or add your own.</div>`;
+    return;
+  }
+  list.forEach(idea => {
+    const card = document.createElement('div');
+    card.className = 'card' + (idea.source === 'user' ? ' user' : '');
+    const doneCount = (doneLog[idea.id] || []).length;
+    const doneBadge = doneCount > 0
+      ? `<span style="display:inline-block;font-size:10px;letter-spacing:.12em;color:var(--accent-bright);background:rgba(232,185,104,0.12);border:1px solid var(--accent-bright);border-radius:999px;padding:2px 8px;margin-left:6px;">DONE ×${doneCount}</span>`
+      : '';
+    card.innerHTML = `
+      <span class="card-tag">${escapeHtml(idea.category)} · ${escapeHtml(idea.cost)}${doneBadge}</span>
+      <h3 class="card-title">${escapeHtml(idea.title)}</h3>
+      <p class="card-desc">${escapeHtml(idea.desc)}</p>
+      <p class="card-meta">
+        <span>📍 ${escapeHtml(idea.where)}</span>
+        ${idea.vibe ? `<span>· ${escapeHtml(idea.vibe)}</span>` : ''}
+      </p>
+    `;
+    card.addEventListener('click', () => showDetail(idea));
+    g.appendChild(card);
+  });
+  renderDoneJournal();
+}
+
+function renderDoneJournal() {
+  let journalEl = document.getElementById('done-journal');
+  if (!journalEl) {
+    journalEl = document.createElement('div');
+    journalEl.id = 'done-journal';
+    journalEl.style.marginTop = '36px';
+    document.querySelector('main.wrap').insertBefore(journalEl, document.querySelector('p.footer'));
+  }
+  const entries = [];
+  Object.entries(doneLog).forEach(([ideaId, logs]) => {
+    const idea = allIdeas().find(i => i.id === ideaId);
+    if (!idea) return;
+    logs.forEach(l => entries.push({ idea, log: l }));
+  });
+  entries.sort((a, b) => b.log.ts - a.log.ts);
+  if (entries.length === 0) { journalEl.innerHTML = ''; return; }
+  journalEl.innerHTML = `
+    <h2 class="serif" style="font-family:'Cinzel',Georgia,serif;font-size:24px;color:var(--text);margin:0 0 16px;">
+      Done <span style="color:var(--text-light);font-size:14px;font-family:Inter,sans-serif;">— ${entries.length} hangout${entries.length===1?'':'s'} you actually did</span>
+    </h2>
+    <div style="display:grid;gap:8px;">
+      ${entries.slice(0, 30).map((e, i) => `
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:14px;color:var(--text);font-weight:600;">${escapeHtml(e.idea.title)}</div>
+            <div style="font-size:12px;color:var(--text-light);">${new Date(e.log.ts).toLocaleDateString()}${e.log.with ? ` · with ${escapeHtml(e.log.with)}` : ''}${e.log.note ? ` · "${escapeHtml(e.log.note)}"` : ''}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function render() { renderFilters(); renderGrid(); if (currentView === 'map') renderMap(); }
+function escapeHtml(s) { return String(s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+let currentView = 'list';
+let leafletMap = null;
+let markerLayer = null;
+
+function renderMap() {
+  const mapEl = document.getElementById('map-view');
+  if (!window.L) {
+    // Leaflet hasn't loaded yet, try again in 200ms
+    setTimeout(renderMap, 200);
+    return;
+  }
+  if (!leafletMap) {
+    leafletMap = L.map(mapEl).setView([33.95, -84.55], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap',
+    }).addTo(leafletMap);
+    markerLayer = L.layerGroup().addTo(leafletMap);
+  }
+  markerLayer.clearLayers();
+  const list = allIdeas().filter(matchesFilter).filter(matchesSearch).filter(i => i.lat != null && i.lng != null);
+  const goldIcon = L.divIcon({
+    className: '',
+    html: '<div style="width:16px;height:16px;border-radius:50%;background:#e8b968;border:2px solid #0a0604;box-shadow:0 0 0 1px #c2a173,0 0 12px rgba(232,185,104,0.6);"></div>',
+    iconSize: [16, 16], iconAnchor: [8, 8],
+  });
+  list.forEach(idea => {
+    const marker = L.marker([idea.lat, idea.lng], { icon: goldIcon }).addTo(markerLayer);
+    marker.bindPopup(`
+      <strong>${escapeHtml(idea.title)}</strong><br>
+      <span style="color:#b6a98e;font-size:11px;text-transform:uppercase;letter-spacing:0.12em;">${escapeHtml(idea.category)} · ${escapeHtml(idea.cost)}</span>
+      <p style="margin:8px 0 0;font-size:12px;">${escapeHtml(idea.desc.slice(0, 140))}${idea.desc.length > 140 ? '…' : ''}</p>
+      <button onclick="window.__viewIdea('${idea.id}')" style="margin-top:10px;padding:6px 12px;background:#c2a173;color:#0a0604;border:none;border-radius:4px;font-size:12px;cursor:pointer;font-weight:600;">Open</button>
+    `);
+  });
+  // Setup global hook so popup buttons can call showDetail
+  window.__viewIdea = (id) => {
+    const idea = allIdeas().find(i => i.id === id);
+    if (idea) showDetail(idea);
+  };
+  setTimeout(() => leafletMap.invalidateSize(), 50);
+}
+
+document.getElementById('view-list').addEventListener('click', () => {
+  currentView = 'list';
+  document.getElementById('view-list').classList.add('on');
+  document.getElementById('view-map').classList.remove('on');
+  document.getElementById('grid').classList.remove('hidden');
+  document.getElementById('map-view').classList.remove('show');
+});
+document.getElementById('view-map').addEventListener('click', () => {
+  currentView = 'map';
+  document.getElementById('view-list').classList.remove('on');
+  document.getElementById('view-map').classList.add('on');
+  document.getElementById('grid').classList.add('hidden');
+  document.getElementById('map-view').classList.add('show');
+  renderMap();
+});
+
+// Share my list — encodes userIdeas as base64 into the URL hash
+document.getElementById('share-list').addEventListener('click', async () => {
+  if (userIdeas.length === 0) {
+    alert('You haven\\'t added any custom ideas yet. Use "+ Add your own" first.');
+    return;
+  }
+  // Only share the *content* — strip ids since recipient will re-id on import
+  const stripped = userIdeas.map(({ id: _id, ...rest }) => rest);
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(stripped))));
+  const url = `${location.origin}${location.pathname}#list=${encoded}`;
+  const text = `Here are ${userIdeas.length} hangout ideas from my list:\\n\\n${userIdeas.slice(0, 6).map(i => '• ' + i.title).join('\\n')}${userIdeas.length > 6 ? `\\n  …and ${userIdeas.length - 6} more` : ''}\\n\\nTap to add them to your own:\\n${url}`;
+  if (navigator.share) {
+    try { await navigator.share({ text, url }); return; } catch {}
+  }
+  try {
+    await navigator.clipboard.writeText(url);
+    alert(`Link copied. Paste it anywhere — they\\'ll get all ${userIdeas.length} ideas when they open it.`);
+  } catch {
+    prompt('Copy this link:', url);
+  }
+});
+
+// Random
+document.getElementById('random').addEventListener('click', () => {
+  const list = allIdeas().filter(matchesFilter);
+  if (list.length === 0) return;
+  const idea = list[Math.floor(Math.random() * list.length)];
+  showDetail(idea);
+});
+
+function pickSmart(predicate, label) {
+  const candidates = allIdeas().filter(predicate);
+  if (candidates.length === 0) { alert(`No ${label} ideas matched. Try the dice.`); return; }
+  const idea = candidates[Math.floor(Math.random() * candidates.length)];
+  showDetail(idea);
+}
+
+document.getElementById('for-weekend').addEventListener('click', () => {
+  // Weekend = bigger experiences welcome, all costs except $$$ if you want it
+  pickSmart(i => true, 'weekend');
+});
+
+document.getElementById('for-cheap').addEventListener('click', () => {
+  pickSmart(i => i.cost === 'free' || i.cost === '$', 'under-$10');
+});
+
+// For tonight — smart filter: cheap, time-appropriate, doable on short notice
+document.getElementById('for-tonight').addEventListener('click', () => {
+  const hour = new Date().getHours();
+  const isLate = hour >= 21 || hour < 6;
+  const isWeekday = ([1,2,3,4].includes(new Date().getDay())); // Mon-Thu
+  const candidates = allIdeas().filter(i => {
+    // Always cheap-friendly for spontaneous tonight ideas
+    if (i.cost === '$$$') return false;
+    // Late at night → bias toward late-night / chill / nearby
+    if (isLate) return ['Late Night', 'Chill', 'Weird', 'Food'].includes(i.category);
+    // Weeknight → no half-day adventures
+    if (isWeekday) return !['Adventure'].includes(i.category) || i.cost === 'free';
+    // Weekend daytime/evening: anything goes except $$$
+    return true;
+  });
+  if (candidates.length === 0) {
+    alert('Nothing matched tonight. Try the dice.');
+    return;
+  }
+  const idea = candidates[Math.floor(Math.random() * candidates.length)];
+  showDetail(idea);
+});
+
+// Search
+document.getElementById('search').addEventListener('input', (e) => { searchTerm = e.target.value; renderGrid(); });
+
+// Add modal
+const aModal = document.getElementById('modal-add');
+document.getElementById('open-add').addEventListener('click', () => {
+  ['a-title','a-desc','a-where','a-vibe'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('a-cat').selectedIndex = 0;
+  document.getElementById('a-cost').selectedIndex = 0;
+  aModal.classList.add('show');
+});
+document.getElementById('a-cancel').addEventListener('click', () => aModal.classList.remove('show'));
+aModal.addEventListener('click', (e) => { if (e.target === aModal) aModal.classList.remove('show'); });
+document.getElementById('a-save').addEventListener('click', () => {
+  const title = document.getElementById('a-title').value.trim();
+  const desc  = document.getElementById('a-desc').value.trim();
+  if (!title || !desc) { document.getElementById('a-title').focus(); return; }
+  const idea = {
+    id: 'u_' + Date.now().toString(36),
+    title, desc,
+    where: document.getElementById('a-where').value.trim() || 'Anywhere',
+    category: document.getElementById('a-cat').value,
+    vibe: document.getElementById('a-vibe').value.trim(),
+    cost: document.getElementById('a-cost').value,
+  };
+  userIdeas = [idea, ...userIdeas];
+  saveUser(userIdeas);
+  aModal.classList.remove('show');
+  render();
+});
+
+// Detail modal
+const dModal = document.getElementById('modal-detail');
+let currentIdea = null;
+function showDetail(idea) {
+  currentIdea = idea;
+  const doneCount = (doneLog[idea.id] || []).length;
+  document.getElementById('d-tag').textContent = `${idea.category} · ${idea.cost}${doneCount ? ` · done ×${doneCount}` : ''}`;
+  document.getElementById('d-title').textContent = idea.title;
+  document.getElementById('d-desc').textContent = idea.desc;
+  document.getElementById('d-meta').innerHTML = `<span>📍 ${escapeHtml(idea.where)}</span>${idea.vibe ? ` <span>· ${escapeHtml(idea.vibe)}</span>` : ''}`;
+  document.getElementById('d-delete').style.display = idea.source === 'user' ? 'inline-block' : 'none';
+  document.getElementById('d-hide').style.display = idea.source === 'seed' ? 'inline-block' : 'none';
+  dModal.classList.add('show');
+}
+document.getElementById('d-close').addEventListener('click', () => dModal.classList.remove('show'));
+dModal.addEventListener('click', (e) => { if (e.target === dModal) dModal.classList.remove('show'); });
+document.getElementById('d-share').addEventListener('click', async () => {
+  if (!currentIdea) return;
+  const text = `Steal My Hangout idea:\n\n${currentIdea.title}\n${currentIdea.desc}\n\n📍 ${currentIdea.where}\n\nSee more: https://thebigjah.github.io/hangout/`;
+  if (navigator.share) {
+    try { await navigator.share({ text }); } catch {}
+  } else {
+    await navigator.clipboard.writeText(text);
+    alert('Copied to clipboard.');
+  }
+});
+document.getElementById('d-delete').addEventListener('click', () => {
+  if (!currentIdea || currentIdea.source !== 'user') return;
+  if (!confirm('Delete this idea?')) return;
+  userIdeas = userIdeas.filter(u => u.id !== currentIdea.id);
+  saveUser(userIdeas);
+  dModal.classList.remove('show');
+  render();
+});
+document.getElementById('d-hide').addEventListener('click', () => {
+  if (!currentIdea || currentIdea.source !== 'seed') return;
+  if (!hiddenSeeds.includes(currentIdea.id)) hiddenSeeds.push(currentIdea.id);
+  saveHidden(hiddenSeeds);
+  dModal.classList.remove('show');
+  render();
+});
+document.getElementById('d-mark-done').addEventListener('click', () => {
+  if (!currentIdea) return;
+  const w = prompt('Who were you with? (optional)') || '';
+  const note = prompt('Any note about how it went? (optional)') || '';
+  const log = { ts: Date.now(), with: w.trim(), note: note.trim() };
+  doneLog[currentIdea.id] = doneLog[currentIdea.id] || [];
+  doneLog[currentIdea.id].push(log);
+  saveDone(doneLog);
+  dModal.classList.remove('show');
+  render();
+});
+
+render();
+</script>
+</body>
+</html>

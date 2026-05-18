@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Momentum — one intention a day, witnessed</title>
+<meta name="description" content="One intention per day. Friends witness it. End of day: done or not. No streak shaming, no leaderboards. Just witness.">
+<meta property="og:title" content="Momentum — one intention a day, witnessed">
+<meta property="og:description" content="One intention per day. Friends witness it. No streak shaming. Just witness.">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --bg: #faf6f1;
+    --panel: #ffffff;
+    --ink: #1b1510;
+    --ink-soft: #6b5a44;
+    --ink-faint: #a89880;
+    --brass: #c2a173;
+    --brass-deep: #8a6a3a;
+    --done: #4a7c3d;
+    --done-bg: #e8f0e2;
+    --missed: #8c6e5a;
+    --missed-bg: #f0e5dc;
+    --border: #e6dccb;
+    --shadow: 0 1px 3px rgba(27,21,16,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    min-height: 100vh;
+    padding: 1rem;
+  }
+  .container { max-width: 580px; margin: 0 auto; }
+  header { text-align: center; padding: 1.5rem 0 2rem; }
+  header h1 {
+    font-family: Georgia, serif;
+    font-size: 2.25rem;
+    color: var(--brass-deep);
+    letter-spacing: -0.02em;
+    margin-bottom: 0.3rem;
+  }
+  header .tag {
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+    font-style: italic;
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+  }
+  .panel h2 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    margin-bottom: 1rem;
+  }
+
+  .today-date {
+    font-size: 0.85rem;
+    color: var(--ink-faint);
+    margin-bottom: 0.5rem;
+  }
+  .intention-input {
+    width: 100%;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    font-size: 1.05rem;
+    color: var(--ink);
+    font-family: inherit;
+    resize: vertical;
+    min-height: 60px;
+  }
+  .intention-input:focus {
+    outline: none;
+    border-color: var(--brass);
+    background: #fff;
+  }
+  .intention-display {
+    font-size: 1.15rem;
+    color: var(--ink);
+    padding: 1rem;
+    background: var(--bg);
+    border-radius: 8px;
+    border-left: 3px solid var(--brass);
+    margin-bottom: 1rem;
+  }
+  .row { display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap; }
+  button {
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    padding: 0.65rem 1.2rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: background 0.12s;
+  }
+  button:hover { background: var(--brass-deep); }
+  button.ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+  }
+  button.ghost:hover { background: var(--bg); color: var(--ink); }
+  button.done { background: var(--done); }
+  button.done:hover { background: #3a5c2d; }
+  button.missed { background: var(--missed); }
+  button.missed:hover { background: #6c5444; }
+
+  .verdict {
+    padding: 0.85rem 1rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+  }
+  .verdict.done { background: var(--done-bg); color: var(--done); }
+  .verdict.missed { background: var(--missed-bg); color: var(--missed); }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+  }
+  .stat {
+    text-align: center;
+    padding: 0.85rem 0.5rem;
+    background: var(--bg);
+    border-radius: 8px;
+  }
+  .stat .n {
+    font-family: Georgia, serif;
+    font-size: 1.6rem;
+    color: var(--brass-deep);
+    line-height: 1.1;
+  }
+  .stat .l {
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0.25rem;
+  }
+
+  .history { max-height: 360px; overflow-y: auto; }
+  .day {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .day:last-child { border-bottom: none; }
+  .day .mark {
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #fff;
+  }
+  .mark.done { background: var(--done); }
+  .mark.missed { background: var(--missed); }
+  .mark.unsettled { background: var(--ink-faint); }
+  .day .body { flex: 1; min-width: 0; }
+  .day .date {
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .day .text { font-size: 0.95rem; color: var(--ink); margin-top: 0.15rem; }
+  .day.empty .text { color: var(--ink-faint); font-style: italic; }
+
+  .witness-link {
+    background: linear-gradient(135deg, #1b1510 0%, #2e2820 100%);
+    color: var(--brass);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  .witness-link a {
+    color: var(--brass);
+    text-decoration: underline;
+    word-break: break-all;
+  }
+
+  .witnessing-banner {
+    background: var(--done-bg);
+    border-left: 3px solid var(--done);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+  }
+  .witnessing-banner strong { color: var(--done); }
+
+  footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+    line-height: 1.6;
+  }
+  footer a { color: var(--brass-deep); text-decoration: none; }
+
+  .scripture {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--border);
+    font-family: Georgia, serif;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  .scripture .ref {
+    display: block;
+    margin-top: 0.4rem;
+    font-style: normal;
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .heatmap {
+    display: grid;
+    grid-template-columns: repeat(53, 1fr);
+    gap: 2px;
+    margin-bottom: 0.5rem;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  .hm {
+    aspect-ratio: 1;
+    border-radius: 2px;
+    background: var(--border);
+    min-width: 8px;
+    min-height: 8px;
+  }
+  .hm-0 { background: #ebe4d6; }
+  .hm-1 { background: #b8d4a8; }
+  .hm-2 { background: #7ba861; }
+  .hm-3 { background: #4a7c3d; }
+  .hm-missed { background: var(--missed-bg); border: 1px solid var(--missed); }
+  .heatmap-legend {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+    justify-content: flex-end;
+  }
+  .heatmap-legend .hm {
+    width: 10px;
+    height: 10px;
+    min-width: 10px;
+    min-height: 10px;
+  }
+
+  .category-picker {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-top: 0.6rem;
+  }
+  .cat-btn {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+    padding: 0.35rem 0.7rem;
+    font-size: 0.8rem;
+    border-radius: 999px;
+  }
+  .cat-btn:hover {
+    border-color: var(--cat-color, var(--ink-soft));
+    color: var(--ink);
+    background: transparent;
+  }
+  .cat-btn.selected {
+    background: var(--cat-color, var(--ink));
+    color: #fff;
+    border-color: var(--cat-color, var(--ink));
+  }
+  .cat-badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+
+  .evening-nudge {
+    background: #fff4d6;
+    border-left: 3px solid #c9803a;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.85rem;
+    color: #6b4a1a;
+    font-size: 0.9rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Momentum</h1>
+  <p class="tag">one intention a day, witnessed</p>
+</header>
+
+<div id="witnessing-banner" class="witnessing-banner" style="display:none;"></div>
+
+<div class="panel" id="today-panel">
+  <h2 id="today-heading">Today's intention</h2>
+  <div class="today-date" id="today-date"></div>
+  <div id="today-body"></div>
+  <div id="scripture" class="scripture"></div>
+</div>
+
+<div class="panel">
+  <h2>How you've shown up</h2>
+  <div class="stats" id="stats"></div>
+</div>
+
+<div class="panel">
+  <h2>Year at a glance</h2>
+  <div id="heatmap" class="heatmap"></div>
+  <div class="heatmap-legend">
+    <span>less</span>
+    <span class="hm hm-0"></span>
+    <span class="hm hm-1"></span>
+    <span class="hm hm-2"></span>
+    <span class="hm hm-3"></span>
+    <span>more</span>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>Last 30 days</h2>
+  <div class="history" id="history"></div>
+</div>
+
+<div class="panel">
+  <h2>Share with a witness</h2>
+  <p style="font-size:0.9rem;color:var(--ink-soft);margin-bottom:0.75rem;">
+    Send this link to one friend. They'll see your intention, but not your history. No app to install.
+  </p>
+  <div class="row">
+    <button id="copy-link-btn">Copy witness link</button>
+    <button class="ghost" id="share-btn">Share</button>
+  </div>
+  <div id="witness-link-display" class="witness-link" style="display:none;"></div>
+</div>
+
+<div class="panel">
+  <h2>Manage</h2>
+  <div class="row">
+    <button class="ghost" id="export-btn">Export JSON</button>
+    <button class="ghost" id="import-btn">Import JSON</button>
+    <button class="ghost" id="reset-btn">Reset all</button>
+    <input type="file" id="import-file" accept=".json" style="display:none;">
+  </div>
+</div>
+
+<footer>
+  <p>One intention. Witnessed, not graded.<br>
+  No streaks shame. No leaderboard. No penalty for a missed day.<br>
+  <a href="https://github.com/thebigjah/momentum">source</a>
+  </p>
+</footer>
+
+</div>
+
+<script>
+'use strict';
+
+const STORAGE_KEY = 'momentum.v1';
+
+const CATEGORIES = [
+  { id: 'faith',    label: 'Faith',     color: '#8a6a3a' },
+  { id: 'health',   label: 'Health',    color: '#4a7c3d' },
+  { id: 'relate',   label: 'Relate',    color: '#a8488e' },
+  { id: 'work',     label: 'Work',      color: '#3b6da6' },
+  { id: 'learn',    label: 'Learn',     color: '#c9803a' },
+];
+const CAT_MAP = Object.fromEntries(CATEGORIES.map(c => [c.id, c]));
+
+const SCRIPTURES = [
+  { text: "Let your 'yes' be 'yes,' and your 'no,' 'no.'", ref: "Matthew 5:37" },
+  { text: "Whatever you do, work at it with all your heart, as working for the Lord.", ref: "Colossians 3:23" },
+  { text: "The plans of the diligent lead to profit as surely as haste leads to poverty.", ref: "Proverbs 21:5" },
+  { text: "Commit to the Lord whatever you do, and he will establish your plans.", ref: "Proverbs 16:3" },
+  { text: "Whoever can be trusted with very little can also be trusted with much.", ref: "Luke 16:10" },
+  { text: "Be still, and know that I am God.", ref: "Psalm 46:10" },
+  { text: "He who began a good work in you will carry it on to completion.", ref: "Philippians 1:6" },
+  { text: "Do not despise these small beginnings, for the Lord rejoices to see the work begin.", ref: "Zechariah 4:10" },
+  { text: "Let us not grow weary of doing good, for in due season we will reap, if we do not give up.", ref: "Galatians 6:9" },
+  { text: "Trust in the Lord with all your heart, and do not lean on your own understanding.", ref: "Proverbs 3:5" },
+  { text: "Run in such a way as to get the prize.", ref: "1 Corinthians 9:24" },
+  { text: "His mercies are new every morning; great is your faithfulness.", ref: "Lamentations 3:23" },
+  { text: "I have fought the good fight, I have finished the race, I have kept the faith.", ref: "2 Timothy 4:7" },
+  { text: "We are God's handiwork, created in Christ Jesus to do good works.", ref: "Ephesians 2:10" },
+];
+const todayKey = () => {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+};
+const yesterdayKey = () => {
+  const d = new Date(); d.setDate(d.getDate()-1);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+};
+const fmtDate = (key) => {
+  const [y,m,d] = key.split('-').map(Number);
+  const dt = new Date(y, m-1, d);
+  return dt.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+};
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return {};
+    return JSON.parse(raw);
+  } catch { return {}; }
+}
+function saveState(state) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+let state = loadState();
+// state schema: { 'YYYY-MM-DD': { intention: string, status: 'pending'|'done'|'missed', setAt: iso } }
+
+function settleYesterdayIfNeeded() {
+  const yk = yesterdayKey();
+  if (state[yk] && state[yk].status === 'pending') {
+    // Auto-settle as missed if user didn't mark anything
+    // But only if more than 24h has passed since setAt — give grace
+    state[yk].status = 'unsettled';
+  }
+  saveState(state);
+}
+
+function renderToday() {
+  const key = todayKey();
+  const entry = state[key];
+  const dateEl = document.getElementById('today-date');
+  const bodyEl = document.getElementById('today-body');
+  const heading = document.getElementById('today-heading');
+
+  dateEl.textContent = fmtDate(key);
+
+  if (!entry) {
+    heading.textContent = "Today's intention";
+    bodyEl.innerHTML = `
+      <textarea id="intention-input" class="intention-input" placeholder="One thing you'll do today. Specific. Visible by end of day."></textarea>
+      <div class="category-picker">
+        ${CATEGORIES.map(c => `<button class="cat-btn" data-cat="${c.id}" style="--cat-color:${c.color}">${c.label}</button>`).join('')}
+      </div>
+      <div class="row">
+        <button id="set-btn">Set intention</button>
+      </div>
+    `;
+    document.getElementById('set-btn').addEventListener('click', setIntention);
+    document.querySelectorAll('.cat-btn').forEach(b => b.addEventListener('click', e => {
+      document.querySelectorAll('.cat-btn').forEach(x => x.classList.remove('selected'));
+      e.target.classList.add('selected');
+    }));
+    document.getElementById('intention-input').focus();
+  } else if (entry.status === 'pending') {
+    heading.textContent = "Today's intention — in progress";
+    const nudge = eveningNudge();
+    const catBadge = entry.category && CAT_MAP[entry.category]
+      ? `<span class="cat-badge" style="background:${CAT_MAP[entry.category].color}">${CAT_MAP[entry.category].label}</span>`
+      : '';
+    bodyEl.innerHTML = `
+      ${nudge ? `<div class="evening-nudge">${escapeHtml(nudge)}</div>` : ''}
+      <div class="intention-display">${catBadge}${escapeHtml(entry.intention)}</div>
+      <div class="row">
+        <button class="done" id="done-btn">I did it</button>
+        <button class="missed" id="missed-btn">I didn't</button>
+        <button class="ghost" id="edit-btn">Edit</button>
+      </div>
+    `;
+    document.getElementById('done-btn').addEventListener('click', () => markStatus('done'));
+    document.getElementById('missed-btn').addEventListener('click', () => markStatus('missed'));
+    document.getElementById('edit-btn').addEventListener('click', editToday);
+  } else {
+    const verdictText = entry.status === 'done' ? 'Done. Witnessed.' : 'Not today. Tomorrow is new.';
+    heading.textContent = "Today's intention — settled";
+    const catBadge = entry.category && CAT_MAP[entry.category]
+      ? `<span class="cat-badge" style="background:${CAT_MAP[entry.category].color}">${CAT_MAP[entry.category].label}</span>`
+      : '';
+    bodyEl.innerHTML = `
+      <div class="verdict ${entry.status}">${verdictText}</div>
+      <div class="intention-display">${catBadge}${escapeHtml(entry.intention)}</div>
+      <div class="row">
+        <button class="ghost" id="reopen-btn">Reopen</button>
+      </div>
+    `;
+    document.getElementById('reopen-btn').addEventListener('click', () => {
+      state[key].status = 'pending';
+      saveState(state);
+      renderAll();
+    });
+  }
+}
+
+function setIntention() {
+  const input = document.getElementById('intention-input');
+  const text = input.value.trim();
+  if (!text) { input.focus(); return; }
+  if (text.length > 280) { alert('Keep it under 280 chars. One intention.'); return; }
+  const selectedCat = document.querySelector('.cat-btn.selected');
+  const category = selectedCat ? selectedCat.dataset.cat : null;
+  state[todayKey()] = { intention: text, category, status: 'pending', setAt: new Date().toISOString() };
+  saveState(state);
+  renderAll();
+}
+
+function eveningNudge() {
+  const key = todayKey();
+  const entry = state[key];
+  if (!entry || entry.status !== 'pending') return null;
+  const now = new Date();
+  const hour = now.getHours();
+  if (hour < 19) return null;
+  return `Evening check: still pending. Did you do it?`;
+}
+
+function markStatus(status) {
+  const key = todayKey();
+  if (!state[key]) return;
+  state[key].status = status;
+  state[key].settledAt = new Date().toISOString();
+  saveState(state);
+  renderAll();
+}
+
+function editToday() {
+  const key = todayKey();
+  const entry = state[key];
+  const bodyEl = document.getElementById('today-body');
+  bodyEl.innerHTML = `
+    <textarea id="intention-input" class="intention-input">${escapeHtml(entry.intention)}</textarea>
+    <div class="row">
+      <button id="save-edit-btn">Save</button>
+      <button class="ghost" id="cancel-edit-btn">Cancel</button>
+    </div>
+  `;
+  document.getElementById('save-edit-btn').addEventListener('click', () => {
+    const text = document.getElementById('intention-input').value.trim();
+    if (!text) return;
+    state[key].intention = text;
+    saveState(state);
+    renderAll();
+  });
+  document.getElementById('cancel-edit-btn').addEventListener('click', renderAll);
+}
+
+function renderStats() {
+  const keys = Object.keys(state).sort();
+  const total = keys.length;
+  const done = keys.filter(k => state[k].status === 'done').length;
+  const pct = total ? Math.round((done / total) * 100) : 0;
+
+  // current streak: consecutive days back from today with status === 'done'
+  let streak = 0;
+  const d = new Date();
+  while (true) {
+    const k = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    if (state[k] && state[k].status === 'done') {
+      streak++;
+      d.setDate(d.getDate()-1);
+    } else {
+      break;
+    }
+  }
+
+  document.getElementById('stats').innerHTML = `
+    <div class="stat"><div class="n">${done}</div><div class="l">days kept</div></div>
+    <div class="stat"><div class="n">${pct}%</div><div class="l">of intentions</div></div>
+    <div class="stat"><div class="n">${streak}</div><div class="l">current streak</div></div>
+  `;
+}
+
+function renderHistory() {
+  const days = [];
+  const d = new Date();
+  for (let i = 0; i < 30; i++) {
+    const k = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    days.push(k);
+    d.setDate(d.getDate()-1);
+  }
+
+  const el = document.getElementById('history');
+  el.innerHTML = '';
+  days.forEach(k => {
+    const entry = state[k];
+    const row = document.createElement('div');
+    row.className = 'day' + (entry ? '' : ' empty');
+    let markClass = 'unsettled';
+    let markText = '·';
+    if (entry) {
+      if (entry.status === 'done') { markClass = 'done'; markText = '✓'; }
+      else if (entry.status === 'missed') { markClass = 'missed'; markText = '×'; }
+    }
+    row.innerHTML = `
+      <div class="mark ${markClass}">${markText}</div>
+      <div class="body">
+        <div class="date">${fmtDate(k)}</div>
+        <div class="text">${entry ? escapeHtml(entry.intention) : 'no intention set'}</div>
+      </div>
+    `;
+    el.appendChild(row);
+  });
+}
+
+function getWitnessLink() {
+  const key = todayKey();
+  const entry = state[key];
+  if (!entry) return null;
+  const payload = { d: key, i: entry.intention, s: entry.status };
+  const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+  const url = new URL(location.href);
+  url.hash = 'w=' + b64;
+  return url.toString();
+}
+
+function copyWitnessLink() {
+  const link = getWitnessLink();
+  if (!link) { alert('Set today\'s intention first.'); return; }
+  navigator.clipboard.writeText(link).then(() => {
+    const display = document.getElementById('witness-link-display');
+    display.style.display = 'block';
+    display.innerHTML = `Copied. Send this:<br><a href="${link}">${link}</a>`;
+  }).catch(() => {
+    const display = document.getElementById('witness-link-display');
+    display.style.display = 'block';
+    display.innerHTML = `Copy this:<br><a href="${link}">${link}</a>`;
+  });
+}
+
+function shareWitnessLink() {
+  const link = getWitnessLink();
+  if (!link) { alert('Set today\'s intention first.'); return; }
+  if (navigator.share) {
+    navigator.share({
+      title: 'Witness my intention today',
+      text: 'I set an intention today. Will you witness it?',
+      url: link,
+    }).catch(()=>{});
+  } else {
+    copyWitnessLink();
+  }
+}
+
+function checkIfWitnessing() {
+  const hash = location.hash;
+  if (!hash.startsWith('#w=')) return;
+  try {
+    const b64 = hash.slice(3);
+    const json = decodeURIComponent(escape(atob(b64)));
+    const payload = JSON.parse(json);
+    const banner = document.getElementById('witnessing-banner');
+    let statusText = '';
+    if (payload.s === 'done') statusText = ' (they completed it)';
+    else if (payload.s === 'missed') statusText = ' (they did not complete it today)';
+    else statusText = ' (still in progress)';
+    banner.innerHTML = `<strong>You're witnessing an intention.</strong><br>
+      For ${escapeHtml(fmtDate(payload.d))}:<br>
+      <em>"${escapeHtml(payload.i)}"</em>${statusText}<br><br>
+      <span style="font-size:0.85rem;color:var(--ink-soft);">No app to install. No reply needed. You bearing witness is the point.</span>`;
+    banner.style.display = 'block';
+  } catch (err) {
+    console.warn('bad witness link', err);
+  }
+}
+
+function exportJSON() {
+  const data = JSON.stringify(state, null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'momentum-' + todayKey() + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importJSON(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const incoming = JSON.parse(ev.target.result);
+      if (!confirm('Merge ' + Object.keys(incoming).length + ' days into your local history?')) return;
+      state = { ...state, ...incoming };
+      saveState(state);
+      renderAll();
+    } catch (err) {
+      alert('Bad JSON file.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function resetAll() {
+  if (!confirm('Erase all intentions and history? This cannot be undone.')) return;
+  if (!confirm('Really sure? All data wiped.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  state = {};
+  renderAll();
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function renderScripture() {
+  // Same verse for the whole day, deterministic from date
+  const seed = todayKey().split('-').reduce((a,b) => a + parseInt(b,10), 0);
+  const v = SCRIPTURES[seed % SCRIPTURES.length];
+  document.getElementById('scripture').innerHTML = `"${escapeHtml(v.text)}"<span class="ref">${escapeHtml(v.ref)}</span>`;
+}
+
+function renderHeatmap() {
+  const el = document.getElementById('heatmap');
+  el.innerHTML = '';
+  const days = [];
+  const d = new Date();
+  for (let i = 0; i < 365; i++) {
+    const k = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    days.unshift({ key: k, entry: state[k] });
+    d.setDate(d.getDate()-1);
+  }
+  days.forEach(({key, entry}) => {
+    const cell = document.createElement('div');
+    let cls = 'hm hm-0';
+    let title = fmtDate(key) + ' — no intention';
+    if (entry) {
+      if (entry.status === 'done') { cls = 'hm hm-3'; title = fmtDate(key) + ' — done: ' + entry.intention; }
+      else if (entry.status === 'pending') { cls = 'hm hm-1'; title = fmtDate(key) + ' — in progress: ' + entry.intention; }
+      else if (entry.status === 'missed') { cls = 'hm hm-missed'; title = fmtDate(key) + ' — missed: ' + entry.intention; }
+      else { cls = 'hm hm-1'; title = fmtDate(key) + ' — ' + entry.intention; }
+    }
+    cell.className = cls;
+    cell.title = title;
+    el.appendChild(cell);
+  });
+}
+
+function renderAll() {
+  settleYesterdayIfNeeded();
+  renderToday();
+  renderScripture();
+  renderStats();
+  renderHeatmap();
+  renderHistory();
+}
+
+document.getElementById('copy-link-btn').addEventListener('click', copyWitnessLink);
+document.getElementById('share-btn').addEventListener('click', shareWitnessLink);
+document.getElementById('export-btn').addEventListener('click', exportJSON);
+document.getElementById('import-btn').addEventListener('click', () => document.getElementById('import-file').click());
+document.getElementById('import-file').addEventListener('change', importJSON);
+document.getElementById('reset-btn').addEventListener('click', resetAll);
+
+checkIfWitnessing();
+renderAll();
+</script>
+
+</body>
+</html>

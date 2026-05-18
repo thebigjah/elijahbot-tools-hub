@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cipher Lab — encode, decode, hide</title>
+<meta name="description" content="Interactive workbench for 6 classic ciphers — Caesar, Atbash, Vigenère, Bacon, ROT13, Rail Fence. Plus puzzle generator. Built for cryptography class + hunt design.">
+<meta property="og:title" content="Cipher Lab — encode, decode, hide">
+<meta property="og:description" content="6 classic ciphers, interactive. Plus puzzle generator + shareable hunts.">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --panel: #161614;
+    --panel-2: #20201d;
+    --ink: #d8d3c4;
+    --ink-soft: #888370;
+    --ink-faint: #5a5648;
+    --accent: #3aaa6a;
+    --accent-deep: #2a8a52;
+    --warn: #d8a04a;
+    --border: #2e2e2a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Monaco, Consolas, monospace;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    min-height: 100vh;
+    padding: 1rem;
+  }
+  .container { max-width: 800px; margin: 0 auto; }
+  header { text-align: center; padding: 1.5rem 0 1.5rem; }
+  header h1 {
+    font-family: ui-monospace, monospace;
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.4rem;
+  }
+  header p {
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+  }
+
+  .nav {
+    display: flex;
+    gap: 0.3rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+  }
+  .nav button {
+    flex: 1;
+    min-width: 80px;
+    padding: 0.55rem 0.6rem;
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.78rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .nav button.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+  .nav button:hover:not(.active) {
+    border-color: var(--accent);
+    color: var(--ink);
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .panel h2 {
+    font-size: 0.75rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    margin-bottom: 0.5rem;
+  }
+  .panel .desc {
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    margin-bottom: 1.25rem;
+    line-height: 1.6;
+  }
+
+  textarea, input[type="text"], input[type="number"] {
+    width: 100%;
+    background: var(--panel-2);
+    color: var(--ink);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.75rem;
+    font-family: inherit;
+    font-size: 0.95rem;
+    margin-bottom: 0.75rem;
+    resize: vertical;
+  }
+  textarea { min-height: 80px; }
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .controls {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+  }
+  .controls label {
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+  }
+  .controls input[type="number"], .controls input[type="text"] {
+    width: auto;
+    flex: 1;
+    min-width: 100px;
+    margin-bottom: 0;
+  }
+
+  button {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 0.55rem 1rem;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  button:hover { background: var(--accent-deep); }
+  button.ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+  }
+  button.ghost:hover { color: var(--ink); border-color: var(--accent); }
+
+  .output {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 0.85rem 1rem;
+    border-radius: 4px;
+    color: var(--ink);
+    font-size: 0.95rem;
+    white-space: pre-wrap;
+    word-break: break-all;
+    margin-top: 0.75rem;
+    line-height: 1.6;
+  }
+
+  .row-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+  }
+  .table th, .table td {
+    border: 1px solid var(--border);
+    padding: 0.3rem 0.5rem;
+    text-align: center;
+  }
+  .table th {
+    background: var(--panel-2);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .hint {
+    color: var(--ink-faint);
+    font-size: 0.78rem;
+    font-style: italic;
+    margin-top: 0.5rem;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--ink-faint);
+    font-size: 0.78rem;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  .puzzle-display {
+    background: linear-gradient(135deg, var(--panel-2) 0%, #1a1a17 100%);
+    border: 1px dashed var(--accent);
+    padding: 1.25rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+    font-size: 1.1rem;
+    text-align: center;
+    line-height: 1.8;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>CIPHER LAB</h1>
+  <p>encode &middot; decode &middot; hide &middot; reveal</p>
+</header>
+
+<div class="nav" id="nav"></div>
+
+<div id="content"></div>
+
+<footer>
+  <p>Built for Lee Summer Honors cryptography week. Six ciphers covered.<br>
+  <a href="https://github.com/thebigjah/cipher-lab">source</a> · <a href="#" onclick="document.body.scrollIntoView({top:0})">↑ top</a>
+  </p>
+</footer>
+
+</div>
+
+<script>
+'use strict';
+
+const CIPHERS = [
+  { id: 'caesar', label: 'Caesar', renderer: renderCaesar },
+  { id: 'atbash', label: 'Atbash', renderer: renderAtbash },
+  { id: 'vigenere', label: 'Vigenère', renderer: renderVigenere },
+  { id: 'rot13', label: 'ROT13', renderer: renderRot13 },
+  { id: 'bacon', label: 'Bacon', renderer: renderBacon },
+  { id: 'rail', label: 'Rail Fence', renderer: renderRailFence },
+  { id: 'enigma', label: 'Enigma', renderer: renderEnigma },
+  { id: 'hunt', label: 'Puzzle Hunt', renderer: renderHunt },
+  { id: 'crack', label: 'Crack This', renderer: renderCrack },
+];
+
+const nav = document.getElementById('nav');
+const content = document.getElementById('content');
+
+CIPHERS.forEach(c => {
+  const btn = document.createElement('button');
+  btn.textContent = c.label;
+  btn.dataset.id = c.id;
+  btn.addEventListener('click', () => showCipher(c.id));
+  nav.appendChild(btn);
+});
+
+function showCipher(id) {
+  document.querySelectorAll('.nav button').forEach(b => {
+    b.classList.toggle('active', b.dataset.id === id);
+  });
+  const c = CIPHERS.find(x => x.id === id);
+  content.innerHTML = '';
+  c.renderer(content);
+  history.replaceState(null, '', '#' + id);
+}
+
+// ============ CAESAR ============
+function caesarShift(text, n) {
+  return text.replace(/[a-zA-Z]/g, ch => {
+    const base = ch >= 'a' ? 97 : 65;
+    return String.fromCharCode(((ch.charCodeAt(0) - base + n) % 26 + 26) % 26 + base);
+  });
+}
+
+function renderCaesar(root) {
+  root.innerHTML = `
+    <div class="panel">
+      <h2>Caesar Cipher</h2>
+      <p class="desc">Each letter shifts forward by a fixed number. Named for Julius Caesar (shift of 3). Trivially breakable by frequency analysis — try shifting 1 through 25 until something reads as English.</p>
+      <textarea id="caesar-in" placeholder="Type plaintext or ciphertext here..."></textarea>
+      <div class="controls">
+        <label>Shift</label>
+        <input type="number" id="caesar-shift" value="3" min="-25" max="25">
+        <button onclick="document.getElementById('caesar-shift').value = Math.floor(Math.random() * 25) + 1; runCaesar();">Random</button>
+        <button onclick="runCaesar()">Encode →</button>
+        <button class="ghost" onclick="runCaesarReverse()">← Decode</button>
+        <button class="ghost" onclick="bruteCaesar()">Brute force</button>
+      </div>
+      <div id="caesar-out" class="output">—</div>
+      <p class="hint">Tip: the shift-by-13 special case is called ROT13 and is its own tab.</p>
+    </div>
+  `;
+}
+window.runCaesar = () => {
+  const t = document.getElementById('caesar-in').value;
+  const n = parseInt(document.getElementById('caesar-shift').value, 10) || 0;
+  document.getElementById('caesar-out').textContent = caesarShift(t, n);
+};
+window.runCaesarReverse = () => {
+  const t = document.getElementById('caesar-in').value;
+  const n = parseInt(document.getElementById('caesar-shift').value, 10) || 0;
+  document.getElementById('caesar-out').textContent = caesarShift(t, -n);
+};
+window.bruteCaesar = () => {
+  const t = document.getElementById('caesar-in').value;
+  const lines = [];
+  for (let i = 1; i <= 25; i++) {
+    lines.push(String(i).padStart(2, ' ') + ': ' + caesarShift(t, -i));
+  }
+  document.getElementById('caesar-out').textContent = lines.join('\n');
+};
+
+// ============ ATBASH ============
+function atbash(text) {
+  return text.replace(/[a-zA-Z]/g, ch => {
+    const base = ch >= 'a' ? 97 : 65;
+    return String.fromCharCode(25 - (ch.charCodeAt(0) - base) + base);
+  });
+}
+
+function renderAtbash(root) {
+  root.innerHTML = `
+    <div class="panel">
+      <h2>Atbash Cipher</h2>
+      <p class="desc">Hebrew-origin: A → Z, B → Y, C → X. The alphabet reversed against itself. Self-inverse (encode = decode). Appears in the Hebrew Bible (Jeremiah 25:26, "Sheshach" → "Babel").</p>
+      <textarea id="atbash-in" placeholder="Type any text — atbash is symmetric, same operation either direction"></textarea>
+      <div class="controls">
+        <button onclick="runAtbash()">Transform</button>
+      </div>
+      <div id="atbash-out" class="output">—</div>
+      <table class="table">
+        <tr><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th><th>H</th><th>I</th><th>J</th><th>K</th><th>L</th><th>M</th></tr>
+        <tr><td>Z</td><td>Y</td><td>X</td><td>W</td><td>V</td><td>U</td><td>T</td><td>S</td><td>R</td><td>Q</td><td>P</td><td>O</td><td>N</td></tr>
+      </table>
+    </div>
+  `;
+}
+window.runAtbash = () => {
+  document.getElementById('atbash-out').textContent = atbash(document.getElementById('atbash-in').value) || '—';
+};
+
+// ============ VIGENERE ============
+function vigenere(text, key, decode=false) {
+  if (!key) return text;
+  key = key.toLowerCase().replace(/[^a-z]/g, '');
+  if (!key) return text;
+  let ki = 0;
+  return text.replace(/[a-zA-Z]/g, ch => {
+    const base = ch >= 'a' ? 97 : 65;
+    const shift = key.charCodeAt(ki % key.length) - 97;
+    ki++;
+    const s = decode ? -shift : shift;
+    return String.fromCharCode(((ch.charCodeAt(0) - base + s) % 26 + 26) % 26 + base);
+  });
+}
+
+function renderVigenere(root) {
+  root.innerHTML = `
+    <div class="panel">
+      <h2>Vigenère Cipher</h2>
+      <p class="desc">Polyalphabetic Caesar: each plaintext letter gets shifted by the corresponding letter of a repeating key. Resisted analysis for ~300 years before Kasiski cracked it (1863) by looking for repeated patterns.</p>
+      <textarea id="vig-in" placeholder="Plaintext or ciphertext"></textarea>
+      <div class="controls">
+        <label>Key</label>
+        <input type="text" id="vig-key" placeholder="LEMON" value="LEMON">
+        <button onclick="runVig(false)">Encode →</button>
+        <button class="ghost" onclick="runVig(true)">← Decode</button>
+      </div>
+      <div id="vig-out" class="output">—</div>
+      <p class="hint">Example: plaintext "ATTACKATDAWN" with key "LEMON" → "LXFOPVEFRNHR". The longer + more random the key, the harder to break.</p>
+    </div>
+  `;
+}
+window.runVig = (decode) => {
+  const t = document.getElementById('vig-in').value;
+  const k = document.getElementById('vig-key').value;
+  document.getElementById('vig-out').textContent = vigenere(t, k, decode);
+};
+
+// ============ ROT13 ============
+function renderRot13(root) {
+  root.innerHTML = `
+    <div class="panel">
+      <h2>ROT13</h2>
+      <p class="desc">Caesar shift of 13. Its own inverse (because 13 + 13 = 26 = full rotation). Standard on Usenet in the 1980s to hide spoilers + punchlines. Provides no actual security — pure novelty.</p>
+      <textarea id="rot13-in" placeholder="Type any text. ROT13(ROT13(x)) = x."></textarea>
+      <div class="controls">
+        <button onclick="runRot13()">Transform</button>
+      </div>
+      <div id="rot13-out" class="output">—</div>
+      <p class="hint">Famous: "Pretty Good Privacy" → "Cerggl Tbbq Cevinpl" → "Pretty Good Privacy"</p>
+    </div>
+  `;
+}
+window.runRot13 = () => {
+  document.getElementById('rot13-out').textContent = caesarShift(document.getElementById('rot13-in').value, 13);
+};
+
+// ============ BACON ============
+const BACON_TABLE = {
+  A:'AAAAA',B:'AAAAB',C:'AAABA',D:'AAABB',E:'AABAA',F:'AABAB',G:'AABBA',H:'AABBB',
+  I:'ABAAA',J:'ABAAB',K:'ABABA',L:'ABABB',M:'ABBAA',N:'ABBAB',O:'ABBBA',P:'ABBBB',
+  Q:'BAAAA',R:'BAAAB',S:'BAABA',T:'BAABB',U:'BABAA',V:'BABAB',W:'BABBA',X:'BABBB',
+  Y:'BBAAA',Z:'BBAAB',
+};
+const BACON_REVERSE = Object.fromEntries(Object.entries(BACON_TABLE).map(([k,v]) => [v,k]));
+
+function baconEncode(text) {
+  return text.toUpperCase().replace(/[A-Z]/g, ch => BACON_TABLE[ch] + ' ').replace(/\s+/g, ' ').trim();
+}
+function baconDecode(text) {
+  return text.toUpperCase().replace(/[^AB]/g, '').match(/.{1,5}/g)?.map(g => BACON_REVERSE[g] || '?').join('') || '';
+}
+
+function renderBacon(root) {
+  root.innerHTML = `
+    <div class="panel">
+      <h2>Bacon Cipher</h2>
+      <p class="desc">Francis Bacon, 1605. Each letter encoded as 5 binary digits (A/B). The trick: the A's and B's can be HIDDEN in any binary distinction in the carrier — italic vs. roman type, capital vs. lowercase letters, long notes vs. short, white tiles vs. black. Bacon called it a way to "infold" a message inside another.</p>
+      <textarea id="bacon-in" placeholder="Plaintext to encode, or Bacon AB-string to decode"></textarea>
+      <div class="controls">
+        <button onclick="runBaconEncode()">Encode →</button>
+        <button class="ghost" onclick="runBaconDecode()">← Decode</button>
+      </div>
+      <div id="bacon-out" class="output">—</div>
+      <p class="hint">Try: encode "HELLO" → AABBB AABAA ABABB ABABB ABBBA. Then imagine each A as a regular letter, each B as a bold letter, hidden in normal-looking text.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Bacon hidden in carrier text</h2>
+      <p class="desc">Bacon's full power: hide AB pattern in a normal-looking sentence using italic vs. regular type. Paste a long carrier and a short secret. The output looks like ordinary writing — but italicized letters spell out your secret.</p>
+      <textarea id="bacon-secret" placeholder="Secret to hide (e.g., MEET AT THE LIBRARY)"></textarea>
+      <textarea id="bacon-carrier" placeholder="Carrier text (must contain enough letters — need 5 letters per secret letter). Try a Bible verse or a Wikipedia paragraph."></textarea>
+      <div class="controls">
+        <button onclick="hideBacon()">Hide in carrier</button>
+        <button class="ghost" onclick="revealBacon()">Reveal from italic pattern</button>
+      </div>
+      <div id="bacon-hidden-out" class="output">—</div>
+      <p class="hint">The output uses italic tags. View source on the printed page to see exactly which letters were marked. For a real hunt: print the message and italicize the marked letters by hand, OR use Word's italic styling — solvers must spot which letters look different.</p>
+    </div>
+  `;
+}
+window.runBaconEncode = () => {
+  document.getElementById('bacon-out').textContent = baconEncode(document.getElementById('bacon-in').value);
+};
+window.runBaconDecode = () => {
+  document.getElementById('bacon-out').textContent = baconDecode(document.getElementById('bacon-in').value);
+};
+
+window.hideBacon = () => {
+  const secret = document.getElementById('bacon-secret').value.toUpperCase().replace(/[^A-Z]/g, '');
+  const carrier = document.getElementById('bacon-carrier').value;
+  const out = document.getElementById('bacon-hidden-out');
+  if (!secret || !carrier) { out.textContent = 'Need both a secret and a carrier.'; return; }
+  const baconBits = secret.split('').map(c => BACON_TABLE[c]).join('');
+  // Now walk the carrier — for each letter, consume one bit. A = roman, B = italic.
+  const carrierLetters = carrier.match(/[a-zA-Z]/g) || [];
+  if (carrierLetters.length < baconBits.length) {
+    out.innerHTML = `<span style="color:var(--warn);">Carrier too short: needs ${baconBits.length} letters, has ${carrierLetters.length}. Add more text.</span>`;
+    return;
+  }
+  let bitIdx = 0;
+  const html = carrier.split('').map(ch => {
+    if (/[a-zA-Z]/.test(ch)) {
+      if (bitIdx < baconBits.length) {
+        const bit = baconBits[bitIdx];
+        bitIdx++;
+        return bit === 'B' ? `<em style="color:var(--accent);">${ch}</em>` : ch;
+      }
+    }
+    return ch;
+  }).join('');
+  out.innerHTML = `<div style="line-height:1.8;">${html}</div><br><span style="color:var(--ink-faint);font-size:0.8rem;">Used ${baconBits.length} letters of ${carrierLetters.length} available. Italicized letters (in green) = B bits. Print + italicize by hand for a real hunt.</span>`;
+};
+
+window.revealBacon = () => {
+  const carrier = document.getElementById('bacon-carrier').value;
+  // Parse the HTML — italic = B, regular = A. But since the carrier is a textarea,
+  // we can't read formatting. So this mode is for when the user pastes AB-pattern strings.
+  const out = document.getElementById('bacon-hidden-out');
+  out.innerHTML = `<span style="color:var(--ink-soft);">Reveal mode: textarea can't carry italic formatting. To decode an italicized-text Bacon message: type 'A' for each regular letter and 'B' for each italic letter into the regular Bacon Decode box above, then hit Decode. (Or — for a future v0.3, paste rich HTML here.)</span>`;
+};
+
+// ============ RAIL FENCE ============
+function railFenceEncode(text, rails) {
+  if (rails < 2) return text;
+  const fence = Array.from({length: rails}, () => []);
+  let rail = 0, dir = 1;
+  for (const ch of text) {
+    fence[rail].push(ch);
+    rail += dir;
+    if (rail === rails - 1 || rail === 0) dir = -dir;
+  }
+  return fence.flat().join('');
+}
+function railFenceDecode(text, rails) {
+  if (rails < 2) return text;
+  const len = text.length;
+  const pattern = [];
+  let rail = 0, dir = 1;
+  for (let i = 0; i < len; i++) {
+    pattern.push(rail);
+    rail += dir;
+    if (rail === rails - 1 || rail === 0) dir = -dir;
+  }
+  const sorted = pattern.map((r, i) => [r, i]).sort((a,b) => a[0]-b[0] || a[1]-b[1]);
+  const out = new Array(len);
+  for (let i = 0; i < len; i++) {
+    out[sorted[i][1]] = text[i];
+  }
+  return out.join('');
+}
+
+function renderRailFence(root) {
+  root.innerHTML = `
+    <div class="panel">
+      <h2>Rail Fence Cipher</h2>
+      <p class="desc">Transposition cipher: write the message in a zigzag pattern across N "rails," then read it off row by row. The number of rails is the key. Used in the American Civil War.</p>
+      <textarea id="rail-in" placeholder="Plaintext or ciphertext"></textarea>
+      <div class="controls">
+        <label>Rails</label>
+        <input type="number" id="rail-n" value="3" min="2" max="10">
+        <button onclick="runRail(false)">Encode →</button>
+        <button class="ghost" onclick="runRail(true)">← Decode</button>
+      </div>
+      <div id="rail-out" class="output">—</div>
+      <p class="hint">Example with 3 rails: "WEAREDISCOVERED" → "WECRUOERDSOEEVRD" (the W goes on rail 0, E on rail 1, A on rail 2, R on rail 1, then bounces back up).</p>
+    </div>
+  `;
+}
+window.runRail = (decode) => {
+  const t = document.getElementById('rail-in').value;
+  const n = parseInt(document.getElementById('rail-n').value, 10) || 2;
+  document.getElementById('rail-out').textContent = decode ? railFenceDecode(t, n) : railFenceEncode(t, n);
+};
+
+// ============ PUZZLE HUNT ============
+function renderHunt(root) {
+  root.innerHTML = `
+    <div class="panel">
+      <h2>Puzzle Hunt Builder</h2>
+      <p class="desc">Generate a chained puzzle: plaintext gets encoded through multiple cipher layers. The solver has to peel each layer using clues you provide. Share the final cipher + clues via URL hash.</p>
+      <textarea id="hunt-in" placeholder="Final message the solver finds at the end (e.g., 'Behold the secret of the order: Romans 8:28')"></textarea>
+      <div class="controls" style="flex-direction:column;align-items:stretch;">
+        <select id="hunt-layer1" style="background:var(--panel-2);color:var(--ink);border:1px solid var(--border);border-radius:4px;padding:0.5rem;font-family:inherit;">
+          <option value="caesar:3">Layer 1: Caesar +3</option>
+          <option value="caesar:7">Layer 1: Caesar +7</option>
+          <option value="atbash:0">Layer 1: Atbash</option>
+          <option value="rot13:0">Layer 1: ROT13</option>
+        </select>
+        <select id="hunt-layer2" style="background:var(--panel-2);color:var(--ink);border:1px solid var(--border);border-radius:4px;padding:0.5rem;font-family:inherit;">
+          <option value="">Layer 2: (none)</option>
+          <option value="vigenere:WISDOM">Layer 2: Vigenère key=WISDOM</option>
+          <option value="vigenere:STONEBRIDGE">Layer 2: Vigenère key=STONEBRIDGE</option>
+          <option value="rail:3">Layer 2: Rail Fence 3</option>
+          <option value="rail:4">Layer 2: Rail Fence 4</option>
+        </select>
+        <button onclick="generateHunt()">Generate puzzle</button>
+      </div>
+      <div id="hunt-out"></div>
+    </div>
+  `;
+}
+
+function applyLayer(text, op) {
+  if (!op) return text;
+  const [name, arg] = op.split(':');
+  if (name === 'caesar') return caesarShift(text, parseInt(arg, 10));
+  if (name === 'atbash') return atbash(text);
+  if (name === 'rot13') return caesarShift(text, 13);
+  if (name === 'vigenere') return vigenere(text, arg);
+  if (name === 'rail') return railFenceEncode(text.replace(/\s/g, ''), parseInt(arg, 10));
+  return text;
+}
+
+window.generateHunt = () => {
+  const msg = document.getElementById('hunt-in').value.trim();
+  const l1 = document.getElementById('hunt-layer1').value;
+  const l2 = document.getElementById('hunt-layer2').value;
+  if (!msg) { alert('Enter a final message.'); return; }
+  // Apply layers in REVERSE order so the solver decodes layer 1 first
+  let encoded = msg;
+  if (l2) encoded = applyLayer(encoded, l2);
+  encoded = applyLayer(encoded, l1);
+
+  const cluesL1 = {
+    'caesar:3': 'Hint #1: "Et tu, Brute?" Roll the alphabet 3 forward.',
+    'caesar:7': 'Hint #1: Each letter walks 7 steps. The cardinal directions.',
+    'atbash:0': 'Hint #1: A meets Z. The alphabet folded onto itself.',
+    'rot13:0': 'Hint #1: Half-turn. Apply, then apply again to return.',
+  };
+  const cluesL2 = {
+    '': '',
+    'vigenere:WISDOM': 'Hint #2: A key of six letters. What does Proverbs 9:10 promise?',
+    'vigenere:STONEBRIDGE': 'Hint #2: A key of eleven letters. Where the doors open every Sunday.',
+    'rail:3': 'Hint #2: Three lines. A zigzag down a fence.',
+    'rail:4': 'Hint #2: Four lines. A zigzag down a fence.',
+  };
+  const hint1 = cluesL1[l1] || '';
+  const hint2 = cluesL2[l2] || '';
+
+  const out = document.getElementById('hunt-out');
+  out.innerHTML = `
+    <div class="puzzle-display">${escapeHtml(encoded)}</div>
+    <div style="margin-top:1rem;color:var(--ink-soft);font-size:0.85rem;">
+      <strong style="color:var(--warn);">Clues for the solver:</strong><br>
+      ${escapeHtml(hint1)}<br>
+      ${hint2 ? escapeHtml(hint2) + '<br>' : ''}
+    </div>
+    <div class="row-actions">
+      <button onclick="copyHunt('${encoded.replace(/'/g, "\\'")}')">Copy puzzle</button>
+      <button class="ghost" onclick="shareHunt('${encoded.replace(/'/g, "\\'")}')">Share via URL</button>
+    </div>
+  `;
+};
+window.copyHunt = (text) => {
+  navigator.clipboard.writeText(text).then(() => alert('Copied: ' + text)).catch(() => prompt('Copy:', text));
+};
+window.shareHunt = (text) => {
+  const url = new URL(location.href);
+  url.hash = 'puzzle=' + encodeURIComponent(btoa(text));
+  navigator.clipboard.writeText(url.toString()).then(() => alert('URL copied. Share with solvers.'));
+};
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ============ ENIGMA ============
+// Historical Wehrmacht Enigma I rotor wirings and notches.
+// Each wiring is the permutation A->? B->? ... Z->?
+// Notch is the letter that, when displayed in the rotor window,
+// causes the NEXT rotor to step on the next keypress.
+const ENIGMA_ROTORS = {
+  I:    { wiring: 'EKMFLGDQVZNTOWYHXUSPAIBRCJ', notch: 'Q' },
+  II:   { wiring: 'AJDKSIRUXBLHWTMCQGZNPYFVOE', notch: 'E' },
+  III:  { wiring: 'BDFHJLCPRTXVZNYEIWGAKMUSQO', notch: 'V' },
+  IV:   { wiring: 'ESOVPZJAYQUIRHXLNFTGKDCMWB', notch: 'J' },
+  V:    { wiring: 'VZBRGITYUPSDNHLXAWMJQOFECK', notch: 'Z' },
+};
+const ENIGMA_REFLECTORS = {
+  A: 'EJMZALYXVBWFCRQUONTSPIKHGD',
+  B: 'YRUHQSLDPXNGOKMIEBFZCWVJAT',
+  C: 'FVPJIAOYEDRZXWGCTKUQSBNMHL',
+};
+
+function letterToNum(c) { return c.charCodeAt(0) - 65; }
+function numToLetter(n) { return String.fromCharCode(((n % 26) + 26) % 26 + 65); }
+
+function makeRotor(name, position) {
+  // position: letter shown in the window initially, e.g. 'A'
+  const r = ENIGMA_ROTORS[name];
+  // Forward map: input pin index -> output pin index, given rotor at position 0
+  const wiring = r.wiring.split('').map(letterToNum);
+  const reverse = new Array(26);
+  wiring.forEach((to, from) => { reverse[to] = from; });
+  return {
+    name,
+    notchPos: letterToNum(r.notch),
+    pos: letterToNum(position),
+    forward: wiring,
+    reverse,
+  };
+}
+
+function makeReflector(name) {
+  return ENIGMA_REFLECTORS[name].split('').map(letterToNum);
+}
+
+function makePlugboard(pairsStr) {
+  const map = new Array(26).fill(0).map((_, i) => i);
+  const pairs = pairsStr.toUpperCase().split(/[\s,]+/).filter(s => s.length === 2);
+  pairs.forEach(p => {
+    const a = letterToNum(p[0]);
+    const b = letterToNum(p[1]);
+    if (a >= 0 && a < 26 && b >= 0 && b < 26) {
+      map[a] = b;
+      map[b] = a;
+    }
+  });
+  return map;
+}
+
+function rotorForward(rotor, signalIdx) {
+  // shift input by rotor position, look up wiring, shift output back
+  const shifted = (signalIdx + rotor.pos) % 26;
+  const wired = rotor.forward[shifted];
+  return ((wired - rotor.pos) % 26 + 26) % 26;
+}
+
+function rotorReverse(rotor, signalIdx) {
+  const shifted = (signalIdx + rotor.pos) % 26;
+  const wired = rotor.reverse[shifted];
+  return ((wired - rotor.pos) % 26 + 26) % 26;
+}
+
+function stepRotors(rotors) {
+  // rotors[0] = fast rotor (right), rotors[1] = middle, rotors[2] = slow (left)
+  // Double-stepping: if middle rotor is at its notch, both middle AND slow step.
+  const willStepMiddle = (rotors[0].pos === rotors[0].notchPos);
+  const willStepSlow = (rotors[1].pos === rotors[1].notchPos);
+  // Middle steps if right is at notch OR middle is at notch (double-step)
+  if (willStepMiddle || willStepSlow) {
+    rotors[1].pos = (rotors[1].pos + 1) % 26;
+  }
+  // Slow steps only if middle is at notch
+  if (willStepSlow) {
+    rotors[2].pos = (rotors[2].pos + 1) % 26;
+  }
+  // Fast rotor always steps
+  rotors[0].pos = (rotors[0].pos + 1) % 26;
+}
+
+function encryptLetter(letter, state) {
+  if (!/[A-Z]/.test(letter)) return letter;
+  stepRotors(state.rotors);
+  let signal = letterToNum(letter);
+  // Through plugboard
+  signal = state.plugboard[signal];
+  // Through rotors right to left
+  signal = rotorForward(state.rotors[0], signal);
+  signal = rotorForward(state.rotors[1], signal);
+  signal = rotorForward(state.rotors[2], signal);
+  // Through reflector
+  signal = state.reflector[signal];
+  // Back through rotors left to right
+  signal = rotorReverse(state.rotors[2], signal);
+  signal = rotorReverse(state.rotors[1], signal);
+  signal = rotorReverse(state.rotors[0], signal);
+  // Back through plugboard
+  signal = state.plugboard[signal];
+  return numToLetter(signal);
+}
+
+function runEnigma(text, config) {
+  const state = {
+    rotors: [
+      makeRotor(config.r1, config.p1),  // fast (right)
+      makeRotor(config.r2, config.p2),  // middle
+      makeRotor(config.r3, config.p3),  // slow (left)
+    ],
+    reflector: makeReflector(config.reflector),
+    plugboard: makePlugboard(config.plugboard || ''),
+  };
+  return text.toUpperCase().split('').map(c => encryptLetter(c, state)).join('');
+}
+
+function renderEnigma(root) {
+  const rotorOpts = Object.keys(ENIGMA_ROTORS).map(k => `<option value="${k}">${k}</option>`).join('');
+  const reflectorOpts = Object.keys(ENIGMA_REFLECTORS).map(k => `<option value="${k}">${k}</option>`).join('');
+  const positions = Array.from({length: 26}, (_, i) => `<option value="${numToLetter(i)}">${numToLetter(i)}</option>`).join('');
+
+  root.innerHTML = `
+    <div class="panel">
+      <h2>Enigma Machine</h2>
+      <p class="desc">Faithful sim of the German Wehrmacht Enigma I (3 rotors, plugboard, reflector). Encryption and decryption are the same operation — the machine is its own inverse for any given setting. The stepping is real: middle rotor advances when right rotor hits its notch, and the famous double-stepping anomaly is preserved.</p>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.6rem;margin-bottom:1rem;">
+        <div>
+          <div style="color:var(--accent);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.3rem;">Slow (L)</div>
+          <select id="eni-r3" style="background:var(--panel-2);color:var(--ink);border:1px solid var(--border);border-radius:4px;padding:0.5rem;font-family:inherit;width:100%;">${rotorOpts}</select>
+          <select id="eni-p3" style="background:var(--panel-2);color:var(--ink);border:1px solid var(--border);border-radius:4px;padding:0.5rem;font-family:inherit;margin-top:0.3rem;width:100%;">${positions}</select>
+        </div>
+        <div>
+          <div style="color:var(--accent);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.3rem;">Middle</div>
+          <select id="eni-r2" style="background:var(--panel-2);color:var(--ink);border:1px solid var(--border);border-radius:4px;padding:0.5rem;font-family:inherit;width:100%;">${rotorOpts}</select>
+          <select id="eni-p2" style="background:var(--panel-2);color:var(--ink);border:1px solid var(--border);border-radius:4px;padding:0.5rem;font-family:inherit;margin-top:0.3rem;width:100%;">${positions}</select>
+        </div>
+        <div>
+          <div style="color:var(--accent);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.3rem;">Fast (R)</div>
+          <select id="eni-r1" style="background:var(--panel-2);color:var(--ink);border:1px solid var(--border);border-radius:4px;padding:0.5rem;font-family:inherit;width:100%;">${rotorOpts}</select>
+          <select id="eni-p1" style="background:var(--panel-2);color:var(--ink);border:1px solid var(--border);border-radius:4px;padding:0.5rem;font-family:inherit;margin-top:0.3rem;width:100%;">${positions}</select>
+        </div>
+      </div>
+
+      <div class="controls">
+        <label>Reflector</label>
+        <select id="eni-reflector" style="background:var(--panel-2);color:var(--ink);border:1px solid var(--border);border-radius:4px;padding:0.5rem;font-family:inherit;">${reflectorOpts}</select>
+      </div>
+
+      <label style="color:var(--accent);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;margin-top:0.85rem;display:block;">Plugboard (space-separated pairs, e.g., "AB CD EF")</label>
+      <input type="text" id="eni-plugboard" placeholder="AB CD EF" style="background:var(--panel-2);color:var(--ink);border:1px solid var(--border);border-radius:4px;padding:0.6rem 0.85rem;font-family:inherit;font-size:0.95rem;width:100%;margin-bottom:0.85rem;">
+
+      <textarea id="eni-input" placeholder="Type plaintext or ciphertext. Same operation either way."></textarea>
+      <div class="row-actions">
+        <button onclick="runEnigmaUI()">Run</button>
+        <button class="ghost" onclick="enigmaPreset('basic')">Reset to default</button>
+        <button class="ghost" onclick="enigmaPreset('historic')">Historic test (I II III, AAA, B reflector)</button>
+      </div>
+      <div id="eni-out" class="output">—</div>
+      <p class="hint">Default config gets you the standard 'AAAAA' → 'BDZGO' famous-first-letters test. Try encrypting 'ENIGMA' and then encrypting your ciphertext with the same settings — you get 'ENIGMA' back.</p>
+    </div>
+  `;
+
+  // Set sensible defaults
+  document.getElementById('eni-r3').value = 'I';
+  document.getElementById('eni-r2').value = 'II';
+  document.getElementById('eni-r1').value = 'III';
+  document.getElementById('eni-p3').value = 'A';
+  document.getElementById('eni-p2').value = 'A';
+  document.getElementById('eni-p1').value = 'A';
+  document.getElementById('eni-reflector').value = 'B';
+}
+
+window.runEnigmaUI = () => {
+  const config = {
+    r1: document.getElementById('eni-r1').value,
+    r2: document.getElementById('eni-r2').value,
+    r3: document.getElementById('eni-r3').value,
+    p1: document.getElementById('eni-p1').value,
+    p2: document.getElementById('eni-p2').value,
+    p3: document.getElementById('eni-p3').value,
+    reflector: document.getElementById('eni-reflector').value,
+    plugboard: document.getElementById('eni-plugboard').value,
+  };
+  const input = document.getElementById('eni-input').value;
+  const output = runEnigma(input, config);
+  document.getElementById('eni-out').textContent = output || '—';
+};
+
+window.enigmaPreset = (preset) => {
+  if (preset === 'basic' || preset === 'historic') {
+    document.getElementById('eni-r3').value = 'I';
+    document.getElementById('eni-r2').value = 'II';
+    document.getElementById('eni-r1').value = 'III';
+    document.getElementById('eni-p3').value = 'A';
+    document.getElementById('eni-p2').value = 'A';
+    document.getElementById('eni-p1').value = 'A';
+    document.getElementById('eni-reflector').value = 'B';
+    document.getElementById('eni-plugboard').value = '';
+  }
+};
+
+// ============ CRACK THIS (practice mode) ============
+const PRACTICE = [
+  {
+    level: 1,
+    type: 'Caesar',
+    cipher: 'WKLV LV WKH ILUVW VWHS',
+    answer: 'THIS IS THE FIRST STEP',
+    hint: 'Caesar shift. The classic shift is 3.',
+    explain: 'Caesar with shift +3. Try 1-25 if you do not know which.',
+  },
+  {
+    level: 2,
+    type: 'Atbash',
+    cipher: 'TLW QFWTVH FH GVMWVIOB',
+    answer: 'GOD JUDGES US TENDERLY',
+    hint: 'Symmetric Hebrew cipher: A→Z, B→Y, C→X.',
+    explain: 'Atbash is its own inverse. Just apply the same transform.',
+  },
+  {
+    level: 3,
+    type: 'Vigenère (key = MERCY)',
+    cipher: 'YIIEW FVZWKBLJ QTQV AWBSQVPR',
+    answer: 'MERCY TRIUMPHS OVER JUDGMENT',
+    hint: 'Vigenère. The key is a 5-letter virtue. Try MERCY.',
+    explain: 'Key MERCY. James 2:13.',
+  },
+  {
+    level: 4,
+    type: 'Rail Fence (3 rails)',
+    cipher: 'TEORAWHARSLPAWLOSEOSYL',
+    answer: 'THEAEROSOLSPRAYWALLOWS',
+    hint: 'Transposition with 3 rails. Zigzag pattern. Spaces dropped.',
+    explain: 'Plaintext "THE AEROSOL SPRAY WALLOWS" (22 letters w/o spaces) zigzags down 3 rails. Read rail-by-rail: rail 0 = T,E,O,R,W,W; rail 1 = H,A,R,S,L,P,A,W,L,O,S; rail 2 = E,O,S,Y,L. Concatenate.',
+  },
+  {
+    level: 5,
+    type: 'Vigenère (unknown key)',
+    cipher: 'GLGULK FHX AAV JKPHICMPXJ IY RBEAWVF GYHWEV',
+    answer: 'NUMBER ONE THE PRIORITIES OF KINGDOM PEOPLE',
+    hint: 'Try Kasiski examination. Or just guess: the key is a 5-letter word about what God speaks.',
+    explain: 'Key TRUTH. The plaintext is a sermon fragment about priorities.',
+  },
+];
+
+let practiceState = {};
+
+function renderCrack(root) {
+  root.innerHTML = `
+    <div class="panel">
+      <h2>Crack This — practice puzzles</h2>
+      <p class="desc">Five puzzles at increasing difficulty. Decrypt each ciphertext using only the cipher type as a clue. Hints unfold; answers reveal. Progress saves locally.</p>
+      <div id="puzzle-list"></div>
+    </div>
+  `;
+  // Load saved progress
+  try {
+    practiceState = JSON.parse(localStorage.getItem('cipher-lab.crack.v1') || '{}');
+  } catch { practiceState = {}; }
+  const listEl = document.getElementById('puzzle-list');
+  listEl.innerHTML = PRACTICE.map((p, i) => {
+    const st = practiceState[p.level] || { revealed: false, hintShown: false, solved: false };
+    const statusBadge = st.solved ? '<span style="color:var(--accent);font-size:0.75rem;letter-spacing:0.1em;">✓ SOLVED</span>'
+      : st.revealed ? '<span style="color:var(--warn);font-size:0.75rem;letter-spacing:0.1em;">REVEALED</span>'
+      : '';
+    return `
+      <div class="panel" style="margin: 1.25rem 0; background: #14140f; padding: 1.25rem 1.5rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.85rem;">
+          <h2 style="margin:0;">Level ${p.level} · ${escapeHtml(p.type)}</h2>
+          ${statusBadge}
+        </div>
+        <div class="output" style="margin-bottom:1rem;">${escapeHtml(p.cipher)}</div>
+        <div style="margin-bottom:0.85rem;">
+          <input type="text" id="crack-input-${i}" placeholder="Your decryption..." value="${escapeHtml((st.attempt || '').toUpperCase())}" style="width:100%;background:var(--panel-2);color:var(--ink);border:1px solid var(--border);padding:0.6rem 0.85rem;border-radius:4px;font-family:inherit;font-size:0.95rem;text-transform:uppercase;">
+        </div>
+        <div class="row-actions">
+          <button onclick="checkCrack(${i})">Check</button>
+          <button class="ghost" onclick="hintCrack(${i})">${st.hintShown ? 'Hint shown' : 'Hint'}</button>
+          <button class="ghost" onclick="revealCrack(${i})">${st.revealed ? 'Revealed' : 'Reveal'}</button>
+        </div>
+        <div id="crack-feedback-${i}" style="margin-top:0.85rem;font-size:0.85rem;color:var(--ink-soft);">
+          ${st.hintShown ? '<div style="color:var(--warn);margin-bottom:0.4rem;"><strong>HINT:</strong> ' + escapeHtml(p.hint) + '</div>' : ''}
+          ${st.revealed ? '<div style="color:var(--accent);"><strong>ANSWER:</strong> ' + escapeHtml(p.answer) + '<br><em>' + escapeHtml(p.explain) + '</em></div>' : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Render scoreboard
+  const solved = Object.values(practiceState).filter(s => s.solved).length;
+  const revealed = Object.values(practiceState).filter(s => s.revealed && !s.solved).length;
+  document.getElementById('puzzle-list').insertAdjacentHTML('beforebegin', `
+    <div style="text-align:center;color:var(--ink-soft);font-size:0.85rem;margin-bottom:1rem;">
+      <strong style="color:var(--accent);">${solved}</strong> solved · <strong style="color:var(--warn);">${revealed}</strong> revealed · ${PRACTICE.length - solved - revealed} untried
+    </div>
+  `);
+}
+
+function normalize(s) {
+  return s.toUpperCase().replace(/[^A-Z]/g, '');
+}
+
+window.checkCrack = (i) => {
+  const p = PRACTICE[i];
+  const input = document.getElementById('crack-input-' + i).value;
+  practiceState[p.level] = practiceState[p.level] || {};
+  practiceState[p.level].attempt = input;
+  const fb = document.getElementById('crack-feedback-' + i);
+  if (normalize(input) === normalize(p.answer)) {
+    practiceState[p.level].solved = true;
+    localStorage.setItem('cipher-lab.crack.v1', JSON.stringify(practiceState));
+    fb.innerHTML = '<div style="color:var(--accent);font-weight:600;">✓ correct. ' + escapeHtml(p.explain) + '</div>';
+  } else {
+    localStorage.setItem('cipher-lab.crack.v1', JSON.stringify(practiceState));
+    fb.innerHTML = '<div style="color:#c46a4a;">not yet. compare your decryption letter-by-letter.</div>';
+  }
+};
+
+window.hintCrack = (i) => {
+  const p = PRACTICE[i];
+  practiceState[p.level] = practiceState[p.level] || {};
+  practiceState[p.level].hintShown = true;
+  localStorage.setItem('cipher-lab.crack.v1', JSON.stringify(practiceState));
+  document.getElementById('crack-feedback-' + i).innerHTML =
+    '<div style="color:var(--warn);"><strong>HINT:</strong> ' + escapeHtml(p.hint) + '</div>';
+};
+
+window.revealCrack = (i) => {
+  const p = PRACTICE[i];
+  if (!confirm('Reveal the answer? You will no longer be marked solved for this level.')) return;
+  practiceState[p.level] = practiceState[p.level] || {};
+  practiceState[p.level].revealed = true;
+  localStorage.setItem('cipher-lab.crack.v1', JSON.stringify(practiceState));
+  document.getElementById('crack-feedback-' + i).innerHTML =
+    '<div style="color:var(--accent);"><strong>ANSWER:</strong> ' + escapeHtml(p.answer) + '<br><em>' + escapeHtml(p.explain) + '</em></div>';
+};
+
+// Initial route
+const hash = location.hash.slice(1);
+const initial = CIPHERS.find(c => c.id === hash) ? hash : 'caesar';
+showCipher(initial);
+</script>
+
+</body>
+</html>

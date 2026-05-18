@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verse Vault — memorize scripture without humiliation</title>
+<meta name="description" content="A spaced-recall tool for scripture memorization. Add verses you want to know cold. The tool progressively hides words across review sessions until you're saying the whole thing from memory.">
+<meta property="og:title" content="Verse Vault — memorize scripture without humiliation">
+<meta property="og:description" content="Progressive-hide scripture memorization. Add verses, review, retain.">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --bg: #f7f1e3;
+    --panel: #fffbef;
+    --ink: #1d1812;
+    --ink-soft: #6b5a44;
+    --ink-faint: #a89880;
+    --accent: #8a6a3a;
+    --accent-light: #c2a173;
+    --done: #4a7c3d;
+    --hidden: #e0d2b0;
+    --border: #e5d9c0;
+    --serif: Georgia, "Times New Roman", serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 1rem;
+  }
+  .container { max-width: 640px; margin: 0 auto; }
+
+  header { text-align: center; padding: 2rem 0 1.5rem; }
+  header h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 6vw, 2.75rem);
+    color: var(--accent);
+    margin-bottom: 0.3rem;
+    letter-spacing: -0.01em;
+  }
+  header p {
+    color: var(--ink-soft);
+    font-style: italic;
+    font-size: 0.95rem;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .tab {
+    padding: 0.55rem 1.1rem;
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .tab.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+  .tab:hover:not(.active) {
+    border-color: var(--accent);
+    color: var(--ink);
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(29,24,18,0.06);
+  }
+  .panel h2 {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    color: var(--accent);
+    margin-bottom: 0.85rem;
+  }
+  .panel p.prompt {
+    color: var(--ink-soft);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+
+  textarea, input[type="text"], select {
+    width: 100%;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.55;
+    resize: vertical;
+  }
+  textarea { min-height: 100px; margin-bottom: 0.75rem; }
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  button {
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    padding: 0.65rem 1.3rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  button:hover { background: var(--accent); }
+  button.ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+  }
+  button.ghost:hover { background: var(--bg); color: var(--ink); border-color: var(--accent); }
+  button.done { background: var(--done); }
+  button.done:hover { background: #3a5c2d; }
+
+  .row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+
+  .verse-card {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .verse-card:last-child { border-bottom: none; }
+  .verse-card .ref {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.4rem;
+  }
+  .verse-card .text {
+    font-family: var(--serif);
+    color: var(--ink);
+    line-height: 1.7;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  .verse-card .meta {
+    color: var(--ink-faint);
+    font-size: 0.78rem;
+    margin-bottom: 0.5rem;
+  }
+  .verse-card .actions {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-top: 0.4rem;
+  }
+  .verse-card .actions button { padding: 0.3rem 0.7rem; font-size: 0.78rem; }
+
+  .review-stage {
+    text-align: center;
+    padding: 2rem 0;
+  }
+  .review-ref {
+    color: var(--accent);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 1rem;
+  }
+  .review-text {
+    font-family: var(--serif);
+    font-size: 1.25rem;
+    line-height: 1.9;
+    color: var(--ink);
+    margin: 0 auto 2rem;
+    max-width: 540px;
+  }
+  .review-text .word.hidden {
+    display: inline-block;
+    background: var(--hidden);
+    color: var(--hidden);
+    border-radius: 3px;
+    padding: 0 0.25rem;
+    user-select: none;
+    cursor: pointer;
+  }
+  .review-text .word.hidden:hover {
+    color: var(--ink);
+  }
+  .review-text .word.revealed {
+    background: #fff2c4;
+  }
+  .review-difficulty {
+    color: var(--ink-faint);
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+  }
+  .difficulty-bar {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 1rem 0;
+  }
+  .difficulty-bar button {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 0.45rem 0.85rem;
+    font-size: 0.85rem;
+  }
+  .difficulty-bar button:hover { background: var(--accent); color: var(--bg); }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+  }
+  .stat {
+    text-align: center;
+    padding: 0.85rem 0.4rem;
+    background: var(--bg);
+    border-radius: 8px;
+  }
+  .stat .n {
+    font-family: var(--serif);
+    font-size: 1.6rem;
+    color: var(--accent);
+    line-height: 1.1;
+  }
+  .stat .l {
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0.25rem;
+  }
+
+  .empty {
+    text-align: center;
+    color: var(--ink-faint);
+    padding: 1.5rem 0;
+    font-style: italic;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+    line-height: 1.6;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Verse Vault</h1>
+  <p>memorize scripture without humiliation</p>
+</header>
+
+<div class="tabs">
+  <button class="tab active" data-view="review">Review</button>
+  <button class="tab" data-view="add">Add</button>
+  <button class="tab" data-view="library">Library</button>
+  <button class="tab" data-view="stats">Stats</button>
+  <button class="tab" data-view="manage">Manage</button>
+</div>
+
+<div id="view-review" class="view">
+  <div class="panel" id="review-panel"></div>
+</div>
+
+<div id="view-add" class="view" style="display:none;">
+  <div class="panel">
+    <h2>Add a verse</h2>
+    <p class="prompt">Paste the verse exactly. The reference (e.g., "Romans 8:28") goes in its own field. The tool will hide progressively more words across your review sessions.</p>
+    <input type="text" id="add-ref" placeholder="Reference — e.g., Romans 8:28">
+    <textarea id="add-text" placeholder="Verse text..."></textarea>
+    <input type="text" id="add-tag" placeholder="Tag (optional) — e.g., comfort, identity, suffering">
+    <button id="add-btn">Add to vault</button>
+  </div>
+
+  <div class="panel">
+    <h2>Quick add — Elijah's set</h2>
+    <p class="prompt">Pre-loaded list. Tap to add to your vault.</p>
+    <div id="preset-list"></div>
+  </div>
+</div>
+
+<div id="view-library" class="view" style="display:none;">
+  <div class="panel">
+    <h2>Your vault</h2>
+    <input type="text" id="library-search" placeholder="Search by reference, text, or tag" style="margin-bottom:0.85rem;">
+    <div id="library-list"></div>
+  </div>
+</div>
+
+<div id="view-stats" class="view" style="display:none;">
+  <div class="panel">
+    <h2>How you're doing</h2>
+    <div class="stats" id="stats-grid"></div>
+  </div>
+  <div class="panel">
+    <h2>By tag</h2>
+    <div id="stats-tags"></div>
+  </div>
+</div>
+
+<div id="view-manage" class="view" style="display:none;">
+  <div class="panel">
+    <h2>Manage</h2>
+    <div class="row">
+      <button class="ghost" id="export-btn">Export JSON</button>
+      <button class="ghost" id="import-btn">Import JSON</button>
+      <button class="ghost" id="reset-btn" style="color:#b04a4a;border-color:#d8b6b6;">Reset all</button>
+      <input type="file" id="import-file" accept=".json" style="display:none;">
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>No cloud. No reminders. No streaks shame.<br>
+  <a href="https://github.com/thebigjah/verse-vault">source</a>
+  </p>
+</footer>
+
+</div>
+
+<script>
+'use strict';
+
+const KEY = 'versevault.v1';
+
+const PRESETS = [
+  { ref: 'Romans 8:28', text: 'And we know that in all things God works for the good of those who love him, who have been called according to his purpose.', tag: 'comfort' },
+  { ref: 'Matthew 5:10', text: 'Blessed are those who are persecuted because of righteousness, for theirs is the kingdom of heaven.', tag: 'identity' },
+  { ref: 'Romans 1:16', text: 'For I am not ashamed of the gospel, because it is the power of God that brings salvation to everyone who believes.', tag: 'identity' },
+  { ref: 'Proverbs 3:5-6', text: 'Trust in the Lord with all your heart and lean not on your own understanding; in all your ways submit to him, and he will make your paths straight.', tag: 'trust' },
+  { ref: 'Psalm 139:13', text: 'For you created my inmost being; you knit me together in my mother\'s womb.', tag: 'identity' },
+  { ref: 'Philippians 4:6-7', text: 'Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God. And the peace of God, which transcends all understanding, will guard your hearts and your minds in Christ Jesus.', tag: 'anxiety' },
+  { ref: 'Joshua 1:9', text: 'Have I not commanded you? Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go.', tag: 'courage' },
+  { ref: 'James 1:2-3', text: 'Consider it pure joy, my brothers and sisters, whenever you face trials of many kinds, because you know that the testing of your faith produces perseverance.', tag: 'suffering' },
+  { ref: 'Proverbs 25:2', text: 'It is the glory of God to conceal a thing: but the honour of kings is to search out a matter.', tag: 'wisdom' },
+  { ref: '2 Timothy 1:7', text: 'For the Spirit God gave us does not make us timid, but gives us power, love and self-discipline.', tag: 'courage' },
+];
+
+let state = load();
+
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return { verses: [] };
+    return JSON.parse(raw);
+  } catch { return { verses: [] }; }
+}
+function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function escapeHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function addVerse(ref, text, tag) {
+  state.verses.push({
+    id: uid(),
+    ref: ref.trim(),
+    text: text.trim(),
+    tag: (tag || '').trim(),
+    level: 0,            // visual: 0 full visible -> 4 100% hidden
+    reviews: 0,
+    addedAt: new Date().toISOString(),
+    lastReview: null,
+    // SM-2 fields
+    ef: 2.5,             // easiness factor
+    n: 0,                // consecutive correct repetitions
+    intervalDays: 0,     // days until next review
+    dueDate: new Date().toISOString().split('T')[0],  // YYYY-MM-DD
+  });
+  save();
+}
+
+// SM-2 algorithm
+// q is quality of recall, 0-5
+function sm2Schedule(v, q) {
+  if (q < 3) {
+    v.n = 0;
+    v.intervalDays = 1;
+  } else {
+    if (v.n === 0) v.intervalDays = 1;
+    else if (v.n === 1) v.intervalDays = 6;
+    else v.intervalDays = Math.round(v.intervalDays * v.ef);
+    v.n += 1;
+    v.ef = Math.max(1.3, v.ef + 0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
+  }
+  // Compute due date
+  const due = new Date();
+  due.setDate(due.getDate() + v.intervalDays);
+  v.dueDate = due.toISOString().split('T')[0];
+}
+
+function hidePercentage(level) {
+  return [0, 0.25, 0.5, 0.75, 1.0][level] || 0;
+}
+
+function pickVerseForReview() {
+  // Prefer verses that are due (dueDate <= today). Among those, oldest first.
+  const today = new Date().toISOString().split('T')[0];
+  const due = state.verses.filter(v => (v.dueDate || today) <= today);
+  if (due.length) {
+    return due.sort((a, b) => (a.dueDate || '').localeCompare(b.dueDate || ''))[0];
+  }
+  // Fallback: lowest level / oldest-reviewed (for new verses without due dates)
+  return [...state.verses].sort((a, b) => {
+    if (a.level !== b.level) return a.level - b.level;
+    return (a.lastReview || '').localeCompare(b.lastReview || '');
+  })[0];
+}
+
+function dueCount() {
+  const today = new Date().toISOString().split('T')[0];
+  return state.verses.filter(v => (v.dueDate || today) <= today).length;
+}
+
+function renderReview() {
+  const panel = document.getElementById('review-panel');
+  if (!state.verses.length) {
+    panel.innerHTML = '<div class="empty">No verses yet. Add some on the Add tab — there are 10 of yours pre-loaded.</div>';
+    return;
+  }
+  const v = pickVerseForReview();
+  const pct = hidePercentage(v.level);
+  const words = v.text.split(/(\s+)/);
+  // Hide pct of word-bearing tokens (alphanumeric)
+  const wordIdxs = words.map((w, i) => /\w/.test(w) ? i : -1).filter(i => i >= 0);
+  const targetHide = Math.floor(wordIdxs.length * pct);
+  // Deterministic per session: seed by id+date
+  const seed = (v.id + new Date().toISOString().split('T')[0]).split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  const shuffled = [...wordIdxs].sort((a, b) => ((a * 7 + seed) % 31) - ((b * 7 + seed) % 31));
+  const hideSet = new Set(shuffled.slice(0, targetHide));
+
+  const levelLabels = ['full visible', '25% hidden', '50% hidden', '75% hidden', 'cold recall (100% hidden)'];
+
+  panel.innerHTML = `
+    <div class="review-stage">
+      <div class="review-ref">${escapeHtml(v.ref)}</div>
+      <div class="review-text" id="review-text">
+        ${words.map((w, i) => {
+          if (!/\w/.test(w)) return w;
+          if (hideSet.has(i)) {
+            return `<span class="word hidden" data-idx="${i}" onclick="this.classList.toggle('revealed')">${escapeHtml(w)}</span>`;
+          }
+          return `<span class="word">${escapeHtml(w)}</span>`;
+        }).join('')}
+      </div>
+      <div class="review-difficulty">level ${v.level + 1} of 5 — ${levelLabels[v.level]}${v.intervalDays ? ' · last interval ' + v.intervalDays + 'd · ef ' + (v.ef || 2.5).toFixed(2) : ''}</div>
+      <div style="color:var(--ink-faint);font-size:0.78rem;margin-bottom:0.5rem;">${dueCount()} verse${dueCount()===1?'':'s'} due today</div>
+      <div class="difficulty-bar">
+        <button onclick="reviewResult('hard')">Hard. Hold here.</button>
+        <button onclick="reviewResult('ok')">Okay. Advance.</button>
+        <button onclick="reviewResult('easy')">Easy. Skip ahead.</button>
+      </div>
+      <div style="color:var(--ink-faint);font-size:0.78rem;margin-top:1rem;">tap any blocked word to peek &middot; <a href="#" onclick="enterTypeMode();return false;" style="color:var(--accent);text-decoration:underline;">or type it from memory →</a></div>
+      <div style="color:var(--ink-faint);font-size:0.72rem;margin-top:0.4rem;">keys: H hard · O okay · E easy · T type</div>
+    </div>
+  `;
+}
+
+window.enterTypeMode = () => {
+  const sorted = [...state.verses].sort((a, b) => {
+    if (a.level !== b.level) return a.level - b.level;
+    return (a.lastReview || '').localeCompare(b.lastReview || '');
+  });
+  const v = sorted[0];
+  const panel = document.getElementById('review-panel');
+  panel.innerHTML = `
+    <div class="review-stage">
+      <div class="review-ref">${escapeHtml(v.ref)}</div>
+      <p style="color:var(--ink-soft);margin-bottom:1.25rem;">Type the verse from memory. Word-by-word grading shows hits and misses on submit.</p>
+      <textarea id="type-input" placeholder="Type the verse exactly as you remember..." style="min-height:140px;text-align:left;"></textarea>
+      <div class="difficulty-bar">
+        <button onclick="gradeTyped('${v.id}')">Grade my typing</button>
+        <button class="ghost" onclick="renderReview()">Back to hide mode</button>
+      </div>
+      <div id="grade-result" style="margin-top:1.5rem;"></div>
+    </div>
+  `;
+  setTimeout(() => document.getElementById('type-input').focus(), 50);
+};
+
+window.gradeTyped = (id) => {
+  const v = state.verses.find(x => x.id === id);
+  if (!v) return;
+  const typed = document.getElementById('type-input').value.trim();
+  if (!typed) { alert('Type something first.'); return; }
+
+  // Normalize for comparison
+  const normalize = (s) => s.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+  const refWords = normalize(v.text).split(' ');
+  const typedWords = normalize(typed).split(' ');
+
+  // Word-by-word grading: align positions, mark hits and misses
+  const result = [];
+  const maxLen = Math.max(refWords.length, typedWords.length);
+  let hits = 0;
+  for (let i = 0; i < maxLen; i++) {
+    const ref = refWords[i] || '';
+    const tp = typedWords[i] || '';
+    if (ref === tp) {
+      result.push(`<span style="color:var(--done);">${escapeHtml(tp)}</span>`);
+      hits++;
+    } else if (tp) {
+      result.push(`<span style="color:#c46a4a;text-decoration:line-through;">${escapeHtml(tp)}</span> <span style="color:var(--ink-faint);">[${escapeHtml(ref)}]</span>`);
+    } else {
+      result.push(`<span style="color:var(--ink-faint);">[${escapeHtml(ref)}]</span>`);
+    }
+  }
+  const pct = Math.round((hits / refWords.length) * 100);
+  const verdict = pct >= 95 ? 'easy' : pct >= 75 ? 'ok' : 'hard';
+
+  v.reviews = (v.reviews || 0) + 1;
+  v.lastReview = new Date().toISOString();
+  if (verdict === 'easy') v.level = Math.min(4, v.level + 2);
+  else if (verdict === 'ok') v.level = Math.min(4, v.level + 1);
+  // hard: stay
+  v.lastTypingScore = pct;
+  // SM-2 schedule using typing score as quality (0% -> q=0, 100% -> q=5)
+  const q = Math.min(5, Math.max(0, Math.round(pct / 20)));
+  if (!v.ef) v.ef = 2.5;
+  if (v.n == null) v.n = 0;
+  if (v.intervalDays == null) v.intervalDays = 0;
+  sm2Schedule(v, q);
+  save();
+
+  const verdictText = {
+    easy: `<strong style="color:var(--done);">${pct}% — clean.</strong> Advanced two levels.`,
+    ok: `<strong style="color:var(--accent);">${pct}% — okay.</strong> Advanced one level.`,
+    hard: `<strong style="color:#c46a4a;">${pct}% — hold here.</strong> Stayed at level ${v.level + 1}.`,
+  }[verdict];
+
+  document.getElementById('grade-result').innerHTML = `
+    <div style="background:var(--bg);padding:1rem 1.25rem;border-radius:8px;border-left:3px solid var(--accent);margin-bottom:1rem;text-align:left;">
+      <div style="font-family:Georgia,serif;line-height:1.85;">${result.join(' ')}</div>
+    </div>
+    <div style="text-align:center;color:var(--ink);">${verdictText}</div>
+    <div style="text-align:center;margin-top:1rem;">
+      <button onclick="renderReview()">Next verse</button>
+    </div>
+  `;
+};
+
+window.reviewResult = (verdict) => {
+  const v = pickVerseForReview();
+  v.reviews = (v.reviews || 0) + 1;
+  v.lastReview = new Date().toISOString();
+  // Update visual level (hide percentage)
+  if (verdict === 'hard') {
+    if (v.level > 0 && v.reviews > 3) v.level = Math.max(0, v.level - 1);
+  } else if (verdict === 'ok') {
+    v.level = Math.min(4, v.level + 1);
+  } else if (verdict === 'easy') {
+    v.level = Math.min(4, v.level + 2);
+  }
+  // Update SM-2 schedule
+  // hard -> q=2, ok -> q=4, easy -> q=5
+  const q = verdict === 'easy' ? 5 : verdict === 'ok' ? 4 : 2;
+  if (!v.ef) v.ef = 2.5;
+  if (v.n == null) v.n = 0;
+  if (v.intervalDays == null) v.intervalDays = 0;
+  sm2Schedule(v, q);
+  save();
+  renderReview();
+};
+
+function renderAdd() {
+  // Populate preset list
+  const el = document.getElementById('preset-list');
+  const existingRefs = new Set(state.verses.map(v => v.ref));
+  el.innerHTML = PRESETS.map((p, i) => `
+    <div class="verse-card">
+      <div class="ref">${escapeHtml(p.ref)}</div>
+      <div class="text">${escapeHtml(p.text)}</div>
+      <div class="actions">
+        ${existingRefs.has(p.ref)
+          ? '<span style="color:var(--done);font-size:0.78rem;letter-spacing:0.1em;">✓ IN VAULT</span>'
+          : `<button class="ghost" onclick="addPreset(${i})">Add</button>`}
+      </div>
+    </div>
+  `).join('');
+}
+
+window.addPreset = (i) => {
+  const p = PRESETS[i];
+  addVerse(p.ref, p.text, p.tag);
+  renderAll();
+};
+
+function renderLibrary() {
+  const el = document.getElementById('library-list');
+  const q = (document.getElementById('library-search')?.value || '').toLowerCase().trim();
+  let verses = state.verses;
+  if (q) {
+    verses = verses.filter(v =>
+      v.ref.toLowerCase().includes(q) ||
+      v.text.toLowerCase().includes(q) ||
+      (v.tag || '').toLowerCase().includes(q)
+    );
+  }
+  if (!verses.length) {
+    el.innerHTML = q ? '<div class="empty">No matches.</div>' : '<div class="empty">Empty vault.</div>';
+    return;
+  }
+  el.innerHTML = verses.map(v => `
+    <div class="verse-card">
+      <div class="ref">${escapeHtml(v.ref)}</div>
+      <div class="text">${escapeHtml(v.text)}</div>
+      <div class="meta">
+        level ${v.level + 1}/5 · ${v.reviews || 0} reviews
+        ${v.tag ? ' · ' + escapeHtml(v.tag) : ''}
+        ${v.lastReview ? ' · last: ' + new Date(v.lastReview).toLocaleDateString() : ''}
+      </div>
+      <div class="actions">
+        <button class="ghost" onclick="resetLevel('${v.id}')">Reset to L1</button>
+        <button class="ghost" onclick="deleteVerse('${v.id}')">Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.resetLevel = (id) => {
+  const v = state.verses.find(x => x.id === id);
+  if (!v) return;
+  if (!confirm('Reset this verse to level 1 (full visible)?')) return;
+  v.level = 0;
+  save();
+  renderLibrary();
+};
+
+window.deleteVerse = (id) => {
+  if (!confirm('Delete this verse from your vault?')) return;
+  state.verses = state.verses.filter(v => v.id !== id);
+  save();
+  renderAll();
+};
+
+function renderStats() {
+  const total = state.verses.length;
+  const mastered = state.verses.filter(v => v.level >= 4).length;
+  const totalReviews = state.verses.reduce((s, v) => s + (v.reviews || 0), 0);
+  const due = dueCount();
+  const avgInterval = state.verses.length ? Math.round(state.verses.reduce((s, v) => s + (v.intervalDays || 0), 0) / state.verses.length) : 0;
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat"><div class="n">${total}</div><div class="l">in vault</div></div>
+    <div class="stat"><div class="n">${mastered}</div><div class="l">cold-recall</div></div>
+    <div class="stat"><div class="n">${totalReviews}</div><div class="l">total reviews</div></div>
+    <div class="stat"><div class="n">${due}</div><div class="l">due today</div></div>
+    <div class="stat"><div class="n">${avgInterval}d</div><div class="l">avg interval</div></div>
+    <div class="stat"><div class="n">${state.verses.filter(v => (v.intervalDays || 0) >= 30).length}</div><div class="l">monthly+</div></div>
+  `;
+  // By tag
+  const byTag = {};
+  state.verses.forEach(v => {
+    const t = v.tag || '(untagged)';
+    byTag[t] = byTag[t] || { count: 0, mastered: 0 };
+    byTag[t].count++;
+    if (v.level >= 4) byTag[t].mastered++;
+  });
+  const tags = Object.entries(byTag).sort((a, b) => b[1].count - a[1].count);
+  document.getElementById('stats-tags').innerHTML = tags.length ? tags.map(([t, s]) => `
+    <div class="verse-card" style="padding: 0.5rem 0;">
+      <div style="display:flex;justify-content:space-between;">
+        <span>${escapeHtml(t)}</span>
+        <span class="meta">${s.mastered} / ${s.count} mastered</span>
+      </div>
+    </div>
+  `).join('') : '<div class="empty">No tags yet.</div>';
+}
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + name).style.display = '';
+  document.querySelector(`.tab[data-view="${name}"]`).classList.add('active');
+  // Re-render the active view to pick up state changes
+  if (name === 'review') renderReview();
+  if (name === 'add') renderAdd();
+  if (name === 'library') renderLibrary();
+  if (name === 'stats') renderStats();
+}
+
+function exportJSON() {
+  const data = JSON.stringify(state, null, 2);
+  const blob = new Blob([data], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'verse-vault-' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+}
+
+function importJSON(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!Array.isArray(data.verses)) throw new Error('not a valid vault');
+      if (!confirm('Merge ' + data.verses.length + ' verses into your vault?')) return;
+      const existing = new Set(state.verses.map(v => v.ref));
+      let added = 0;
+      data.verses.forEach(v => {
+        if (!existing.has(v.ref)) { state.verses.push({ ...v, id: v.id || uid() }); added++; }
+      });
+      save();
+      renderAll();
+      alert('Added ' + added + ' verses.');
+    } catch (err) { alert('Bad JSON: ' + err.message); }
+  };
+  reader.readAsText(file);
+}
+
+function resetAll() {
+  if (!confirm('Erase your entire vault?')) return;
+  if (!confirm('Really? Cannot be undone.')) return;
+  localStorage.removeItem(KEY);
+  state = { verses: [] };
+  renderAll();
+}
+
+function renderAll() {
+  renderReview();
+  renderAdd();
+  renderLibrary();
+  renderStats();
+}
+
+// Keyboard shortcuts during review: H = hard, O = okay, E = easy, T = type mode
+document.addEventListener('keydown', (e) => {
+  // Only on review view; only when not typing in an input/textarea
+  const inView = document.getElementById('view-review').style.display !== 'none';
+  if (!inView) return;
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  const key = e.key.toLowerCase();
+  if (key === 'h') { reviewResult('hard'); e.preventDefault(); }
+  else if (key === 'o') { reviewResult('ok'); e.preventDefault(); }
+  else if (key === 'e') { reviewResult('easy'); e.preventDefault(); }
+  else if (key === 't') { enterTypeMode(); e.preventDefault(); }
+});
+
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
+document.getElementById('add-btn').addEventListener('click', () => {
+  const ref = document.getElementById('add-ref').value;
+  const text = document.getElementById('add-text').value;
+  const tag = document.getElementById('add-tag').value;
+  if (!ref.trim() || !text.trim()) { alert('Reference and text required.'); return; }
+  addVerse(ref, text, tag);
+  document.getElementById('add-ref').value = '';
+  document.getElementById('add-text').value = '';
+  document.getElementById('add-tag').value = '';
+  renderAll();
+});
+document.getElementById('library-search').addEventListener('input', renderLibrary);
+document.getElementById('export-btn').addEventListener('click', exportJSON);
+document.getElementById('import-btn').addEventListener('click', () => document.getElementById('import-file').click());
+document.getElementById('import-file').addEventListener('change', importJSON);
+document.getElementById('reset-btn').addEventListener('click', resetAll);
+
+renderAll();
+</script>
+
+</body>
+</html>

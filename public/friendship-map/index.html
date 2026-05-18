@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Friendship Map — quiet personal CRM</title>
+<meta name="description" content="A tiny CRM for the 20-30 people you actually care about. Track last contact, surface who's gone too long without hearing from you. Tier by closeness. No notifications, no judgment.">
+<meta property="og:title" content="Friendship Map — quiet personal CRM">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --bg: #f5f1e9;
+    --panel: #fffcf4;
+    --ink: #1d1812;
+    --ink-soft: #6b5a44;
+    --ink-faint: #a89880;
+    --accent: #6a4a8a;
+    --accent-light: #8e74a8;
+    --warn: #b85c2e;
+    --done: #4a7c3d;
+    --inner: #2e5a7e;
+    --close: #a8488e;
+    --regular: #5a4022;
+    --periphery: #8e7e64;
+    --border: #ddd3c0;
+    --serif: Georgia, "Times New Roman", serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    min-height: 100vh;
+    padding: 1rem;
+  }
+  .container { max-width: 720px; margin: 0 auto; }
+  header { text-align: center; padding: 2rem 0; }
+  header h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 6vw, 2.6rem);
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+    letter-spacing: -0.01em;
+  }
+  header p {
+    color: var(--ink-soft);
+    font-style: italic;
+    font-size: 0.95rem;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .tab {
+    padding: 0.55rem 1.1rem;
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .tab.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+  .tab:hover:not(.active) { border-color: var(--accent); color: var(--ink); }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(29,24,18,0.06);
+  }
+  .panel h2 {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+  .panel p.help { color: var(--ink-soft); font-size: 0.88rem; margin-bottom: 1rem; }
+
+  label {
+    display: block;
+    color: var(--accent);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin: 1rem 0 0.4rem;
+    font-weight: 600;
+  }
+  label:first-child { margin-top: 0; }
+
+  input[type="text"], textarea, select {
+    width: 100%;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 6px;
+    padding: 0.7rem 0.95rem;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 0.95rem;
+  }
+  textarea { min-height: 60px; resize: vertical; }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
+
+  button {
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    padding: 0.65rem 1.2rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  button:hover { background: var(--accent); }
+  button.ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+  }
+  button.ghost:hover { background: var(--bg); color: var(--ink); border-color: var(--accent); }
+
+  .row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
+
+  .tier-row {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+    margin-top: 0.4rem;
+  }
+  .tier-row button {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+    padding: 0.35rem 0.7rem;
+    font-size: 0.78rem;
+    font-weight: 400;
+  }
+  .tier-row button.selected[data-t="inner"]    { background: var(--inner);    color: #fff; border-color: var(--inner); }
+  .tier-row button.selected[data-t="close"]    { background: var(--close);    color: #fff; border-color: var(--close); }
+  .tier-row button.selected[data-t="regular"]  { background: var(--regular);  color: #fff; border-color: var(--regular); }
+  .tier-row button.selected[data-t="periphery"]{ background: var(--periphery);color: #fff; border-color: var(--periphery); }
+
+  .person {
+    display: flex;
+    gap: 0.85rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+  .person:last-child { border-bottom: none; }
+  .person .tier-dot {
+    flex-shrink: 0;
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    margin-top: 0.55rem;
+  }
+  .tier-dot.inner     { background: var(--inner); }
+  .tier-dot.close     { background: var(--close); }
+  .tier-dot.regular   { background: var(--regular); }
+  .tier-dot.periphery { background: var(--periphery); }
+  .person .body { flex: 1; min-width: 0; }
+  .person .name { font-weight: 600; color: var(--ink); }
+  .person .meta { color: var(--ink-faint); font-size: 0.78rem; margin-top: 0.15rem; }
+  .person .notes {
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    margin-top: 0.4rem;
+    font-style: italic;
+  }
+  .person .last {
+    color: var(--ink-soft);
+    font-size: 0.82rem;
+    margin-top: 0.3rem;
+  }
+  .person .last.overdue { color: var(--warn); font-weight: 600; }
+  .person .actions {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+  }
+  .person .actions button { padding: 0.3rem 0.65rem; font-size: 0.78rem; }
+
+  .legend {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 1rem;
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+  }
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .legend .dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+  }
+
+  .empty {
+    text-align: center;
+    color: var(--ink-faint);
+    padding: 1.5rem 0;
+    font-style: italic;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Friendship Map</h1>
+  <p>quiet personal CRM</p>
+</header>
+
+<div class="tabs">
+  <button class="tab active" data-view="surface">Surface</button>
+  <button class="tab" data-view="add">Add person</button>
+  <button class="tab" data-view="all">All people</button>
+  <button class="tab" data-view="manage">Manage</button>
+</div>
+
+<div id="view-surface" class="view">
+  <div class="panel">
+    <h2>Who you should reach out to</h2>
+    <p class="help">Sorted by overdue-ness. Tier cadences: <strong style="color:var(--inner);">inner ring</strong> 7d &middot; <strong style="color:var(--close);">close</strong> 30d &middot; <strong style="color:var(--regular);">regular</strong> 90d &middot; <strong style="color:var(--periphery);">periphery</strong> 180d.</p>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--inner);"></span> inner</span>
+      <span><span class="dot" style="background:var(--close);"></span> close</span>
+      <span><span class="dot" style="background:var(--regular);"></span> regular</span>
+      <span><span class="dot" style="background:var(--periphery);"></span> periphery</span>
+    </div>
+    <div id="surface-list"></div>
+  </div>
+</div>
+
+<div id="view-add" class="view" style="display:none;">
+  <div class="panel">
+    <h2>Add a person</h2>
+    <label>Name</label>
+    <input type="text" id="a-name" placeholder="First name + last initial works: Wes B / Pastor Matt / Clint R">
+
+    <label>How — phone, signal, text, meet in person</label>
+    <input type="text" id="a-how" placeholder="text · call · coffee at Three Stones · zoom">
+
+    <label>Tier</label>
+    <div class="tier-row" id="tier-row">
+      <button data-t="inner">Inner ring — family, best friends</button>
+      <button data-t="close">Close — regular orbit</button>
+      <button data-t="regular">Regular — keep in touch</button>
+      <button data-t="periphery">Periphery — annual check-in</button>
+    </div>
+
+    <label>Last contact (when did you last talk?)</label>
+    <input type="date" id="a-last">
+
+    <label>Context / notes</label>
+    <textarea id="a-notes" placeholder="What's going on with them. Last topic. Where they live. Birthday. Anything you want to remember."></textarea>
+
+    <label>Tag (optional)</label>
+    <input type="text" id="a-tag" placeholder="e.g., family, college, work, faith, cobb-county">
+
+    <button id="add-btn" style="margin-top:1.25rem;">Add to map</button>
+  </div>
+</div>
+
+<div id="view-all" class="view" style="display:none;">
+  <div class="panel">
+    <h2>All people</h2>
+    <input type="text" id="all-search" placeholder="Search name, tier, notes, tag" style="margin-bottom:1rem;">
+    <div id="all-list"></div>
+  </div>
+</div>
+
+<div id="view-manage" class="view" style="display:none;">
+  <div class="panel">
+    <h2>Manage</h2>
+    <div class="row">
+      <button class="ghost" id="export-btn">Export JSON</button>
+      <button class="ghost" id="import-btn">Import JSON</button>
+      <button class="ghost" id="reset-btn" style="color:#b04a4a;border-color:#d8b6b6;">Reset all</button>
+      <input type="file" id="import-file" accept=".json" style="display:none;">
+    </div>
+    <p class="help" style="margin-top:1rem;">Everything stays on your device. Nothing's tracked, nothing's shared. Friendship is too personal for the cloud.</p>
+  </div>
+</div>
+
+<footer>
+  <p>No notifications. No nudges. Just a place that remembers.<br>
+  <a href="https://github.com/thebigjah/friendship-map">source</a></p>
+</footer>
+
+</div>
+
+<script>
+'use strict';
+
+const KEY = 'friendshipmap.v1';
+let people = load();
+let selectedTier = null;
+
+const TIER_CADENCE = {  // days
+  inner: 7,
+  close: 30,
+  regular: 90,
+  periphery: 180,
+};
+const TIER_LABEL = {
+  inner: 'inner ring',
+  close: 'close',
+  regular: 'regular',
+  periphery: 'periphery',
+};
+
+function load() {
+  try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; }
+}
+function save() { localStorage.setItem(KEY, JSON.stringify(people)); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function escapeHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function fmtDate(d) {
+  const dt = new Date(d + 'T00:00:00');
+  if (isNaN(dt)) return d;
+  return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+function daysSince(dateStr) {
+  if (!dateStr) return 99999;
+  const then = new Date(dateStr + 'T00:00:00').getTime();
+  const now = new Date(todayKey() + 'T00:00:00').getTime();
+  return Math.max(0, Math.floor((now - then) / (1000 * 60 * 60 * 24)));
+}
+
+document.getElementById('tier-row').addEventListener('click', (e) => {
+  if (e.target.tagName !== 'BUTTON') return;
+  document.querySelectorAll('#tier-row button').forEach(b => b.classList.remove('selected'));
+  e.target.classList.add('selected');
+  selectedTier = e.target.dataset.t;
+});
+
+function addPerson() {
+  const name = document.getElementById('a-name').value.trim();
+  if (!name) { alert('Need a name.'); return; }
+  if (!selectedTier) { alert('Pick a tier.'); return; }
+  const p = {
+    id: uid(),
+    name,
+    how: document.getElementById('a-how').value.trim(),
+    tier: selectedTier,
+    lastContact: document.getElementById('a-last').value || todayKey(),
+    notes: document.getElementById('a-notes').value.trim(),
+    tag: document.getElementById('a-tag').value.trim(),
+    addedAt: new Date().toISOString(),
+  };
+  people.push(p);
+  save();
+  document.getElementById('a-name').value = '';
+  document.getElementById('a-how').value = '';
+  document.getElementById('a-last').value = '';
+  document.getElementById('a-notes').value = '';
+  document.getElementById('a-tag').value = '';
+  selectedTier = null;
+  document.querySelectorAll('#tier-row button').forEach(b => b.classList.remove('selected'));
+  renderAll();
+  showView('surface');
+}
+
+function renderSurface() {
+  // Order: most overdue first. overdue = daysSince - cadence
+  const enriched = people.map(p => {
+    const days = daysSince(p.lastContact);
+    const cad = TIER_CADENCE[p.tier] || 90;
+    return { ...p, days, overdue: days - cad };
+  }).sort((a, b) => b.overdue - a.overdue);
+
+  const el = document.getElementById('surface-list');
+  if (!enriched.length) {
+    el.innerHTML = '<div class="empty">No one in the map yet. Add the people you actually want to keep up with.</div>';
+    return;
+  }
+  el.innerHTML = enriched.map(p => `
+    <div class="person">
+      <div class="tier-dot ${p.tier}"></div>
+      <div class="body">
+        <div class="name">${escapeHtml(p.name)}</div>
+        <div class="meta">${TIER_LABEL[p.tier]} · cadence ${TIER_CADENCE[p.tier]}d${p.how ? ' · ' + escapeHtml(p.how) : ''}${p.tag ? ' · ' + escapeHtml(p.tag) : ''}</div>
+        <div class="last ${p.overdue > 0 ? 'overdue' : ''}">last contact ${p.days}d ago${p.overdue > 0 ? ' · ' + p.overdue + 'd overdue' : ''}</div>
+        ${p.notes ? `<div class="notes">${escapeHtml(p.notes)}</div>` : ''}
+        <div class="actions">
+          <button onclick="markContacted('${p.id}')">Just reached out</button>
+          <button class="ghost" onclick="editPerson('${p.id}')">Edit</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.markContacted = (id) => {
+  const p = people.find(x => x.id === id);
+  if (!p) return;
+  const note = prompt('Any quick note about this contact? (blank to skip)', '');
+  if (note === null) return;
+  p.lastContact = todayKey();
+  if (note.trim()) {
+    p.notes = (p.notes ? p.notes + '\n\n' : '') + '[' + todayKey() + '] ' + note.trim();
+  }
+  save();
+  renderSurface(); renderAll();
+};
+
+window.editPerson = (id) => {
+  const p = people.find(x => x.id === id);
+  if (!p) return;
+  const newName = prompt('Name:', p.name);
+  if (newName === null) return;
+  const newTier = prompt('Tier (inner / close / regular / periphery):', p.tier);
+  if (newTier === null) return;
+  const newNotes = prompt('Notes:', p.notes || '');
+  if (newNotes === null) return;
+  p.name = newName.trim() || p.name;
+  if (['inner','close','regular','periphery'].includes(newTier.trim())) p.tier = newTier.trim();
+  p.notes = newNotes.trim();
+  save();
+  renderSurface(); renderAll();
+};
+
+window.deletePerson = (id) => {
+  if (!confirm('Remove this person from the map?')) return;
+  people = people.filter(p => p.id !== id);
+  save();
+  renderSurface(); renderAll();
+};
+
+function renderAll() {
+  const q = (document.getElementById('all-search')?.value || '').toLowerCase().trim();
+  const order = { inner: 0, close: 1, regular: 2, periphery: 3 };
+  let list = [...people].sort((a, b) => {
+    const ot = (order[a.tier] || 9) - (order[b.tier] || 9);
+    if (ot) return ot;
+    return a.name.localeCompare(b.name);
+  });
+  if (q) {
+    list = list.filter(p =>
+      (p.name || '').toLowerCase().includes(q) ||
+      (p.tier || '').toLowerCase().includes(q) ||
+      (p.notes || '').toLowerCase().includes(q) ||
+      (p.tag || '').toLowerCase().includes(q)
+    );
+  }
+  const el = document.getElementById('all-list');
+  if (!list.length) { el.innerHTML = q ? '<div class="empty">No matches.</div>' : '<div class="empty">No people yet.</div>'; return; }
+  el.innerHTML = list.map(p => `
+    <div class="person">
+      <div class="tier-dot ${p.tier}"></div>
+      <div class="body">
+        <div class="name">${escapeHtml(p.name)}</div>
+        <div class="meta">${TIER_LABEL[p.tier]}${p.how ? ' · ' + escapeHtml(p.how) : ''}${p.tag ? ' · ' + escapeHtml(p.tag) : ''}</div>
+        <div class="last">last ${fmtDate(p.lastContact)} · ${daysSince(p.lastContact)}d</div>
+        ${p.notes ? `<div class="notes">${escapeHtml(p.notes)}</div>` : ''}
+        <div class="actions">
+          <button onclick="markContacted('${p.id}')">Just reached out</button>
+          <button class="ghost" onclick="editPerson('${p.id}')">Edit</button>
+          <button class="ghost" onclick="deletePerson('${p.id}')">Remove</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(people, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'friendship-map-' + todayKey() + '.json';
+  a.click();
+}
+
+function importJSON(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!Array.isArray(data)) throw new Error('not array');
+      if (!confirm('Merge ' + data.length + ' people?')) return;
+      const existing = new Set(people.map(p => p.id));
+      let added = 0;
+      data.forEach(p => { if (!existing.has(p.id)) { people.push(p); added++; } });
+      save();
+      renderSurface(); renderAll();
+      alert('Added ' + added + '.');
+    } catch (err) { alert('Bad JSON: ' + err.message); }
+  };
+  r.readAsText(file);
+}
+
+function resetAll() {
+  if (!confirm('Erase all people from the map?')) return;
+  if (!confirm('Really?')) return;
+  localStorage.removeItem(KEY); people = [];
+  renderSurface(); renderAll();
+}
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + name).style.display = '';
+  document.querySelector(`.tab[data-view="${name}"]`).classList.add('active');
+  if (name === 'surface') renderSurface();
+  if (name === 'all') renderAll();
+}
+
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
+document.getElementById('add-btn').addEventListener('click', addPerson);
+document.getElementById('all-search').addEventListener('input', renderAll);
+document.getElementById('export-btn').addEventListener('click', exportJSON);
+document.getElementById('import-btn').addEventListener('click', () => document.getElementById('import-file').click());
+document.getElementById('import-file').addEventListener('change', importJSON);
+document.getElementById('reset-btn').addEventListener('click', resetAll);
+
+renderSurface();
+renderAll();
+</script>
+
+</body>
+</html>

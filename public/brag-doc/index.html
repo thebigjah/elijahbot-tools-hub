@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brag Doc — what you've done, kept honest</title>
+<meta name="description" content="Log accomplishments, kind things people said, projects shipped, awards. The doc you reach for at résumé time, on hard days, or before a scholarship application.">
+<meta property="og:title" content="Brag Doc — what you've done, kept honest">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --bg: #f1ede4;
+    --panel: #fdfaf0;
+    --ink: #1d1812;
+    --ink-soft: #6b5a44;
+    --ink-faint: #a89880;
+    --accent: #7a5226;
+    --accent-light: #a07a4d;
+    --gold: #b89540;
+    --warn: #b85c2e;
+    --done: #4a7c3d;
+    --ship: #3b6da6;
+    --kind: #a8488e;
+    --award: #b89540;
+    --skill: #4a7c3d;
+    --metric: #6a4a8a;
+    --border: #d8cdb2;
+    --serif: Georgia, "Times New Roman", serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 1rem;
+  }
+  .container { max-width: 720px; margin: 0 auto; }
+  header { text-align: center; padding: 2rem 0; }
+  header h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 6vw, 2.6rem);
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+  }
+  header p {
+    color: var(--ink-soft);
+    font-style: italic;
+    font-size: 0.95rem;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .tab {
+    padding: 0.55rem 1.1rem;
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .tab.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+  .tab:hover:not(.active) { border-color: var(--accent); color: var(--ink); }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(29,24,18,0.06);
+  }
+  .panel h2 {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    color: var(--accent);
+    margin-bottom: 0.85rem;
+  }
+  .panel p.help { color: var(--ink-soft); font-size: 0.88rem; margin-bottom: 1rem; }
+
+  label {
+    display: block;
+    color: var(--accent);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin: 1rem 0 0.4rem;
+    font-weight: 600;
+  }
+  label:first-child { margin-top: 0; }
+
+  input[type="text"], input[type="date"], input[type="url"], textarea, select {
+    width: 100%;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 6px;
+    padding: 0.7rem 0.95rem;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  textarea { min-height: 70px; resize: vertical; }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
+
+  .type-row {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-top: 0.4rem;
+  }
+  .type-row button {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+    padding: 0.4rem 0.85rem;
+    font-size: 0.85rem;
+    font-weight: 400;
+  }
+  .type-row button.selected[data-t="ship"]   { background: var(--ship);   color: #fff; border-color: var(--ship); }
+  .type-row button.selected[data-t="kind"]   { background: var(--kind);   color: #fff; border-color: var(--kind); }
+  .type-row button.selected[data-t="award"]  { background: var(--award);  color: #fff; border-color: var(--award); }
+  .type-row button.selected[data-t="skill"]  { background: var(--skill);  color: #fff; border-color: var(--skill); }
+  .type-row button.selected[data-t="metric"] { background: var(--metric); color: #fff; border-color: var(--metric); }
+
+  button {
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    padding: 0.65rem 1.2rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  button:hover { background: var(--accent); }
+  button.ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+  }
+  button.ghost:hover { background: var(--bg); color: var(--ink); border-color: var(--accent); }
+
+  .row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
+
+  .entry {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 0.85rem;
+    align-items: flex-start;
+  }
+  .entry:last-child { border-bottom: none; }
+  .entry .type-dot {
+    flex-shrink: 0;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    margin-top: 0.5rem;
+  }
+  .type-dot.ship { background: var(--ship); }
+  .type-dot.kind { background: var(--kind); }
+  .type-dot.award { background: var(--award); }
+  .type-dot.skill { background: var(--skill); }
+  .type-dot.metric { background: var(--metric); }
+  .entry .body { flex: 1; min-width: 0; }
+  .entry .meta {
+    color: var(--ink-faint);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.3rem;
+  }
+  .entry .title {
+    color: var(--ink);
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+  }
+  .entry .detail {
+    color: var(--ink);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+  .entry .quoted {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--ink-soft);
+    border-left: 3px solid var(--kind);
+    padding-left: 0.85rem;
+    margin: 0.4rem 0;
+  }
+  .entry .source {
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+  }
+  .entry .link {
+    margin-top: 0.4rem;
+    font-size: 0.85rem;
+  }
+  .entry .link a { color: var(--accent); text-decoration: none; }
+  .entry .link a:hover { text-decoration: underline; }
+  .entry .actions {
+    display: flex;
+    gap: 0.35rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .entry .actions button { padding: 0.3rem 0.7rem; font-size: 0.78rem; }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+  }
+  @media (max-width: 540px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  .stat {
+    text-align: center;
+    padding: 0.85rem 0.4rem;
+    background: var(--bg);
+    border-radius: 8px;
+  }
+  .stat .n {
+    font-family: var(--serif);
+    font-size: 1.6rem;
+    color: var(--accent);
+    line-height: 1.1;
+  }
+  .stat .l {
+    font-size: 0.7rem;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0.25rem;
+  }
+
+  .filter-row {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+  .filter-row button {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+    padding: 0.35rem 0.7rem;
+    font-size: 0.78rem;
+    font-weight: 400;
+  }
+  .filter-row button.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+
+  .empty {
+    text-align: center;
+    color: var(--ink-faint);
+    padding: 1.5rem 0;
+    font-style: italic;
+  }
+
+  .quote {
+    background: var(--bg);
+    border-left: 3px solid var(--accent);
+    padding: 0.85rem 1.25rem;
+    border-radius: 4px;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    margin: 1rem 0;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Brag Doc</h1>
+  <p>what you've done, kept honest</p>
+</header>
+
+<div class="tabs">
+  <button class="tab active" data-view="add">Add</button>
+  <button class="tab" data-view="all">All</button>
+  <button class="tab" data-view="darkday">Dark day</button>
+  <button class="tab" data-view="export">Export for résumé</button>
+  <button class="tab" data-view="manage">Manage</button>
+</div>
+
+<div id="view-add" class="view">
+  <div class="panel">
+    <h2>Log something</h2>
+    <div class="quote">"Future you, looking back, will not remember this clearly. Capture it now while you do."</div>
+
+    <label>Type</label>
+    <div class="type-row" id="type-row">
+      <button data-t="ship">Shipped — a project, work product</button>
+      <button data-t="kind">Kind word — someone said something</button>
+      <button data-t="award">Award / honor / acceptance</button>
+      <button data-t="skill">Skill milestone — new ability or breakthrough</button>
+      <button data-t="metric">Metric — measurable outcome</button>
+    </div>
+
+    <label>Date</label>
+    <input type="date" id="e-date">
+
+    <label>Short title</label>
+    <input type="text" id="e-title" placeholder="e.g., Shipped Prayer Walk app / Reza intro accepted / 34 college acceptances">
+
+    <label>What happened — detail</label>
+    <textarea id="e-detail" placeholder="A few specifics. Numbers if you have them. What you did, not just what happened."></textarea>
+
+    <label>Said by (if a kind word)</label>
+    <input type="text" id="e-said-by" placeholder="e.g., Clint Reeves, Pastor Matt, anonymous reviewer">
+
+    <label>Link (optional)</label>
+    <input type="url" id="e-link" placeholder="https://...">
+
+    <label>Tag</label>
+    <input type="text" id="e-tag" placeholder="e.g., college, business, faith, family, school">
+
+    <button id="add-btn" style="margin-top:1rem;">Log it</button>
+  </div>
+</div>
+
+<div id="view-all" class="view" style="display:none;">
+  <div class="panel">
+    <h2>All entries</h2>
+    <div class="filter-row" id="filter-row">
+      <button class="active" data-f="">All</button>
+      <button data-f="ship">Shipped</button>
+      <button data-f="kind">Kind words</button>
+      <button data-f="award">Awards</button>
+      <button data-f="skill">Skills</button>
+      <button data-f="metric">Metrics</button>
+    </div>
+    <input type="text" id="all-search" placeholder="Search title, detail, source, tag" style="margin-bottom:1rem;">
+    <div class="stats" id="stats-grid" style="margin-bottom:1rem;"></div>
+    <div id="all-list"></div>
+  </div>
+</div>
+
+<div id="view-darkday" class="view" style="display:none;">
+  <div class="panel">
+    <h2>For a dark day</h2>
+    <p class="help">Scroll. Read slowly. These are facts, not feelings. You earned each one.</p>
+    <div id="darkday-list"></div>
+    <div style="text-align:center;margin-top:1rem;">
+      <button class="ghost" onclick="renderDarkday()">Shuffle</button>
+    </div>
+  </div>
+</div>
+
+<div id="view-export" class="view" style="display:none;">
+  <div class="panel">
+    <h2>Pull out for an application or résumé</h2>
+    <p class="help">Generates a clean copy-paste section grouped by type. Filters out tags you exclude.</p>
+    <label>Tags to include (leave blank for all)</label>
+    <input type="text" id="ex-tags" placeholder="e.g., college, business — space or comma separated">
+    <label>Date range (leave blank for all)</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+      <input type="date" id="ex-from">
+      <input type="date" id="ex-to">
+    </div>
+    <div class="row">
+      <button onclick="generateExport()">Generate</button>
+      <button class="ghost" onclick="copyExport()">Copy to clipboard</button>
+      <button class="ghost" onclick="downloadExport()">Download as Markdown</button>
+    </div>
+    <pre id="export-out" style="background:var(--bg);padding:1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:0.85rem;line-height:1.6;white-space:pre-wrap;margin-top:1rem;color:var(--ink);max-height:400px;overflow-y:auto;display:none;"></pre>
+  </div>
+</div>
+
+<div id="view-manage" class="view" style="display:none;">
+  <div class="panel">
+    <h2>Manage</h2>
+    <div class="row">
+      <button class="ghost" id="export-btn">Export JSON</button>
+      <button class="ghost" id="import-btn">Import JSON</button>
+      <button class="ghost" id="reset-btn" style="color:#b04a4a;border-color:#d8b6b6;">Reset all</button>
+      <input type="file" id="import-file" accept=".json" style="display:none;">
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>The doc you wish you'd been keeping. Start now.<br>
+  <a href="https://github.com/thebigjah/brag-doc">source</a></p>
+</footer>
+
+</div>
+
+<script>
+'use strict';
+
+const KEY = 'bragdoc.v1';
+let entries = load();
+let selectedType = null;
+let activeFilter = '';
+
+function load() { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; } }
+function save() { localStorage.setItem(KEY, JSON.stringify(entries)); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function escapeHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function fmtDate(d) {
+  const dt = new Date(d + 'T00:00:00');
+  if (isNaN(dt)) return d;
+  return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+const TYPE_LABEL = {
+  ship: 'shipped', kind: 'kind word', award: 'award', skill: 'skill', metric: 'metric',
+};
+
+function initAdd() {
+  document.getElementById('e-date').value = todayKey();
+}
+
+document.getElementById('type-row').addEventListener('click', (e) => {
+  if (e.target.tagName !== 'BUTTON') return;
+  document.querySelectorAll('#type-row button').forEach(b => b.classList.remove('selected'));
+  e.target.classList.add('selected');
+  selectedType = e.target.dataset.t;
+});
+
+function addEntry() {
+  if (!selectedType) { alert('Pick a type.'); return; }
+  const title = document.getElementById('e-title').value.trim();
+  if (!title) { alert('Title required.'); return; }
+  entries.push({
+    id: uid(),
+    type: selectedType,
+    date: document.getElementById('e-date').value,
+    title,
+    detail: document.getElementById('e-detail').value.trim(),
+    saidBy: document.getElementById('e-said-by').value.trim(),
+    link: document.getElementById('e-link').value.trim(),
+    tag: document.getElementById('e-tag').value.trim(),
+    addedAt: new Date().toISOString(),
+  });
+  save();
+  ['e-title','e-detail','e-said-by','e-link','e-tag'].forEach(id => document.getElementById(id).value = '');
+  selectedType = null;
+  document.querySelectorAll('#type-row button').forEach(b => b.classList.remove('selected'));
+  alert('Logged.');
+  initAdd();
+}
+
+document.getElementById('filter-row').addEventListener('click', (e) => {
+  if (e.target.tagName !== 'BUTTON') return;
+  document.querySelectorAll('#filter-row button').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  activeFilter = e.target.dataset.f;
+  renderAll();
+});
+
+function renderEntryCard(e) {
+  return `
+    <div class="entry">
+      <div class="type-dot ${e.type}"></div>
+      <div class="body">
+        <div class="meta">${escapeHtml(fmtDate(e.date))} · ${TYPE_LABEL[e.type] || e.type}${e.tag ? ' · ' + escapeHtml(e.tag) : ''}</div>
+        <div class="title">${escapeHtml(e.title)}</div>
+        ${e.type === 'kind' && e.detail
+          ? `<div class="quoted">${escapeHtml(e.detail)}</div>${e.saidBy ? `<div class="source">— ${escapeHtml(e.saidBy)}</div>` : ''}`
+          : `${e.detail ? `<div class="detail">${escapeHtml(e.detail)}</div>` : ''}${e.saidBy ? `<div class="source">— ${escapeHtml(e.saidBy)}</div>` : ''}`}
+        ${e.link ? `<div class="link"><a href="${escapeHtml(e.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(e.link)}</a></div>` : ''}
+        <div class="actions">
+          <button class="ghost" onclick="deleteEntry('${e.id}')">Delete</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderAll() {
+  const q = (document.getElementById('all-search')?.value || '').toLowerCase().trim();
+  let list = [...entries].sort((a, b) => b.date.localeCompare(a.date));
+  if (activeFilter) list = list.filter(e => e.type === activeFilter);
+  if (q) {
+    list = list.filter(e =>
+      (e.title || '').toLowerCase().includes(q) ||
+      (e.detail || '').toLowerCase().includes(q) ||
+      (e.saidBy || '').toLowerCase().includes(q) ||
+      (e.tag || '').toLowerCase().includes(q)
+    );
+  }
+
+  // Stats from full unfiltered set
+  const stats = entries.reduce((acc, e) => {
+    acc[e.type] = (acc[e.type] || 0) + 1;
+    return acc;
+  }, {});
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat"><div class="n">${stats.ship || 0}</div><div class="l">shipped</div></div>
+    <div class="stat"><div class="n">${stats.kind || 0}</div><div class="l">kind words</div></div>
+    <div class="stat"><div class="n">${stats.award || 0}</div><div class="l">awards</div></div>
+    <div class="stat"><div class="n">${stats.skill || 0}</div><div class="l">skills</div></div>
+    <div class="stat"><div class="n">${stats.metric || 0}</div><div class="l">metrics</div></div>
+  `;
+
+  const el = document.getElementById('all-list');
+  if (!list.length) { el.innerHTML = q || activeFilter ? '<div class="empty">No matches.</div>' : '<div class="empty">No entries yet. Add one.</div>'; return; }
+  el.innerHTML = list.map(renderEntryCard).join('');
+}
+
+window.deleteEntry = (id) => {
+  if (!confirm('Delete this entry?')) return;
+  entries = entries.filter(e => e.id !== id);
+  save();
+  renderAll(); renderDarkday();
+};
+
+function renderDarkday() {
+  const el = document.getElementById('darkday-list');
+  if (!entries.length) { el.innerHTML = '<div class="empty">Nothing logged yet. Future-you needs you to start.</div>'; return; }
+  // Show all kind words + awards + biggest ships, shuffled
+  const select = entries.filter(e => ['kind','award','ship','skill','metric'].includes(e.type));
+  for (let i = select.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [select[i], select[j]] = [select[j], select[i]];
+  }
+  el.innerHTML = select.slice(0, 20).map(renderEntryCard).join('');
+}
+
+window.generateExport = () => {
+  const tagFilter = (document.getElementById('ex-tags').value || '').toLowerCase().split(/[\s,]+/).filter(Boolean);
+  const from = document.getElementById('ex-from').value;
+  const to = document.getElementById('ex-to').value;
+  let filtered = [...entries];
+  if (tagFilter.length) {
+    filtered = filtered.filter(e => tagFilter.some(t => (e.tag || '').toLowerCase().includes(t)));
+  }
+  if (from) filtered = filtered.filter(e => e.date >= from);
+  if (to) filtered = filtered.filter(e => e.date <= to);
+  filtered.sort((a, b) => b.date.localeCompare(a.date));
+
+  const groups = { ship: [], award: [], skill: [], metric: [], kind: [] };
+  filtered.forEach(e => { (groups[e.type] || []).push(e); });
+
+  let out = '# Brag doc export\n\n';
+  out += 'Generated ' + new Date().toISOString().split('T')[0] + (filtered.length < entries.length ? ` (filtered to ${filtered.length} of ${entries.length})` : '') + '\n\n';
+
+  const sectionLabels = {
+    ship: 'Shipped',
+    award: 'Awards & honors',
+    skill: 'Skill milestones',
+    metric: 'Metrics',
+    kind: 'Said about me',
+  };
+  Object.keys(groups).forEach(type => {
+    if (!groups[type].length) return;
+    out += `## ${sectionLabels[type]}\n\n`;
+    groups[type].forEach(e => {
+      out += `- **${fmtDate(e.date)}** — ${e.title}`;
+      if (e.detail) out += `\n  ${e.detail.split('\n').join('\n  ')}`;
+      if (e.saidBy) out += `\n  — ${e.saidBy}`;
+      if (e.link) out += `\n  ${e.link}`;
+      out += '\n';
+    });
+    out += '\n';
+  });
+
+  const pre = document.getElementById('export-out');
+  pre.textContent = out;
+  pre.style.display = 'block';
+};
+
+window.copyExport = () => {
+  const text = document.getElementById('export-out').textContent;
+  if (!text) { alert('Generate first.'); return; }
+  navigator.clipboard.writeText(text).then(() => alert('Copied.')).catch(() => prompt('Copy:', text));
+};
+
+window.downloadExport = () => {
+  const text = document.getElementById('export-out').textContent;
+  if (!text) { alert('Generate first.'); return; }
+  const blob = new Blob([text], { type:'text/markdown' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'brag-doc-' + todayKey() + '.md';
+  a.click();
+};
+
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(entries, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'brag-doc-' + todayKey() + '.json';
+  a.click();
+}
+function importJSON(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!Array.isArray(data)) throw new Error('not array');
+      if (!confirm('Merge ' + data.length + ' entries?')) return;
+      const existing = new Set(entries.map(e => e.id));
+      let added = 0;
+      data.forEach(e => { if (!existing.has(e.id)) { entries.push(e); added++; } });
+      save();
+      renderAll(); renderDarkday();
+      alert('Added ' + added + '.');
+    } catch (err) { alert('Bad JSON: ' + err.message); }
+  };
+  r.readAsText(file);
+}
+function resetAll() {
+  if (!confirm('Erase all brag doc entries?')) return;
+  if (!confirm('Really?')) return;
+  localStorage.removeItem(KEY); entries = [];
+  renderAll(); renderDarkday();
+}
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + name).style.display = '';
+  document.querySelector(`.tab[data-view="${name}"]`).classList.add('active');
+  if (name === 'add') initAdd();
+  if (name === 'all') renderAll();
+  if (name === 'darkday') renderDarkday();
+}
+
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
+document.getElementById('add-btn').addEventListener('click', addEntry);
+document.getElementById('all-search').addEventListener('input', renderAll);
+document.getElementById('export-btn').addEventListener('click', exportJSON);
+document.getElementById('import-btn').addEventListener('click', () => document.getElementById('import-file').click());
+document.getElementById('import-file').addEventListener('change', importJSON);
+document.getElementById('reset-btn').addEventListener('click', resetAll);
+
+initAdd();
+renderAll();
+renderDarkday();
+</script>
+
+</body>
+</html>
