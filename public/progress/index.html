@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Progress — Elijah Purcell</title>
+<meta name="description" content="Honest read on every project I've built. % complete by progress bar. Updated periodically.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22 fill=%22%23c8a96a%22 font-family=%22serif%22>P</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,400;9..144,500;9..144,700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<script src="/lock.js"></script>
+<style>
+:root {
+  --bg: #0d0b08;
+  --bg-2: #15110b;
+  --ink: #ece4d3;
+  --ink-dim: #98897a;
+  --ink-faint: #524a3e;
+  --gold: #c8a96a;
+  --gold-deep: #8a6a3a;
+  --rule: rgba(200, 169, 106, 0.15);
+  --good: #7ec48a;
+  --warn: #d9a05a;
+  --bad: #d57e6a;
+  --serif: 'Fraunces', Georgia, serif;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Inter', -apple-system, system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(200, 169, 106, 0.06), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(200, 169, 106, 0.03), transparent 70%);
+  color: var(--ink);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+.container { position: relative; z-index: 2; max-width: 1080px; margin: 0 auto; padding: 4rem 2rem 6rem; }
+
+header { margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--rule); }
+.eyebrow { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin: 0 0 1rem; }
+.eyebrow::before { content: ''; display: inline-block; width: 28px; height: 1px; background: var(--gold); vertical-align: middle; margin-right: 10px; }
+h1 {
+  font-family: var(--serif);
+  font-variation-settings: 'opsz' 144, 'wght' 500, 'SOFT' 50;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+  margin: 0 0 0.75rem;
+}
+h1 .accent { font-style: italic; font-variation-settings: 'opsz' 144, 'wght' 400, 'SOFT' 100; color: var(--gold); }
+.dek { font-family: var(--serif); font-style: italic; font-size: 1.1rem; color: var(--ink-dim); max-width: 50ch; margin: 0; }
+
+.meta-row {
+  display: flex;
+  gap: 1.5rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+.meta-row span strong { color: var(--gold); text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.65rem; font-weight: 500; margin-right: 6px; }
+
+/* Section */
+.section { margin: 4rem 0 2rem; }
+.section-head { display: grid; grid-template-columns: 5rem 1fr; gap: 2rem; align-items: baseline; margin-bottom: 1.5rem; }
+.section-numeral {
+  font-family: var(--serif);
+  font-variation-settings: 'opsz' 144, 'wght' 400;
+  font-size: 3rem;
+  color: var(--gold-deep);
+  font-style: italic;
+  text-align: right;
+  line-height: 1;
+}
+.section-title { font-family: var(--serif); font-variation-settings: 'opsz' 72, 'wght' 500; font-size: 1.5rem; letter-spacing: -0.01em; margin: 0 0 0.2rem; color: var(--ink); }
+.section-blurb { font-family: var(--sans); font-size: 0.85rem; color: var(--ink-dim); margin: 0; }
+
+/* Project row */
+.projects { display: flex; flex-direction: column; gap: 0; }
+.project { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(150px, 280px) minmax(60px, 80px); gap: 1.25rem; align-items: center; padding: 0.85rem 0; border-bottom: 1px solid var(--rule); }
+.project-info { min-width: 0; }
+.project-name { font-family: var(--serif); font-variation-settings: 'opsz' 36, 'wght' 500; font-size: 1.05rem; margin: 0 0 0.2rem; color: var(--ink); letter-spacing: -0.005em; }
+.project-name.live::after { content: '·'; color: var(--gold); margin: 0 0.4rem; }
+.project-name .live-tag { font-family: var(--mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--good); }
+.project-note { font-family: var(--sans); font-size: 0.78rem; color: var(--ink-dim); margin: 0; line-height: 1.4; }
+
+.bar-wrap { background: rgba(200, 169, 106, 0.08); height: 8px; border-radius: 4px; overflow: hidden; }
+.bar { height: 100%; background: var(--gold); border-radius: 4px; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+.bar.low { background: var(--bad); }
+.bar.mid { background: var(--warn); }
+.bar.high { background: var(--gold); }
+.bar.done { background: var(--good); }
+
+.pct { font-family: var(--mono); font-size: 0.85rem; color: var(--ink-dim); text-align: right; font-variant-numeric: tabular-nums; }
+.pct strong { color: var(--ink); font-weight: 500; }
+
+footer { margin-top: 5rem; padding-top: 2rem; border-top: 1px solid var(--rule); font-size: 0.82rem; color: var(--ink-faint); font-family: var(--sans); }
+footer a { color: var(--gold); text-decoration: none; }
+footer a:hover { color: var(--ink); }
+
+@media (max-width: 720px) {
+  .container { padding: 2.5rem 1rem 4rem; }
+  .section-head { grid-template-columns: 2.5rem 1fr; gap: 0.8rem; }
+  .section-numeral { font-size: 2rem; }
+  .project { grid-template-columns: 1fr; gap: 0.4rem; padding: 0.8rem 0; }
+  .pct { text-align: left; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <p class="eyebrow">An honest read</p>
+  <h1>Progress, <span class="accent">measured</span>.</h1>
+  <p class="dek">Where every project actually sits — not what the README claims, but what's true. Bars show "% to a state you'd call done given current scope," not LOC or commit count.</p>
+  <div class="meta-row" id="meta-row">
+    <span><strong>Updated</strong> <span id="updated">—</span></span>
+    <span><strong>Projects</strong> <span id="proj-count">—</span></span>
+    <span><strong>Avg %</strong> <span id="avg-pct">—</span></span>
+    <span><strong>≥90%</strong> <span id="high-count">—</span></span>
+  </div>
+</header>
+
+<main id="sections"><p style="color:#666;">Loading…</p></main>
+
+<footer>
+  <p>Source data in <code style="color:#c8a96a">/progress/data.json</code>. Regeneratable; updated when Elijah and ElijahBot do another progress check. The percentages reflect a candid judgment — a launched faceless YouTube channel before any uploads is not 100%, even if the code is "done."</p>
+  <p>Tools index: <a href="/">elijahbot-tools-hub.vercel.app</a></p>
+</footer>
+
+</div>
+
+<script>
+fetch('/progress/data.json')
+  .then(r => r.json())
+  .then(render)
+  .catch(e => {
+    document.getElementById('sections').innerHTML = '<p style="color:#d57e6a">Failed to load /progress/data.json — ' + e.message + '</p>';
+  });
+
+function render(data) {
+  document.getElementById('updated').textContent = data.updated_human || data.updated || '—';
+  const allProjects = data.sections.flatMap(s => s.projects);
+  document.getElementById('proj-count').textContent = allProjects.length;
+  const avg = allProjects.length ? Math.round(allProjects.reduce((a, p) => a + p.progress, 0) / allProjects.length) : 0;
+  document.getElementById('avg-pct').textContent = avg + '%';
+  document.getElementById('high-count').textContent = allProjects.filter(p => p.progress >= 90).length;
+
+  const sectionsEl = document.getElementById('sections');
+  sectionsEl.innerHTML = '';
+  data.sections.forEach((section, i) => {
+    const numeral = toRoman(i + 1);
+    const sec = document.createElement('section');
+    sec.className = 'section';
+    sec.innerHTML = `
+      <div class="section-head">
+        <div class="section-numeral">${numeral}</div>
+        <div>
+          <h2 class="section-title">${escapeHtml(section.title)}</h2>
+          ${section.blurb ? `<p class="section-blurb">${escapeHtml(section.blurb)}</p>` : ''}
+        </div>
+      </div>
+      <div class="projects">
+        ${section.projects.map(p => projectHtml(p)).join('')}
+      </div>
+    `;
+    sectionsEl.appendChild(sec);
+  });
+
+  // Animate bars in
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.bar').forEach((el, i) => {
+      const pct = el.dataset.pct;
+      setTimeout(() => el.style.width = pct + '%', 30 + i * 10);
+    });
+  });
+}
+
+function projectHtml(p) {
+  const pct = Math.max(0, Math.min(100, p.progress));
+  const cls = pct >= 95 ? 'done' : pct >= 70 ? 'high' : pct >= 40 ? 'mid' : 'low';
+  const liveTag = p.live ? `<span class="live-tag"> LIVE</span>` : '';
+  return `
+    <div class="project">
+      <div class="project-info">
+        <h3 class="project-name">${escapeHtml(p.name)}${liveTag}</h3>
+        ${p.note ? `<p class="project-note">${escapeHtml(p.note)}</p>` : ''}
+      </div>
+      <div class="bar-wrap"><div class="bar ${cls}" data-pct="${pct}" style="width: 0%"></div></div>
+      <div class="pct"><strong>${pct}</strong>%</div>
+    </div>
+  `;
+}
+
+function toRoman(n) {
+  const map = [['M',1000],['CM',900],['D',500],['CD',400],['C',100],['XC',90],['L',50],['XL',40],['X',10],['IX',9],['V',5],['IV',4],['I',1]];
+  let out = '';
+  for (const [r, v] of map) {
+    while (n >= v) { out += r; n -= v; }
+  }
+  return out;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+}
+</script>
+</body>
+</html>

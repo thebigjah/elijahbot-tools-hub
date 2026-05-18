@@ -1,0 +1,132 @@
+{
+  "updated": "2026-05-18T14:00:00Z",
+  "updated_human": "2026-05-18 — second workshop block",
+  "sections": [
+    {
+      "title": "Personal AI & accountability",
+      "blurb": "The systems that compound on themselves.",
+      "projects": [
+        { "name": "elijahbot-tools-hub", "progress": 100, "live": true, "note": "Live at https://elijahbot-tools-hub.vercel.app. PWA-installable. Editorial redesign, /go/ affiliate redirects, /progress/ tool added today." },
+        { "name": "Refresh (elijahbot-refresh)", "progress": 90, "live": true, "note": "Live in production. Editorial redesign shipped. v0.2 features (cal/tasks wiring, push notifications) pending." },
+        { "name": "elibot-overlay", "progress": 70, "note": "Lockout system works. Codeword leaked. Idle-timeout daemon not built." },
+        { "name": "persona-ai", "progress": 25, "note": "Original flagship. Stalled since late 2025. 'Where do you want to pick up?'" }
+      ]
+    },
+    {
+      "title": "Passive income engines",
+      "blurb": "Things that can earn while you sleep — if you finish the activation.",
+      "projects": [
+        { "name": "youtube-pipeline", "progress": 97, "note": "v0.6: hook grader, scheduler resilience, channel dashboard. 6 channels scaffolded. Code-complete. Gated only on YouTube OAuth + Amazon Associates." },
+        { "name": "wallet-tracker", "progress": 95, "note": "v0.4: backtest framework, parameter sweep, Solana via Helius, token risk scoring, multi-channel alerts, charts dashboard. Gated only on .env keys." },
+        { "name": "elijahbot-app (native master)", "progress": 90, "note": "Expo project complete with OTA updates. Needs `eas-cli init` + first build (15 min)." }
+      ]
+    },
+    {
+      "title": "Purcell Ventures (the business)",
+      "blurb": "Where revenue actually flows when it flows.",
+      "projects": [
+        { "name": "purcell-ventures-site", "progress": 65, "live": true, "note": "Live. 68 course lessons still unrecorded. Checkout placeholders." },
+        { "name": "purcell-ventures-skeletons", "progress": 50, "note": "10/20 modules built. 11-20 pending." },
+        { "name": "AI Readiness Test (lead-gen)", "progress": 90, "live": true, "note": "Live at /ai-readiness-test/. Built into the consulting funnel." },
+        { "name": "AI Cost Calculator (lead-gen)", "progress": 90, "live": true, "note": "Live at /ai-cost-calculator/. Pairs with readiness test." },
+        { "name": "AI Will (lead-gen)", "progress": 85, "live": true, "note": "Live. 30-min interview tool for elderly SMB owners." },
+        { "name": "Mantle Field Services", "progress": 60, "note": "Sister brand, site at mantle-field-site.vercel.app. Spun off from purcell-works." },
+        { "name": "purcell-works (legacy)", "progress": 5, "note": "ORPHANED. Old field-services site superseded by Mantle. Delete candidate." }
+      ]
+    },
+    {
+      "title": "Apps (each will be its own product someday)",
+      "blurb": "The six apps that live in the master app, not the website.",
+      "projects": [
+        { "name": "Echo (legacy stories)", "progress": 80, "live": true, "note": "Web v0.1 shipped. Native version with audio recording pending (v0.2)." },
+        { "name": "Steal My Hangout", "progress": 85, "live": true, "note": "v0.4. Atlanta-seeded. Roll-dice + map view + share-via-hash." },
+        { "name": "Momentum (one intention/day)", "progress": 85, "live": true, "note": "v0.3 with scripture rotation, heatmap, evening nudge." },
+        { "name": "Rival (self-competition)", "progress": 85, "live": true, "note": "v0.5. Metric tracker with sparklines + heatmap. No leaderboards." },
+        { "name": "Era (historical year sim)", "progress": 80, "live": true, "note": "v0.1. 12 hand-curated years 1955-2020." },
+        { "name": "Prayer Walk (mobile, native)", "progress": 75, "note": "v0.5 Expo app with GPS heatmap. APK installable. Pending Play Store + App Store submission." }
+      ]
+    },
+    {
+      "title": "Faith & discipline tools",
+      "blurb": "Built for one specific kind of life.",
+      "projects": [
+        { "name": "Verse Vault", "progress": 80, "live": true, "note": "v0.1. 5-level progressive hide. 10 seeded verses. Wants SM-2 spaced rep (v0.2)." },
+        { "name": "Prayer Journal (ACTS)", "progress": 80, "live": true, "note": "v0.1. Daily entries + answered log. Wants encrypted cloud backup (v0.2)." },
+        { "name": "Examen (Ignatian)", "progress": 80, "live": true, "note": "v0.1. Five-movement end-of-day prayer." },
+        { "name": "Counter (apologetics)", "progress": 80, "live": true, "note": "v0.2 with 12 topics. Wants more topics + spaced repetition of weak areas." },
+        { "name": "Worship Set", "progress": 80, "live": true, "note": "v0.1. Setlist planner. Wants band collaboration (v0.2)." },
+        { "name": "Sermon Notes", "progress": 85, "live": true, "note": "v0.2 with church + preacher autocomplete." },
+        { "name": "Solomon (daily wisdom)", "progress": 80, "live": true, "note": "v0.1. 50+ rotating quotes deterministic per day." },
+        { "name": "Calvinism Test (TULIP)", "progress": 80, "live": true, "note": "v0.1. Self-assessment with scripture from both sides." }
+      ]
+    },
+    {
+      "title": "Productivity & growth tools",
+      "blurb": "Tools for keeping yourself honest.",
+      "projects": [
+        { "name": "Decision Journal", "progress": 80, "live": true, "note": "Annie Duke calibration. v0.1. Wants push reminders on review date (v0.2)." },
+        { "name": "Brag Doc", "progress": 80, "live": true, "note": "v0.1 with dark-day shuffler." },
+        { "name": "Friendship Map", "progress": 80, "live": true, "note": "v0.1 personal CRM. Wants push when overdue (v0.2)." },
+        { "name": "Future Self", "progress": 80, "live": true, "note": "v0.1. Sealed letters with date-locked release." },
+        { "name": "Reading Log", "progress": 80, "live": true, "note": "v0.1 personal Goodreads." },
+        { "name": "Weekly Skill", "progress": 80, "live": true, "note": "v0.4. 42 curated skills, one per week." },
+        { "name": "Wisdom Prep", "progress": 80, "live": true, "note": "v0.1. 5-min mentor conversation prep." }
+      ]
+    },
+    {
+      "title": "UA + planning tools",
+      "blurb": "Built for the Bama Bound → freshman year arc.",
+      "projects": [
+        { "name": "Milestone (countdowns)", "progress": 80, "live": true, "note": "v0.1. Pre-seeded with 20 real upcoming dates." },
+        { "name": "Dorm Pack", "progress": 80, "live": true, "note": "v0.1. 130+ UA-specific items." },
+        { "name": "Day Sheet", "progress": 80, "live": true, "note": "v0.1. Printable daily planner with rotating scripture." }
+      ]
+    },
+    {
+      "title": "Cryptography & play",
+      "blurb": "The fun kind.",
+      "projects": [
+        { "name": "Cipher Lab", "progress": 80, "live": true, "note": "v0.1. 6 classical ciphers + chained puzzle-hunt builder." },
+        { "name": "Project Prowess", "progress": 70, "note": "v0.6 chained recruitment puzzle. 6 layers live. 6 open design questions before launch." }
+      ]
+    },
+    {
+      "title": "Games",
+      "blurb": "The ones that exist as code, not just ideas.",
+      "projects": [
+        { "name": "pulse-game", "progress": 90, "note": "v1.6.0. Spotify-integrated rhythm game. AAB built. Not yet on Play Store." },
+        { "name": "coldmaid", "progress": 80, "note": "Engine + 7 GA-trained bots + tournament viz." },
+        { "name": "coldmaid-extension", "progress": 65, "note": "Chrome UI done. Firebase config + OAuth pending." },
+        { "name": "phaser-game-template", "progress": 50, "note": "Reusable starter." },
+        { "name": "purcellian-ttt", "progress": 40, "note": "3D TTT variant prototype." },
+        { "name": "tower-defense", "progress": 30, "note": "Prototype." },
+        { "name": "games-site", "progress": 30, "note": "Portal scaffold." }
+      ]
+    },
+    {
+      "title": "Automation tools",
+      "blurb": "Things that run while you do other work.",
+      "projects": [
+        { "name": "scholarship-sniper", "progress": 90, "note": "Decision committed (UA). Decline emails drafted. Hasn't hit 'send' yet." },
+        { "name": "email-bot", "progress": 60, "note": "Works. Couponbot3000 mode pending." },
+        { "name": "sniper-app", "progress": 40, "note": "UI dashboard scaffold." }
+      ]
+    },
+    {
+      "title": "Apps in flight",
+      "blurb": "Mobile-first, in motion.",
+      "projects": [
+        { "name": "pickit", "progress": 90, "live": true, "note": "Already on Play Store." },
+        { "name": "hannah-tricks", "progress": 75, "live": true, "note": "Hannah's first app. PWA shipped." },
+        { "name": "magic-closet", "progress": 10, "note": "Expo scaffold, never developed past init." }
+      ]
+    },
+    {
+      "title": "Worldbuilding",
+      "blurb": "Ennemora / Nonetria.",
+      "projects": [
+        { "name": "nonetria", "progress": 30, "note": "Companion site. Lore lives in memory." }
+      ]
+    }
+  ]
+}
