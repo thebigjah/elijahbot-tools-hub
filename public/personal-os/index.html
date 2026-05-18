@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1a1611">
+<title>Personal OS · Elijah Purcell</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#f4ede0;
+  --ink-dim:#a89c87;
+  --ink-faint:#6d6353;
+  --bg:#1a1611;
+  --bg-panel:#221d16;
+  --bg-elev:#2a241c;
+  --accent:#d4a865;
+  --accent-warm:#c97a4b;
+  --rule:#3a3328;
+  --serif:'Fraunces',Georgia,serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-weight:400;font-feature-settings:"ss01","ss02";-webkit-font-smoothing:antialiased}
+body{min-height:100vh;display:flex;flex-direction:column;line-height:1.45}
+header{padding:28px 24px 14px;border-bottom:1px solid var(--rule);position:relative}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px}
+h1{font-family:var(--serif);font-weight:300;font-size:34px;line-height:1.05;letter-spacing:-0.02em;margin:0;font-variation-settings:"opsz" 144}
+h1 em{font-style:italic;color:var(--accent);font-weight:400}
+.tagline{font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin-top:8px;max-width:520px}
+main{flex:1;padding:24px;max-width:780px;width:100%;margin:0 auto}
+section{margin-bottom:32px}
+.section-label{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
+.section-num{font-family:var(--mono);font-size:11px;color:var(--accent-warm);letter-spacing:0.2em}
+.section-h{font-family:var(--serif);font-weight:400;font-size:17px;letter-spacing:0.01em;color:var(--ink)}
+.section-sub{font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-left:auto}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  font-family:var(--mono);font-size:12px;
+  padding:9px 14px;
+  background:var(--bg-panel);
+  border:1px solid var(--rule);
+  border-radius:24px;
+  color:var(--ink-dim);
+  cursor:pointer;
+  transition:all .15s ease;
+  user-select:none;
+}
+.chip:hover{border-color:var(--accent);color:var(--ink)}
+.chip.active{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:500}
+.chip-time{}
+.chip-state{}
+.chip-intention{}
+.results{
+  margin-top:24px;
+  border:1px solid var(--rule);
+  background:var(--bg-panel);
+  padding:18px 20px;
+  min-height:80px;
+}
+.results-empty{font-family:var(--mono);font-size:12px;color:var(--ink-faint);text-align:center;padding:24px 0}
+.results-hint{font-family:var(--mono);font-size:11px;color:var(--accent-warm);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px}
+.tool{
+  display:flex;
+  align-items:flex-start;
+  gap:14px;
+  padding:14px 0;
+  border-bottom:1px solid var(--rule);
+  text-decoration:none;
+  color:inherit;
+}
+.tool:last-child{border-bottom:0}
+.tool-mark{
+  font-family:var(--mono);font-size:11px;
+  color:var(--accent);
+  width:24px;flex-shrink:0;
+  padding-top:4px;
+}
+.tool-body{flex:1;min-width:0}
+.tool-name{font-family:var(--serif);font-size:18px;font-weight:400;color:var(--ink);margin-bottom:2px;line-height:1.2}
+.tool-why{font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);line-height:1.5}
+.tool-arrow{font-family:var(--serif);color:var(--accent);font-size:18px;padding-top:6px;opacity:0.6;transition:transform .15s,opacity .15s}
+.tool:hover .tool-arrow{transform:translateX(4px);opacity:1}
+.tool:hover .tool-name{color:var(--accent)}
+footer{
+  padding:22px 24px;
+  border-top:1px solid var(--rule);
+  font-family:var(--mono);font-size:11px;color:var(--ink-faint);
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;
+}
+footer a{color:var(--ink-dim);text-decoration:none;border-bottom:1px dotted var(--rule)}
+footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
+.reset-btn{
+  font-family:var(--mono);font-size:11px;
+  background:transparent;border:1px solid var(--rule);
+  color:var(--ink-dim);
+  padding:6px 12px;border-radius:14px;cursor:pointer;
+  transition:all .15s;
+}
+.reset-btn:hover{border-color:var(--accent-warm);color:var(--accent-warm)}
+@media(max-width:560px){
+  header{padding:22px 20px 12px}
+  main{padding:20px}
+  h1{font-size:28px}
+  .chip{font-size:11.5px;padding:8px 12px}
+  .tool-name{font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Personal OS · v0.1</div>
+  <h1>What do you <em>need</em> right now?</h1>
+  <div class="tagline">A router for the 30+ tools you've built. Tap what's true, see what fits. Three taps to the right tool.</div>
+</header>
+
+<main>
+
+<section>
+  <div class="section-label">
+    <span class="section-num">I.</span>
+    <span class="section-h">Time of day</span>
+    <span class="section-sub">when is it</span>
+  </div>
+  <div class="chip-row" id="time-row"></div>
+</section>
+
+<section>
+  <div class="section-label">
+    <span class="section-num">II.</span>
+    <span class="section-h">State</span>
+    <span class="section-sub">how you feel</span>
+  </div>
+  <div class="chip-row" id="state-row"></div>
+</section>
+
+<section>
+  <div class="section-label">
+    <span class="section-num">III.</span>
+    <span class="section-h">Intention</span>
+    <span class="section-sub">what you want to do</span>
+  </div>
+  <div class="chip-row" id="intention-row"></div>
+</section>
+
+<section>
+  <div class="section-label">
+    <span class="section-num">IV.</span>
+    <span class="section-h">Routed tools</span>
+    <span class="section-sub"><button class="reset-btn" onclick="resetAll()">reset</button></span>
+  </div>
+  <div class="results" id="results">
+    <div class="results-empty">Tap above. Tools appear as you narrow.</div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <span>Built 2026-05-18 · routes to tools at thebigjah.github.io</span>
+  <a href="https://thebigjah.github.io/tools/" target="_blank">All tools →</a>
+</footer>
+
+<script>
+// ============================================================================
+// CHIP DEFINITIONS
+// ============================================================================
+const TIME = [
+  { id:'morning', label:'Morning', auto:[6,11] },
+  { id:'midday', label:'Midday', auto:[11,16] },
+  { id:'evening', label:'Evening', auto:[16,21] },
+  { id:'night', label:'Late night', auto:[21,30] },
+];
+const STATE = [
+  { id:'clear', label:'Clear-headed' },
+  { id:'restless', label:'Restless' },
+  { id:'hopeful', label:'Hopeful' },
+  { id:'stressed', label:'Stressed' },
+  { id:'low', label:'Low / heavy' },
+  { id:'lonely', label:'Lonely' },
+  { id:'distracted', label:'Distracted' },
+  { id:'anxious', label:'Anxious' },
+];
+const INTENTION = [
+  { id:'reflect', label:'Reflect' },
+  { id:'decide', label:'Decide something' },
+  { id:'pray', label:'Pray / spirit' },
+  { id:'plan', label:'Plan' },
+  { id:'connect', label:'Connect with someone' },
+  { id:'build', label:'Build / make' },
+  { id:'rest', label:'Rest / settle' },
+  { id:'remember', label:'Remember a win' },
+];
+
+// ============================================================================
+// TOOL CATALOG — id, name, url, why-it-fits matchers
+// ============================================================================
+// Each tool: relevance is the sum of weighted matches across time/state/intention.
+const TOOLS = [
+  {
+    id:'examen', name:'Examen', url:'https://thebigjah.github.io/examen/',
+    blurb:'5-movement Ignatian reflection. Surfaces gratitude + struggle + intention.',
+    time:{morning:1,evening:3,night:2}, state:{clear:1,restless:1,low:2,anxious:2,distracted:1,stressed:2},
+    intention:{reflect:3,pray:2,rest:1}
+  },
+  {
+    id:'verse-vault', name:'Verse Vault', url:'https://thebigjah.github.io/verse-vault/',
+    blurb:'Spaced repetition for the verses you want in your bones.',
+    time:{morning:3,midday:1,evening:1,night:0}, state:{clear:2,restless:1,anxious:2,low:2},
+    intention:{pray:3,reflect:1,rest:1}
+  },
+  {
+    id:'prayer-journal', name:'Prayer Journal (ACTS)', url:'https://thebigjah.github.io/prayer-journal/',
+    blurb:'Adoration / Confession / Thanks / Supplication. Track answered prayer.',
+    time:{morning:2,evening:2,night:1}, state:{clear:1,restless:1,low:2,anxious:2,stressed:1,hopeful:1},
+    intention:{pray:3,reflect:1}
+  },
+  {
+    id:'sermon-notes', name:'Sermon Notes', url:'https://thebigjah.github.io/sermon-notes/',
+    blurb:'Capture + revisit Sunday teaching.',
+    time:{morning:1,midday:1,evening:1}, state:{clear:2,hopeful:1},
+    intention:{reflect:2,pray:1,build:1}
+  },
+  {
+    id:'counter', name:'Counter (apologetics)', url:'https://thebigjah.github.io/counter/',
+    blurb:'18 hard objections, steel-manned + answered.',
+    time:{midday:1,evening:1}, state:{clear:2,restless:2,distracted:1},
+    intention:{reflect:1,build:2,decide:1}
+  },
+  {
+    id:'solomon', name:'Solomon (wisdom)', url:'https://thebigjah.github.io/solomon/',
+    blurb:'50+ quotes across four traditions. Reflect on one.',
+    time:{morning:2,midday:1,evening:2}, state:{restless:1,clear:1,low:2,hopeful:1,anxious:1},
+    intention:{reflect:3,pray:1,decide:1,rest:1}
+  },
+  {
+    id:'worship-set', name:'Worship Set', url:'https://thebigjah.github.io/worship-set/',
+    blurb:'Plan a setlist — keys, BPM, flow, scripture pairing.',
+    time:{midday:1,evening:1}, state:{clear:2,hopeful:2},
+    intention:{plan:3,build:2,pray:1}
+  },
+  {
+    id:'examen-quiet', name:'Examen (evening prayer)', url:'https://thebigjah.github.io/examen/',
+    blurb:'Settle the day with the five Ignatian movements.',
+    time:{evening:3,night:3}, state:{restless:2,low:2,anxious:2,stressed:2,distracted:1},
+    intention:{pray:2,rest:3,reflect:2}
+  },
+  {
+    id:'decision-journal', name:'Decision Journal', url:'https://thebigjah.github.io/decision-journal/',
+    blurb:'Log a decision now. Track your calibration over time.',
+    time:{morning:1,midday:2,evening:1}, state:{clear:3,restless:1,distracted:1},
+    intention:{decide:3,reflect:1,build:1}
+  },
+  {
+    id:'wisdom-prep', name:'Wisdom Prep', url:'https://thebigjah.github.io/wisdom-prep/',
+    blurb:'5-min framework before asking a mentor for advice.',
+    time:{morning:1,midday:1,evening:1}, state:{clear:2,restless:1},
+    intention:{decide:2,connect:1,plan:1,reflect:1}
+  },
+  {
+    id:'friendship-map', name:'Friendship Map', url:'https://thebigjah.github.io/friendship-map/',
+    blurb:'Tier-1 to Tier-4 personal CRM. Who needs a check-in?',
+    time:{midday:1,evening:2}, state:{lonely:3,restless:1,low:1,hopeful:1},
+    intention:{connect:3,reflect:1,plan:1}
+  },
+  {
+    id:'hangout', name:'Steal My Hangout', url:'https://thebigjah.github.io/hangout/',
+    blurb:'Atlanta-area ideas. Roll dice, pick one, go.',
+    time:{midday:1,evening:2}, state:{lonely:2,restless:2,hopeful:2,clear:1},
+    intention:{connect:3,rest:1,build:0}
+  },
+  {
+    id:'momentum', name:'Momentum', url:'https://thebigjah.github.io/momentum/',
+    blurb:'One intention per day. Build the streak.',
+    time:{morning:3,midday:2}, state:{clear:2,restless:1,hopeful:2},
+    intention:{plan:3,build:2,decide:1}
+  },
+  {
+    id:'rival', name:'Rival (self-competition)', url:'https://thebigjah.github.io/rival/',
+    blurb:'Track a metric against your past self. No social pressure.',
+    time:{morning:2,evening:1}, state:{clear:2,restless:1,hopeful:2},
+    intention:{plan:2,build:2,reflect:1}
+  },
+  {
+    id:'reading-log', name:'Reading Log', url:'https://thebigjah.github.io/reading-log/',
+    blurb:'Reading / finished / wishlist. Star ratings + per-author stats.',
+    time:{midday:1,evening:2,night:2}, state:{clear:2,restless:2,distracted:1},
+    intention:{rest:2,reflect:2,build:1}
+  },
+  {
+    id:'weekly-skill', name:'Weekly Skill', url:'https://thebigjah.github.io/weekly-skill/',
+    blurb:'42 curated skills. ISO-week rotation. Pick one to learn.',
+    time:{morning:1,midday:2}, state:{clear:3,restless:2,hopeful:2},
+    intention:{build:3,plan:2,reflect:0}
+  },
+  {
+    id:'brag-doc', name:'Brag Doc', url:'https://thebigjah.github.io/brag-doc/',
+    blurb:'Wins log + dark-day shuffler. Pull a recent win.',
+    time:{evening:2,night:1,midday:1}, state:{low:3,anxious:2,stressed:2,restless:1,lonely:1},
+    intention:{remember:3,reflect:1,rest:1}
+  },
+  {
+    id:'future-self', name:'Future Self', url:'https://thebigjah.github.io/future-self/',
+    blurb:'Sealed letter to your future self. Quick-pick release dates.',
+    time:{evening:1,night:1}, state:{hopeful:3,restless:1,clear:1,low:1},
+    intention:{reflect:2,plan:1,remember:1}
+  },
+  {
+    id:'examen-stats', name:'Examen — Stats tab', url:'https://thebigjah.github.io/examen/',
+    blurb:'See your reflection streak + gratitude word cloud.',
+    time:{midday:1,evening:1}, state:{clear:1,hopeful:1},
+    intention:{remember:2,reflect:1}
+  },
+  {
+    id:'milestone', name:'Milestone (countdowns)', url:'https://thebigjah.github.io/milestone/',
+    blurb:'How long until UA move-in. Until Reza call. Until the next thing.',
+    time:{morning:1,midday:1}, state:{clear:1,restless:1,hopeful:1,distracted:1},
+    intention:{plan:2,remember:1}
+  },
+  {
+    id:'dorm-pack', name:'Dorm Pack', url:'https://thebigjah.github.io/dorm-pack/',
+    blurb:'130+ UA-specific items. Pack early.',
+    time:{midday:1,evening:1}, state:{clear:2,restless:1},
+    intention:{plan:3,build:1}
+  },
+  {
+    id:'day-sheet', name:'Day Sheet', url:'https://thebigjah.github.io/day-sheet/',
+    blurb:'One-page printable daily planner. Rotating scripture.',
+    time:{morning:3}, state:{clear:2,restless:1,distracted:2},
+    intention:{plan:3,reflect:1}
+  },
+  {
+    id:'cipher-lab', name:'Cipher Lab', url:'https://thebigjah.github.io/cipher-lab/',
+    blurb:'Six classical ciphers + chain a puzzle. Brain on, hands busy.',
+    time:{midday:1,evening:2,night:2}, state:{restless:3,distracted:1,clear:2},
+    intention:{build:3,rest:1}
+  },
+  {
+    id:'era', name:'Era', url:'https://thebigjah.github.io/era/',
+    blurb:'Drop into a year, 1955-2020. Read what the world looked like.',
+    time:{evening:1,night:2}, state:{restless:1,distracted:2,low:1},
+    intention:{rest:2,reflect:1}
+  },
+  {
+    id:'echo', name:'Echo (legacy stories)', url:'https://thebigjah.github.io/echo/',
+    blurb:'Interview Kiki / a parent / yourself. 60 questions, 9 chapters.',
+    time:{evening:2,midday:1}, state:{clear:2,hopeful:2,low:1},
+    intention:{connect:2,remember:2,reflect:2}
+  },
+  {
+    id:'sermon-recall', name:'Sermon Notes — search', url:'https://thebigjah.github.io/sermon-notes/',
+    blurb:'Search past sermons by book + verse. Recall what Matt said about X.',
+    time:{midday:1,evening:1}, state:{clear:1,restless:1,low:1},
+    intention:{remember:2,reflect:2,pray:1}
+  },
+  {
+    id:'calvinism-test', name:'Calvinism Test', url:'https://thebigjah.github.io/calvinism-test/',
+    blurb:'5-point TULIP self-assessment. See where you actually land.',
+    time:{midday:1,evening:1}, state:{clear:2,restless:1},
+    intention:{reflect:2,decide:1,build:1}
+  },
+];
+
+// ============================================================================
+// STATE
+// ============================================================================
+const state = { time:null, state:null, intention:null };
+
+// ============================================================================
+// RENDER
+// ============================================================================
+function renderChips(){
+  renderRow('time-row', TIME, 'time');
+  renderRow('state-row', STATE, 'state');
+  renderRow('intention-row', INTENTION, 'intention');
+}
+function renderRow(id, items, kind){
+  const row = document.getElementById(id);
+  row.innerHTML='';
+  items.forEach(item=>{
+    const el = document.createElement('div');
+    el.className = 'chip chip-' + kind + (state[kind]===item.id ? ' active' : '');
+    el.textContent = item.label;
+    el.dataset.id = item.id;
+    el.onclick = ()=>{
+      state[kind] = state[kind]===item.id ? null : item.id;
+      renderChips();
+      renderResults();
+    };
+    row.appendChild(el);
+  });
+}
+
+// Auto-detect time on first load
+function autoTime(){
+  const h = new Date().getHours();
+  for(const t of TIME){
+    const [lo, hi] = t.auto;
+    if((hi>24 && (h>=lo || h<hi-24)) || (h>=lo && h<hi)){
+      state.time = t.id;
+      return;
+    }
+  }
+}
+
+function score(tool){
+  let s = 0;
+  if(state.time && tool.time && tool.time[state.time]) s += tool.time[state.time];
+  if(state.state && tool.state && tool.state[state.state]) s += tool.state[state.state] * 1.5;
+  if(state.intention && tool.intention && tool.intention[state.intention]) s += tool.intention[state.intention] * 2;
+  return s;
+}
+
+function renderResults(){
+  const r = document.getElementById('results');
+  const anySelected = state.time || state.state || state.intention;
+  if(!anySelected){
+    r.innerHTML = '<div class="results-empty">Tap above. Tools appear as you narrow.</div>';
+    return;
+  }
+  const ranked = TOOLS
+    .map(t=>({t, s:score(t)}))
+    .filter(x=>x.s>0)
+    .sort((a,b)=>b.s-a.s)
+    .slice(0,5);
+  if(!ranked.length){
+    r.innerHTML = '<div class="results-empty">Nothing routes from that combo yet. Try different chips.</div>';
+    return;
+  }
+  const hint = [
+    state.time && '<span style="color:var(--ink-dim)">'+TIME.find(t=>t.id===state.time).label+'</span>',
+    state.state && '<span style="color:var(--ink-dim)">'+STATE.find(t=>t.id===state.state).label.toLowerCase()+'</span>',
+    state.intention && '<span style="color:var(--ink-dim)">'+INTENTION.find(t=>t.id===state.intention).label.toLowerCase()+'</span>',
+  ].filter(Boolean).join(' · ');
+  r.innerHTML = '<div class="results-hint">'+hint+'</div>' +
+    ranked.map((x,i)=>{
+      const marks = ['i','ii','iii','iv','v'];
+      return '<a class="tool" href="'+x.t.url+'" target="_blank" rel="noopener">' +
+        '<span class="tool-mark">'+marks[i]+'</span>' +
+        '<span class="tool-body">' +
+          '<div class="tool-name">'+x.t.name+'</div>' +
+          '<div class="tool-why">'+x.t.blurb+'</div>' +
+        '</span>' +
+        '<span class="tool-arrow">→</span>' +
+      '</a>';
+    }).join('');
+}
+
+function resetAll(){
+  state.time = null;
+  state.state = null;
+  state.intention = null;
+  autoTime();
+  renderChips();
+  renderResults();
+}
+
+// init
+autoTime();
+renderChips();
+renderResults();
+</script>
+
+</body>
+</html>
