@@ -1,0 +1,705 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1a1611">
+<title>Magic Closet · wardrobe + outfit picker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#f4ede0;
+  --ink-dim:#a89c87;
+  --ink-faint:#6d6353;
+  --bg:#1a1611;
+  --bg-panel:#221d16;
+  --bg-elev:#2a241c;
+  --accent:#d4a865;
+  --accent-warm:#c97a4b;
+  --rule:#3a3328;
+  --serif:'Fraunces',Georgia,serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-weight:400;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;line-height:1.45}
+header{padding:28px 24px 14px;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px}
+h1{font-family:var(--serif);font-weight:300;font-size:36px;line-height:1.02;letter-spacing:-0.025em;margin:0;font-variation-settings:"opsz" 144}
+h1 em{font-style:italic;color:var(--accent);font-weight:400}
+.tagline{font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin-top:10px}
+main{max-width:780px;margin:0 auto;padding:24px}
+nav.tabs{display:flex;gap:0;border-bottom:1px solid var(--rule);margin-bottom:28px}
+nav.tabs button{
+  font-family:var(--mono);font-size:12px;letter-spacing:0.08em;text-transform:uppercase;
+  background:transparent;border:none;color:var(--ink-faint);
+  padding:14px 16px;cursor:pointer;border-bottom:2px solid transparent;
+  transition:all .15s;
+}
+nav.tabs button.active{color:var(--accent);border-bottom-color:var(--accent)}
+nav.tabs button:hover:not(.active){color:var(--ink-dim)}
+.panel{display:none}
+.panel.active{display:block}
+label.lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px;margin-top:14px}
+input[type=text], input[type=date], select, textarea{
+  width:100%;background:var(--bg-panel);border:1px solid var(--rule);color:var(--ink);
+  font-family:var(--serif);font-size:15px;padding:11px 14px;border-radius:6px;outline:none;
+}
+input[type=text]:focus, select:focus, input[type=date]:focus{border-color:var(--accent)}
+button.primary{
+  font-family:var(--mono);font-size:13px;letter-spacing:0.05em;text-transform:uppercase;
+  background:var(--accent);color:var(--bg);border:none;padding:13px 22px;border-radius:6px;cursor:pointer;
+  margin-top:20px;font-weight:500;transition:all .15s;
+}
+button.primary:hover{background:var(--accent-warm);color:var(--ink)}
+button.primary:disabled{opacity:.4;cursor:not-allowed}
+.upload-zone{
+  margin-top:6px;
+  border:2px dashed var(--rule);
+  border-radius:8px;
+  padding:24px;
+  text-align:center;
+  cursor:pointer;
+  transition:border .15s;
+}
+.upload-zone:hover, .upload-zone.dragover{border-color:var(--accent)}
+.upload-zone input[type=file]{display:none}
+.upload-text{font-family:var(--mono);font-size:12px;color:var(--ink-dim)}
+.upload-preview{margin-top:10px;max-width:200px;max-height:200px;border-radius:6px;display:none}
+.upload-preview.show{display:inline-block}
+.tag-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+.tag-chip{font-family:var(--mono);font-size:11.5px;padding:7px 13px;background:var(--bg-panel);border:1px solid var(--rule);border-radius:24px;color:var(--ink-dim);cursor:pointer;transition:all .15s;user-select:none}
+.tag-chip:hover{border-color:var(--accent);color:var(--ink)}
+.tag-chip.active{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:500}
+.closet-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));gap:14px;margin-top:18px}
+.item{
+  background:var(--bg-panel);
+  border:1px solid var(--rule);
+  border-radius:8px;
+  padding:10px;
+  text-align:center;
+  cursor:pointer;
+  transition:transform .12s, border-color .15s;
+}
+.item:hover{transform:translateY(-2px);border-color:var(--accent)}
+.item img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:5px;display:block;background:var(--bg-elev)}
+.item-name{font-family:var(--serif);font-size:14px;color:var(--ink);margin-top:8px;line-height:1.25;font-weight:400}
+.item-tags{font-family:var(--mono);font-size:10px;color:var(--ink-faint);margin-top:4px;letter-spacing:0.04em}
+.empty{font-family:var(--mono);font-size:12px;color:var(--ink-faint);text-align:center;padding:40px 0}
+.section-label{display:flex;align-items:baseline;gap:12px;margin:20px 0 12px}
+.section-num{font-family:var(--mono);font-size:11px;color:var(--accent-warm);letter-spacing:0.2em}
+.section-h{font-family:var(--serif);font-weight:400;font-size:17px;letter-spacing:0.01em;color:var(--ink)}
+.section-sub{font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-left:auto}
+.outfit-zone{
+  background:var(--bg-panel);
+  border:1px solid var(--rule);
+  border-radius:10px;
+  padding:18px 20px;
+}
+.outfit-prompt{font-family:var(--serif);font-style:italic;color:var(--ink-dim);font-size:14px;line-height:1.55;margin-bottom:14px}
+.outfit-controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.outfit-display{margin-top:18px;display:none}
+.outfit-display.show{display:block}
+.outfit-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(120px, 1fr));gap:12px;margin-top:12px}
+.outfit-piece{background:var(--bg-elev);border:1px solid var(--rule);border-radius:8px;padding:10px;text-align:center}
+.outfit-piece img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:5px;background:var(--bg-panel)}
+.outfit-piece-name{font-family:var(--serif);font-size:13px;color:var(--ink);margin-top:6px;line-height:1.2}
+.outfit-piece-role{font-family:var(--mono);font-size:10px;color:var(--accent);margin-top:3px;letter-spacing:0.06em;text-transform:uppercase}
+.stats-card{background:var(--bg-panel);border:1px solid var(--rule);border-radius:8px;padding:14px 18px;margin-bottom:10px}
+.stats-label{font-family:var(--mono);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px}
+.stats-row{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--serif)}
+.stats-val{font-size:22px;color:var(--ink);font-weight:400;font-variation-settings:"opsz" 144}
+.stats-bar{height:6px;background:var(--bg-elev);border-radius:3px;overflow:hidden;margin-top:4px}
+.stats-bar-fill{height:100%;background:linear-gradient(90deg, var(--accent), var(--accent-warm))}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;padding:20px;z-index:100}
+.modal.show{display:flex}
+.modal-card{background:var(--bg);border:1px solid var(--rule);border-radius:10px;max-width:480px;width:100%;max-height:90vh;overflow:auto;padding:24px}
+.modal-card h3{font-family:var(--serif);font-weight:400;font-size:22px;margin:0 0 16px;color:var(--accent);letter-spacing:-0.01em}
+.modal-actions{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+.btn-sm{font-family:var(--mono);font-size:11px;background:transparent;border:1px solid var(--rule);color:var(--ink-dim);padding:8px 13px;border-radius:14px;cursor:pointer;transition:all .15s}
+.btn-sm:hover{border-color:var(--accent-warm);color:var(--accent-warm)}
+.btn-sm.danger:hover{border-color:var(--accent-warm);color:var(--accent-warm)}
+footer{padding:24px;border-top:1px solid var(--rule);text-align:center;font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-top:48px}
+footer a{color:var(--ink-dim);text-decoration:none;border-bottom:1px dotted var(--rule)}
+footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
+@media(max-width:560px){
+  header{padding:24px 20px 12px}
+  main{padding:20px}
+  h1{font-size:28px}
+  .closet-grid{grid-template-columns:repeat(2, 1fr)}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Magic Closet · v0.05</div>
+  <h1>Your <em>wardrobe</em></h1>
+  <p class="tagline">Add your clothes once. Then "Pick today's outfit" gives you something appropriate for the weather + occasion. Photos stored locally only.</p>
+</header>
+
+<main>
+
+<nav class="tabs">
+  <button id="tab-closet" class="active" onclick="setTab('closet')">Closet (<span id="closet-count">0</span>)</button>
+  <button id="tab-add" onclick="setTab('add')">Add item</button>
+  <button id="tab-pick" onclick="setTab('pick')">Pick outfit</button>
+  <button id="tab-stats" onclick="setTab('stats')">Stats</button>
+</nav>
+
+<section class="panel active" id="panel-closet">
+  <div id="closet-list"></div>
+</section>
+
+<section class="panel" id="panel-add">
+  <label class="lbl">Photo (optional but recommended)</label>
+  <div class="upload-zone" id="upload-zone" onclick="document.getElementById('photo-input').click()">
+    <div class="upload-text" id="upload-text">tap to choose a photo · or skip for a text-only item</div>
+    <img id="upload-preview" class="upload-preview" alt="preview">
+    <input type="file" id="photo-input" accept="image/*" onchange="handlePhotoSelected(event)">
+  </div>
+
+  <label class="lbl" for="item-name">Name (e.g. "Olive button-down")</label>
+  <input type="text" id="item-name" placeholder="Brief name">
+
+  <label class="lbl">Type</label>
+  <div class="tag-row" id="type-row"></div>
+
+  <label class="lbl">Color (primary)</label>
+  <div class="tag-row" id="color-row"></div>
+
+  <label class="lbl">Seasons</label>
+  <div class="tag-row" id="season-row"></div>
+
+  <label class="lbl">Formality</label>
+  <div class="tag-row" id="formal-row"></div>
+
+  <button class="primary" id="save-btn" onclick="saveItem()">Save to closet</button>
+</section>
+
+<section class="panel" id="panel-pick">
+  <div class="outfit-zone">
+    <p class="outfit-prompt">Tell me the weather and the occasion. I'll pull a top + bottom + (optional) outer layer + shoes that fit, weighted toward things you haven't worn recently.</p>
+
+    <label class="lbl">Weather</label>
+    <div class="outfit-controls">
+      <div class="tag-row" id="pick-weather"></div>
+    </div>
+
+    <label class="lbl">Occasion</label>
+    <div class="outfit-controls">
+      <div class="tag-row" id="pick-formal"></div>
+    </div>
+
+    <button class="primary" id="pick-btn" onclick="pickOutfit()">Pick today's outfit</button>
+
+    <div class="outfit-display" id="outfit-display">
+      <div class="outfit-grid" id="outfit-grid"></div>
+      <div class="outfit-controls" style="margin-top:18px">
+        <button class="btn-sm" onclick="pickOutfit()">↻ Roll again</button>
+        <button class="btn-sm" onclick="logOutfit()">I'm wearing this today</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="panel-stats">
+  <div id="stats-content"></div>
+</section>
+
+</main>
+
+<!-- detail modal -->
+<div class="modal" id="modal" onclick="if(event.target===this) closeModal()">
+  <div class="modal-card" id="modal-card"></div>
+</div>
+
+<footer>
+  Photos stored locally in IndexedDB. Nothing leaves this device.
+  · <a href="https://elijahbot-tools-hub.vercel.app">All tools →</a>
+</footer>
+
+<script>
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+const TYPES = [
+  { id:'top', label:'Top' },
+  { id:'bottom', label:'Bottom' },
+  { id:'outer', label:'Outer (jacket/coat)' },
+  { id:'dress', label:'Dress / one-piece' },
+  { id:'shoes', label:'Shoes' },
+  { id:'accessory', label:'Accessory' },
+];
+const COLORS = [
+  { id:'black', label:'Black' },
+  { id:'white', label:'White' },
+  { id:'gray', label:'Gray' },
+  { id:'navy', label:'Navy' },
+  { id:'blue', label:'Blue' },
+  { id:'olive', label:'Olive/Green' },
+  { id:'brown', label:'Brown/Tan' },
+  { id:'red', label:'Red/Burgundy' },
+  { id:'mixed', label:'Pattern/Mixed' },
+];
+const SEASONS = [
+  { id:'spring', label:'Spring' },
+  { id:'summer', label:'Summer' },
+  { id:'fall', label:'Fall' },
+  { id:'winter', label:'Winter' },
+];
+const FORMAL = [
+  { id:'lounge', label:'Lounge' },
+  { id:'casual', label:'Casual' },
+  { id:'smart-casual', label:'Smart-casual' },
+  { id:'business', label:'Business' },
+  { id:'formal', label:'Formal' },
+];
+const WEATHER = [
+  { id:'cold', label:'Cold (<50°)' },
+  { id:'cool', label:'Cool (50-65°)' },
+  { id:'warm', label:'Warm (65-80°)' },
+  { id:'hot', label:'Hot (>80°)' },
+  { id:'rain', label:'Rainy' },
+];
+
+// ============================================================================
+// INDEXEDDB
+// ============================================================================
+const DB_NAME = 'magic-closet-v0';
+const DB_VERSION = 1;
+let _db = null;
+
+function openDb(){
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onerror = () => reject(req.error);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if(!db.objectStoreNames.contains('items')){
+        const store = db.createObjectStore('items', { keyPath: 'id' });
+        store.createIndex('type', 'type');
+      }
+      if(!db.objectStoreNames.contains('photos')){
+        db.createObjectStore('photos', { keyPath: 'itemId' });
+      }
+      if(!db.objectStoreNames.contains('outfits')){
+        db.createObjectStore('outfits', { keyPath: 'id' });
+      }
+    };
+    req.onsuccess = () => { _db = req.result; resolve(_db); };
+  });
+}
+
+async function db(){ if(!_db) await openDb(); return _db; }
+
+async function dbPut(storeName, value){
+  const conn = await db();
+  return new Promise((resolve, reject) => {
+    const tx = conn.transaction(storeName, 'readwrite');
+    tx.objectStore(storeName).put(value);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+async function dbGet(storeName, key){
+  const conn = await db();
+  return new Promise((resolve, reject) => {
+    const tx = conn.transaction(storeName, 'readonly');
+    const req = tx.objectStore(storeName).get(key);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function dbGetAll(storeName){
+  const conn = await db();
+  return new Promise((resolve, reject) => {
+    const tx = conn.transaction(storeName, 'readonly');
+    const req = tx.objectStore(storeName).getAll();
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function dbDelete(storeName, key){
+  const conn = await db();
+  return new Promise((resolve, reject) => {
+    const tx = conn.transaction(storeName, 'readwrite');
+    tx.objectStore(storeName).delete(key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+// ============================================================================
+// STATE
+// ============================================================================
+const state = {
+  selected: { type:null, color:null, seasons:[], formal:null },
+  pick: { weather:'cool', formal:'casual' },
+  uploadBlob: null,
+  uploadDataUrl: null,
+};
+
+// ============================================================================
+// RENDERS
+// ============================================================================
+function setTab(tab){
+  ['closet','add','pick','stats'].forEach(t => {
+    document.getElementById('tab-'+t).classList.toggle('active', t===tab);
+    document.getElementById('panel-'+t).classList.toggle('active', t===tab);
+  });
+  if(tab==='closet') renderCloset();
+  if(tab==='pick') renderPickTab();
+  if(tab==='stats') renderStats();
+}
+
+function renderTagRow(rowId, items, kind, multi=false){
+  const row = document.getElementById(rowId);
+  row.innerHTML = '';
+  items.forEach(item => {
+    const el = document.createElement('div');
+    let active = false;
+    if(kind === 'seasons'){
+      active = state.selected.seasons.includes(item.id);
+    } else if(kind in state.selected){
+      active = state.selected[kind] === item.id;
+    } else if(kind in state.pick){
+      active = state.pick[kind] === item.id;
+    }
+    el.className = 'tag-chip' + (active ? ' active' : '');
+    el.textContent = item.label;
+    el.onclick = () => {
+      if(kind === 'seasons'){
+        const i = state.selected.seasons.indexOf(item.id);
+        if(i >= 0) state.selected.seasons.splice(i, 1);
+        else state.selected.seasons.push(item.id);
+      } else if(kind in state.selected){
+        state.selected[kind] = state.selected[kind] === item.id ? null : item.id;
+      } else if(kind in state.pick){
+        state.pick[kind] = item.id;
+      }
+      renderTagRow(rowId, items, kind, multi);
+    };
+    row.appendChild(el);
+  });
+}
+
+function renderAddTab(){
+  renderTagRow('type-row', TYPES, 'type');
+  renderTagRow('color-row', COLORS, 'color');
+  renderTagRow('season-row', SEASONS, 'seasons', true);
+  renderTagRow('formal-row', FORMAL, 'formal');
+}
+
+function renderPickTab(){
+  renderTagRow('pick-weather', WEATHER, 'weather');
+  renderTagRow('pick-formal', FORMAL, 'formal');
+}
+
+function handlePhotoSelected(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  state.uploadBlob = file;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    state.uploadDataUrl = ev.target.result;
+    const preview = document.getElementById('upload-preview');
+    preview.src = state.uploadDataUrl;
+    preview.classList.add('show');
+    document.getElementById('upload-text').textContent = file.name + ' · tap to replace';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function saveItem(){
+  const name = document.getElementById('item-name').value.trim();
+  if(!name){ alert('Give it a name first.'); return; }
+  if(!state.selected.type){ alert('Pick a type (top/bottom/etc.).'); return; }
+  if(!state.selected.color){ alert('Pick a color.'); return; }
+  if(state.selected.seasons.length === 0){ alert('Pick at least one season.'); return; }
+  if(!state.selected.formal){ alert('Pick a formality.'); return; }
+
+  const id = 'C' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+  const item = {
+    id,
+    name,
+    type: state.selected.type,
+    color: state.selected.color,
+    seasons: [...state.selected.seasons],
+    formal: state.selected.formal,
+    addedAt: Date.now(),
+    lastWorn: null,
+    wornCount: 0,
+  };
+  await dbPut('items', item);
+  if(state.uploadBlob){
+    await dbPut('photos', { itemId: id, blob: state.uploadBlob });
+  }
+
+  // reset
+  state.selected = { type:null, color:null, seasons:[], formal:null };
+  state.uploadBlob = null;
+  state.uploadDataUrl = null;
+  document.getElementById('item-name').value = '';
+  document.getElementById('upload-preview').classList.remove('show');
+  document.getElementById('upload-text').textContent = 'tap to choose a photo · or skip for a text-only item';
+  document.getElementById('photo-input').value = '';
+  renderAddTab();
+  await updateCounts();
+  setTab('closet');
+}
+
+async function renderCloset(){
+  const items = await dbGetAll('items');
+  const list = document.getElementById('closet-list');
+  if(!items.length){
+    list.innerHTML = '<div class="empty">Your closet is empty. Tap "Add item" to start cataloging.</div>';
+    return;
+  }
+  // sort by type then name
+  const order = ['top','bottom','outer','dress','shoes','accessory'];
+  items.sort((a,b)=>{
+    const ti = order.indexOf(a.type) - order.indexOf(b.type);
+    if(ti !== 0) return ti;
+    return a.name.localeCompare(b.name);
+  });
+  const grouped = {};
+  items.forEach(it => { if(!grouped[it.type]) grouped[it.type] = []; grouped[it.type].push(it); });
+  let html = '';
+  for(const t of order){
+    if(!grouped[t]) continue;
+    const tLabel = TYPES.find(x => x.id === t).label;
+    html += `<div class="section-label"><span class="section-num">${grouped[t].length}</span><span class="section-h">${tLabel}</span></div>`;
+    html += `<div class="closet-grid">`;
+    for(const it of grouped[t]){
+      const photo = await dbGet('photos', it.id);
+      let imgSrc = '';
+      if(photo && photo.blob){
+        imgSrc = URL.createObjectURL(photo.blob);
+      }
+      html += `<div class="item" onclick="openItem('${it.id}')">
+        ${imgSrc ? `<img src="${imgSrc}" alt="${escapeHtml(it.name)}">` :
+          `<div style="aspect-ratio:1/1;background:var(--bg-elev);display:flex;align-items:center;justify-content:center;color:var(--ink-faint);font-family:var(--mono);font-size:10px;border-radius:5px">no photo</div>`}
+        <div class="item-name">${escapeHtml(it.name)}</div>
+        <div class="item-tags">${it.color} · ${it.formal}${it.lastWorn ? ' · '+daysAgo(it.lastWorn)+'d ago' : ''}</div>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+  list.innerHTML = html;
+}
+
+async function openItem(id){
+  const item = await dbGet('items', id);
+  if(!item) return;
+  const photo = await dbGet('photos', id);
+  let imgSrc = photo && photo.blob ? URL.createObjectURL(photo.blob) : null;
+  const tLabel = TYPES.find(x => x.id === item.type)?.label || item.type;
+  const cLabel = COLORS.find(x => x.id === item.color)?.label || item.color;
+  const fLabel = FORMAL.find(x => x.id === item.formal)?.label || item.formal;
+  document.getElementById('modal-card').innerHTML = `
+    <h3>${escapeHtml(item.name)}</h3>
+    ${imgSrc ? `<img src="${imgSrc}" style="width:100%;border-radius:6px;margin-bottom:14px">` : ''}
+    <div style="font-family:var(--mono);font-size:12px;color:var(--ink-dim);line-height:1.8">
+      ${tLabel} · ${cLabel} · ${fLabel}<br>
+      Seasons: ${item.seasons.join(', ')}<br>
+      Worn ${item.wornCount}x ${item.lastWorn ? '· last '+daysAgo(item.lastWorn)+'d ago' : '· never worn yet'}
+    </div>
+    <div class="modal-actions">
+      <button class="btn-sm" onclick="markWorn('${id}')">Mark worn today</button>
+      <button class="btn-sm danger" onclick="deleteItem('${id}')">Delete</button>
+      <button class="btn-sm" onclick="closeModal()">Close</button>
+    </div>
+  `;
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal(){ document.getElementById('modal').classList.remove('show'); }
+
+async function markWorn(id){
+  const item = await dbGet('items', id);
+  if(!item) return;
+  item.lastWorn = Date.now();
+  item.wornCount = (item.wornCount || 0) + 1;
+  await dbPut('items', item);
+  closeModal();
+  renderCloset();
+}
+
+async function deleteItem(id){
+  if(!confirm('Delete this item?')) return;
+  await dbDelete('items', id);
+  await dbDelete('photos', id);
+  closeModal();
+  await updateCounts();
+  renderCloset();
+}
+
+// ============================================================================
+// PICK OUTFIT
+// ============================================================================
+const SEASON_BY_WEATHER = {
+  cold: ['winter'],
+  cool: ['fall', 'spring'],
+  warm: ['spring', 'summer'],
+  hot: ['summer'],
+  rain: ['fall', 'spring'],
+};
+
+async function pickOutfit(){
+  const items = await dbGetAll('items');
+  if(!items.length){
+    alert('Add some items first.');
+    setTab('add');
+    return;
+  }
+  const seasons = SEASON_BY_WEATHER[state.pick.weather];
+  const matchesContext = (it) =>
+    it.seasons.some(s => seasons.includes(s)) &&
+    (it.formal === state.pick.formal ||
+     (state.pick.formal === 'casual' && it.formal === 'lounge') ||
+     (state.pick.formal === 'smart-casual' && (it.formal === 'casual' || it.formal === 'business')) ||
+     (state.pick.formal === 'business' && it.formal === 'smart-casual'));
+
+  // recency weighting: items not worn recently get higher weight
+  const now = Date.now();
+  const weight = (it) => {
+    const days = it.lastWorn ? (now - it.lastWorn) / (1000*60*60*24) : 60;
+    return Math.min(60, days) + 1;
+  };
+
+  const pickByType = (type) => {
+    const candidates = items.filter(it => it.type === type && matchesContext(it));
+    if(candidates.length === 0) return null;
+    const totalW = candidates.reduce((a, b) => a + weight(b), 0);
+    let r = Math.random() * totalW;
+    for(const it of candidates){
+      r -= weight(it);
+      if(r <= 0) return it;
+    }
+    return candidates[candidates.length - 1];
+  };
+
+  const wantDress = items.some(it => it.type === 'dress' && matchesContext(it)) && Math.random() < 0.2;
+  let outfit;
+  if(wantDress){
+    const dress = pickByType('dress');
+    const shoes = pickByType('shoes');
+    outfit = { dress, shoes };
+  } else {
+    const top = pickByType('top');
+    const bottom = pickByType('bottom');
+    const shoes = pickByType('shoes');
+    let outer = null;
+    if(state.pick.weather === 'cold' || state.pick.weather === 'cool' || state.pick.weather === 'rain'){
+      outer = pickByType('outer');
+    }
+    outfit = { top, bottom, outer, shoes };
+  }
+  await renderOutfit(outfit);
+  document.getElementById('outfit-display').classList.add('show');
+  // store current outfit for "wearing this today"
+  state.currentOutfit = outfit;
+}
+
+async function renderOutfit(outfit){
+  const grid = document.getElementById('outfit-grid');
+  const order = ['outer','top','dress','bottom','shoes'];
+  const labels = { outer:'Outer', top:'Top', dress:'Dress', bottom:'Bottom', shoes:'Shoes' };
+  let html = '';
+  for(const role of order){
+    const it = outfit[role];
+    if(!it) continue;
+    const photo = await dbGet('photos', it.id);
+    const imgSrc = photo && photo.blob ? URL.createObjectURL(photo.blob) : null;
+    html += `<div class="outfit-piece">
+      ${imgSrc ? `<img src="${imgSrc}" alt="${escapeHtml(it.name)}">` :
+        `<div style="aspect-ratio:1/1;background:var(--bg-panel);display:flex;align-items:center;justify-content:center;color:var(--ink-faint);font-family:var(--mono);font-size:10px;border-radius:5px">no photo</div>`}
+      <div class="outfit-piece-role">${labels[role]}</div>
+      <div class="outfit-piece-name">${escapeHtml(it.name)}</div>
+    </div>`;
+  }
+  if(!html){
+    html = '<div class="empty">No items match this weather + occasion combo. Add more, or try a different combo.</div>';
+  }
+  grid.innerHTML = html;
+}
+
+async function logOutfit(){
+  if(!state.currentOutfit) return;
+  for(const role of ['outer','top','dress','bottom','shoes']){
+    const it = state.currentOutfit[role];
+    if(it) await markWorn(it.id);
+  }
+  alert('Marked all pieces as worn today. They\'ll surface less often in future picks until others have been worn.');
+}
+
+// ============================================================================
+// STATS
+// ============================================================================
+async function renderStats(){
+  const items = await dbGetAll('items');
+  const stats = document.getElementById('stats-content');
+  if(!items.length){
+    stats.innerHTML = '<div class="empty">No items yet.</div>';
+    return;
+  }
+  const byType = {};
+  TYPES.forEach(t => byType[t.id] = items.filter(it => it.type === t.id).length);
+  const total = items.length;
+  const worn = items.filter(it => it.wornCount > 0).length;
+  const neverWorn = total - worn;
+  const totalWears = items.reduce((a,b) => a + (b.wornCount||0), 0);
+  let html = `
+    <div class="stats-card">
+      <div class="stats-label">Total items in closet</div>
+      <div class="stats-row"><span class="stats-val">${total}</span><span style="font-family:var(--mono);font-size:11px;color:var(--ink-faint)">${worn} worn · ${neverWorn} never</span></div>
+    </div>
+    <div class="stats-card">
+      <div class="stats-label">Total wears logged</div>
+      <div class="stats-row"><span class="stats-val">${totalWears}</span></div>
+    </div>
+  `;
+  for(const t of TYPES){
+    if(byType[t.id] === 0) continue;
+    const pct = Math.round((byType[t.id] / total) * 100);
+    html += `
+      <div class="stats-card">
+        <div class="stats-label">${t.label}</div>
+        <div class="stats-row"><span class="stats-val">${byType[t.id]}</span><span style="font-family:var(--mono);font-size:11px;color:var(--ink-faint)">${pct}%</span></div>
+        <div class="stats-bar"><div class="stats-bar-fill" style="width:${pct}%"></div></div>
+      </div>
+    `;
+  }
+  stats.innerHTML = html;
+}
+
+// ============================================================================
+// UTILS
+// ============================================================================
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+}
+function daysAgo(ts){
+  return Math.floor((Date.now() - ts) / (1000*60*60*24));
+}
+async function updateCounts(){
+  const items = await dbGetAll('items');
+  document.getElementById('closet-count').textContent = items.length;
+}
+
+// ============================================================================
+// INIT
+// ============================================================================
+(async function(){
+  await openDb();
+  renderAddTab();
+  await updateCounts();
+  await renderCloset();
+})();
+</script>
+
+</body>
+</html>
