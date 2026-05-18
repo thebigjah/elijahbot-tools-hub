@@ -243,6 +243,7 @@
   <button class="tab active" data-view="surface">Surface</button>
   <button class="tab" data-view="add">Add person</button>
   <button class="tab" data-view="all">All people</button>
+  <button class="tab" data-view="map">Map</button>
   <button class="tab" data-view="manage">Manage</button>
 </div>
 
@@ -297,6 +298,30 @@
     <div id="all-list"></div>
   </div>
 </div>
+
+<div id="view-map" class="view" style="display:none;">
+  <div class="panel">
+    <h2>Your friendship coverage</h2>
+    <p class="help">Each circle is a person; size by how recently you've talked. Position by tier ring. Tap to filter the All-People list.</p>
+    <div id="map-canvas" style="background:linear-gradient(135deg, #f9f3e8 0%, #f4ecd9 100%);border:1px solid var(--border);border-radius:10px;padding:1.5rem;margin:1rem 0;min-height:380px;position:relative;overflow:hidden;"></div>
+    <div id="map-stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:0.6rem;margin-top:1rem;"></div>
+  </div>
+</div>
+<style>
+  #map-canvas svg { width: 100%; height: auto; }
+  #map-canvas .ring { fill: none; stroke: var(--border); stroke-width: 1; stroke-dasharray: 3,4; }
+  #map-canvas .ring-label { font-family: ui-monospace, monospace; font-size: 9px; fill: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.08em; }
+  #map-canvas .person-dot { cursor: pointer; transition: r 0.2s; }
+  #map-canvas .person-dot:hover { stroke: var(--ink); stroke-width: 2; }
+  #map-canvas .person-label { font-family: Georgia, serif; font-size: 10px; fill: var(--ink); pointer-events: none; }
+  #map-stats .map-stat { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 0.5rem 0.7rem; text-align: center; }
+  #map-stats .map-stat .num { font-family: Georgia, serif; font-size: 1.2rem; }
+  #map-stats .map-stat .lbl { font-size: 0.68rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.06em; }
+  #map-stats .map-stat .num.inner { color: var(--inner); }
+  #map-stats .map-stat .num.close { color: var(--close); }
+  #map-stats .map-stat .num.regular { color: var(--regular); }
+  #map-stats .map-stat .num.periphery { color: var(--periphery); }
+</style>
 
 <div id="view-manage" class="view" style="display:none;">
   <div class="panel">
@@ -530,6 +555,101 @@ function resetAll() {
   renderSurface(); renderAll();
 }
 
+function renderMap() {
+  const TIER_CADENCE = { inner: 7, close: 30, regular: 90, periphery: 180 };
+  const TIER_ORDER = ['inner', 'close', 'regular', 'periphery'];
+  const TIER_RADIUS = { inner: 60, close: 110, regular: 165, periphery: 220 };
+  const TIER_COLOR = { inner: getComputedStyle(document.documentElement).getPropertyValue('--inner').trim() || '#8a4a2a',
+                       close: getComputedStyle(document.documentElement).getPropertyValue('--close').trim() || '#4a4a8a',
+                       regular: getComputedStyle(document.documentElement).getPropertyValue('--regular').trim() || '#4a6a4a',
+                       periphery: getComputedStyle(document.documentElement).getPropertyValue('--periphery').trim() || '#6a4a4a' };
+
+  const W = 600, H = 480, CX = W/2, CY = H/2;
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  // Group people by tier
+  const byTier = { inner: [], close: [], regular: [], periphery: [] };
+  (people || []).forEach(p => {
+    if (p.tier && byTier[p.tier]) byTier[p.tier].push(p);
+  });
+
+  // Layout each tier on its ring
+  const dots = [];
+  const labels = [];
+  TIER_ORDER.forEach(tier => {
+    const people = byTier[tier];
+    const radius = TIER_RADIUS[tier];
+    const cadence = TIER_CADENCE[tier];
+    const angleStep = people.length ? (2 * Math.PI / people.length) : 0;
+    people.forEach((p, i) => {
+      const angle = -Math.PI / 2 + i * angleStep; // start at top
+      const x = CX + radius * Math.cos(angle);
+      const y = CY + radius * Math.sin(angle);
+
+      // Dot size by recency: more recent contact = larger dot
+      const lc = p.lastContact ? new Date(p.lastContact) : null;
+      const daysSince = lc ? Math.floor((today - lc) / (86400000)) : 9999;
+      const overdueRatio = Math.max(0, Math.min(2, daysSince / cadence));
+      const dotR = Math.max(5, 14 - overdueRatio * 4); // 14 when fresh -> 5 when very overdue
+
+      // Dot opacity by recency
+      const opacity = overdueRatio < 1 ? 1.0 : overdueRatio < 2 ? 0.65 : 0.35;
+
+      dots.push(`<circle class="person-dot" cx="${x}" cy="${y}" r="${dotR}" fill="${TIER_COLOR[tier]}" fill-opacity="${opacity}" stroke="${TIER_COLOR[tier]}" stroke-width="1.5" data-id="${p.id}"><title>${escapeHtml(p.name)} — ${tier}, last contact ${p.lastContact || 'never'} (${daysSince > 999 ? 'never' : daysSince + ' days ago'})</title></circle>`);
+      // Show name for inner + close tiers
+      if (tier === 'inner' || tier === 'close') {
+        labels.push(`<text class="person-label" x="${x}" y="${y + dotR + 11}" text-anchor="middle">${escapeHtml(p.name.split(' ')[0])}</text>`);
+      }
+    });
+  });
+
+  // Ring guides
+  const rings = TIER_ORDER.map(tier => {
+    const r = TIER_RADIUS[tier];
+    return `<circle class="ring" cx="${CX}" cy="${CY}" r="${r}" />` +
+           `<text class="ring-label" x="${CX + r + 4}" y="${CY + 4}">${tier} · ${TIER_CADENCE[tier]}d</text>`;
+  }).join('');
+
+  // YOU at center
+  const center = `<circle cx="${CX}" cy="${CY}" r="6" fill="#1d1812" /><text x="${CX}" y="${CY + 22}" class="person-label" text-anchor="middle" style="font-style:italic;color:var(--ink-soft);">you</text>`;
+
+  document.getElementById('map-canvas').innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" style="display:block;">
+      ${rings}
+      ${center}
+      ${dots.join('')}
+      ${labels.join('')}
+    </svg>
+    <p style="font-size:0.78rem;color:var(--ink-soft);font-style:italic;text-align:center;margin-top:0.4rem;">Larger + more opaque = touched recently within their tier's cadence. Smaller + faded = overdue.</p>
+  `;
+
+  // Stats below
+  document.getElementById('map-stats').innerHTML = TIER_ORDER.map(t => {
+    const total = byTier[t].length;
+    const cadence = TIER_CADENCE[t];
+    const overdue = byTier[t].filter(p => {
+      if (!p.lastContact) return true;
+      const lc = new Date(p.lastContact);
+      const days = Math.floor((today - lc) / 86400000);
+      return days > cadence;
+    }).length;
+    return `<div class="map-stat"><span class="num ${t}">${total - overdue}/${total}</span><span class="lbl">${t} fresh</span></div>`;
+  }).join('');
+
+  // Click-to-filter: clicking a dot switches to All-People tab + filters
+  document.querySelectorAll('#map-canvas .person-dot').forEach(dot => {
+    dot.addEventListener('click', () => {
+      const id = dot.getAttribute('data-id');
+      const p = (people || []).find(x => x.id === id);
+      if (p) {
+        showView('all');
+        document.getElementById('all-search').value = p.name;
+        renderAll();
+      }
+    });
+  });
+}
+
 function showView(name) {
   document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -537,6 +657,7 @@ function showView(name) {
   document.querySelector(`.tab[data-view="${name}"]`).classList.add('active');
   if (name === 'surface') renderSurface();
   if (name === 'all') renderAll();
+  if (name === 'map') renderMap();
 }
 
 document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
