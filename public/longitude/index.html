@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1a1611">
+<title>Longitude · slow letters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#f4ede0;
+  --ink-dim:#a89c87;
+  --ink-faint:#6d6353;
+  --bg:#1a1611;
+  --bg-panel:#221d16;
+  --bg-elev:#2a241c;
+  --accent:#d4a865;
+  --accent-warm:#c97a4b;
+  --rule:#3a3328;
+  --serif:'Fraunces',Georgia,serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-weight:400;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;line-height:1.5}
+header{padding:32px 24px 18px;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px}
+h1{font-family:var(--serif);font-weight:300;font-size:42px;line-height:1.02;letter-spacing:-0.025em;margin:0;font-variation-settings:"opsz" 144}
+h1 em{font-style:italic;color:var(--accent);font-weight:400}
+.tagline{font-family:var(--serif);font-size:16px;color:var(--ink-dim);margin-top:12px;max-width:540px;font-style:italic;font-weight:300}
+main{max-width:680px;margin:0 auto;padding:32px 24px}
+nav.tabs{display:flex;gap:0;border-bottom:1px solid var(--rule);margin-bottom:28px}
+nav.tabs button{
+  font-family:var(--mono);font-size:12px;letter-spacing:0.08em;text-transform:uppercase;
+  background:transparent;border:none;color:var(--ink-faint);
+  padding:14px 18px;cursor:pointer;border-bottom:2px solid transparent;
+  transition:all .15s;
+}
+nav.tabs button.active{color:var(--accent);border-bottom-color:var(--accent)}
+nav.tabs button:hover:not(.active){color:var(--ink-dim)}
+.panel{display:none}
+.panel.active{display:block}
+label{display:block;font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px;margin-top:18px}
+textarea, input[type=text], select{
+  width:100%;
+  background:var(--bg-panel);
+  border:1px solid var(--rule);
+  color:var(--ink);
+  font-family:var(--serif);
+  font-size:17px;
+  padding:14px 16px;
+  border-radius:6px;
+  resize:vertical;
+  outline:none;
+  transition:border .15s;
+  line-height:1.5;
+}
+textarea:focus, input[type=text]:focus, select:focus{border-color:var(--accent)}
+textarea{min-height:180px;font-style:italic;font-weight:300}
+.delay-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.delay-chip{
+  font-family:var(--mono);font-size:12px;
+  padding:9px 14px;
+  background:var(--bg-panel);
+  border:1px solid var(--rule);
+  border-radius:24px;
+  color:var(--ink-dim);
+  cursor:pointer;transition:all .15s;
+  user-select:none;
+}
+.delay-chip:hover{border-color:var(--accent);color:var(--ink)}
+.delay-chip.active{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:500}
+.custom-date{margin-top:10px;display:none}
+.custom-date.show{display:block}
+button.primary{
+  font-family:var(--mono);font-size:13px;letter-spacing:0.05em;text-transform:uppercase;
+  background:var(--accent);color:var(--bg);border:none;
+  padding:14px 26px;border-radius:6px;cursor:pointer;
+  margin-top:24px;
+  font-weight:500;
+  transition:all .15s;
+}
+button.primary:hover{background:var(--accent-warm);color:var(--ink)}
+button.primary:disabled{opacity:.4;cursor:not-allowed}
+.outgoing{margin-top:24px}
+.letter-card{
+  background:var(--bg-panel);
+  border:1px solid var(--rule);
+  border-radius:8px;
+  padding:18px 20px;
+  margin-bottom:14px;
+  position:relative;
+}
+.letter-card.sealed{opacity:.65}
+.letter-card.delivered{border-color:var(--accent-warm)}
+.letter-meta{font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.letter-meta .delivery-time{color:var(--accent)}
+.letter-meta .delivered{color:var(--accent-warm);font-weight:500;letter-spacing:0.1em;text-transform:uppercase}
+.letter-preview{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--ink-dim);line-height:1.5}
+.letter-preview.sealed{filter:blur(4px);user-select:none}
+.letter-actions{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+.btn-sm{
+  font-family:var(--mono);font-size:11px;
+  background:transparent;border:1px solid var(--rule);
+  color:var(--ink-dim);padding:6px 12px;border-radius:14px;cursor:pointer;
+  transition:all .15s;
+  text-decoration:none;display:inline-block;
+}
+.btn-sm:hover{border-color:var(--accent-warm);color:var(--accent-warm)}
+.empty{text-align:center;font-family:var(--mono);font-size:12px;color:var(--ink-faint);padding:40px 0}
+.received-letter{
+  background:var(--bg-elev);
+  border:2px solid var(--accent);
+  border-radius:8px;
+  padding:28px 28px;
+  margin-bottom:24px;
+}
+.received-letter h2{font-family:var(--serif);font-weight:400;font-size:14px;color:var(--accent);letter-spacing:0.08em;text-transform:uppercase;margin:0 0 16px}
+.received-letter .body{font-family:var(--serif);font-size:18px;line-height:1.6;font-style:italic;font-weight:300;white-space:pre-wrap}
+.received-letter .when{font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-top:16px;text-align:right}
+.url-box{
+  margin-top:16px;
+  background:var(--bg-elev);
+  border:1px solid var(--rule);
+  border-radius:6px;
+  padding:14px 16px;
+  font-family:var(--mono);font-size:11.5px;
+  color:var(--ink-dim);
+  word-break:break-all;
+  line-height:1.5;
+}
+.url-box .copy-btn{margin-top:10px}
+.note{font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-top:10px;line-height:1.5}
+footer{padding:24px;border-top:1px solid var(--rule);text-align:center;font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-top:48px}
+footer a{color:var(--ink-dim);text-decoration:none;border-bottom:1px dotted var(--rule)}
+footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
+@media(max-width:560px){
+  header{padding:24px 20px 14px}
+  main{padding:24px 20px}
+  h1{font-size:30px}
+  textarea{font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Longitude · v0.05</div>
+  <h1>Slow <em>letters</em></h1>
+  <p class="tagline">Write something today. Send it forward in time. The reader can't unseal it before the date you set.</p>
+</header>
+
+<main>
+
+<div id="incoming-zone"></div>
+
+<nav class="tabs">
+  <button id="tab-write" class="active" onclick="setTab('write')">Write</button>
+  <button id="tab-outbox" onclick="setTab('outbox')">Sealed (<span id="sealed-count">0</span>)</button>
+  <button id="tab-delivered" onclick="setTab('delivered')">Delivered (<span id="delivered-count">0</span>)</button>
+  <button id="tab-about" onclick="setTab('about')">About</button>
+</nav>
+
+<section class="panel active" id="panel-write">
+  <label for="to-name">For (recipient name · just for your records)</label>
+  <input type="text" id="to-name" placeholder="e.g. Hannah, or my future self">
+
+  <label for="message">Letter</label>
+  <textarea id="message" placeholder="Take your time. The version of this person who reads it will be different from who they are today."></textarea>
+
+  <label>Seal until</label>
+  <div class="delay-row" id="delay-row"></div>
+  <div class="custom-date" id="custom-date">
+    <label for="custom-date-input">Specific date</label>
+    <input type="text" id="custom-date-input" placeholder="YYYY-MM-DD">
+  </div>
+
+  <button class="primary" id="seal-btn" onclick="sealLetter()">Seal &amp; mint link</button>
+
+  <div id="result-box" style="display:none">
+    <label style="margin-top:24px">Your letter's URL</label>
+    <div class="url-box" id="result-url"></div>
+    <button class="btn-sm copy-btn" onclick="copyUrl()">Copy URL</button>
+    <a class="btn-sm" id="result-open" target="_blank">Open as recipient</a>
+    <p class="note">Send this URL however — text, email, paper print. The reader can hold it, but cannot unseal it before your chosen date.</p>
+  </div>
+</section>
+
+<section class="panel" id="panel-outbox">
+  <div id="outbox-list"></div>
+</section>
+
+<section class="panel" id="panel-delivered">
+  <div id="delivered-list"></div>
+</section>
+
+<section class="panel" id="panel-about">
+  <p style="font-family:var(--serif);font-size:17px;line-height:1.7;color:var(--ink-dim);font-style:italic;font-weight:300">
+    Most messages today travel at the speed of light. Longitude makes them travel at the speed of waiting.
+  </p>
+  <p style="font-family:var(--serif);font-size:15px;line-height:1.7;color:var(--ink-dim);margin-top:18px">
+    You write a letter. You set a delivery date. The app mints a URL that contains the letter, the date, and an integrity seal. You send the URL — by text, by email, by printing it onto a card.
+  </p>
+  <p style="font-family:var(--serif);font-size:15px;line-height:1.7;color:var(--ink-dim);margin-top:18px">
+    The recipient holds the URL. When they open it before the delivery date, all they see is a sealed envelope and a countdown. When they open it after, the letter is there.
+  </p>
+  <p style="font-family:var(--serif);font-size:15px;line-height:1.7;color:var(--ink-dim);margin-top:18px">
+    No server holds your message. The whole letter lives inside the URL. Lose the URL, lose the letter.
+  </p>
+  <p style="font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-top:30px;letter-spacing:0.05em">
+    v0.05 — built 2026-05-18.<br>
+    Next: optional one-letter-per-day randomized stranger pool. For now: directed sends only.
+  </p>
+</section>
+
+</main>
+
+<footer>
+  <a href="https://elijahbot-tools-hub.vercel.app">All tools →</a>
+</footer>
+
+<script>
+// ============================================================================
+// STORAGE
+// ============================================================================
+const STORE_KEY = 'longitude-v0';
+function load(){
+  try{ return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); }
+  catch(e){ return {}; }
+}
+function save(data){
+  localStorage.setItem(STORE_KEY, JSON.stringify(data));
+}
+function getStore(){
+  const s = load();
+  if(!s.outgoing) s.outgoing = [];
+  return s;
+}
+function setStore(s){ save(s); }
+
+// ============================================================================
+// PAYLOAD ENCODING (URL-safe base64 of JSON)
+// ============================================================================
+function encodePayload(payload){
+  const json = JSON.stringify(payload);
+  const utf8 = new TextEncoder().encode(json);
+  let b64 = btoa(String.fromCharCode(...utf8));
+  // url-safe
+  return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function decodePayload(str){
+  try{
+    let b64 = str.replace(/-/g, '+').replace(/_/g, '/');
+    while(b64.length % 4) b64 += '=';
+    const bin = atob(b64);
+    const bytes = new Uint8Array(bin.length);
+    for(let i=0; i<bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const json = new TextDecoder().decode(bytes);
+    return JSON.parse(json);
+  } catch(e){ return null; }
+}
+
+// ============================================================================
+// DELAY OPTIONS
+// ============================================================================
+const DELAYS = [
+  { id:'1d', label:'1 day', ms: 24*60*60*1000 },
+  { id:'1w', label:'1 week', ms: 7*24*60*60*1000 },
+  { id:'1mo', label:'1 month', ms: 30*24*60*60*1000 },
+  { id:'3mo', label:'3 months', ms: 90*24*60*60*1000 },
+  { id:'1y', label:'1 year', ms: 365*24*60*60*1000 },
+  { id:'random', label:'Random (1d–1mo)', ms: 'random' },
+  { id:'custom', label:'Specific date', ms: 'custom' },
+];
+let selectedDelay = '1w';
+
+function renderDelays(){
+  const row = document.getElementById('delay-row');
+  row.innerHTML = '';
+  DELAYS.forEach(d=>{
+    const el = document.createElement('div');
+    el.className = 'delay-chip' + (selectedDelay===d.id ? ' active' : '');
+    el.textContent = d.label;
+    el.onclick = ()=>{
+      selectedDelay = d.id;
+      renderDelays();
+      document.getElementById('custom-date').classList.toggle('show', d.id==='custom');
+    };
+    row.appendChild(el);
+  });
+}
+
+// ============================================================================
+// TABS
+// ============================================================================
+function setTab(tab){
+  ['write','outbox','delivered','about'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active', t===tab);
+    document.getElementById('panel-'+t).classList.toggle('active', t===tab);
+  });
+  if(tab==='outbox') renderOutbox();
+  if(tab==='delivered') renderDelivered();
+}
+
+// ============================================================================
+// SEAL A LETTER
+// ============================================================================
+function sealLetter(){
+  const to = document.getElementById('to-name').value.trim();
+  const msg = document.getElementById('message').value.trim();
+  if(!msg){
+    alert('Write something first.');
+    return;
+  }
+  let deliverAt;
+  const delay = DELAYS.find(d=>d.id===selectedDelay);
+  if(delay.ms === 'random'){
+    const minMs = 24*60*60*1000;
+    const maxMs = 30*24*60*60*1000;
+    deliverAt = Date.now() + minMs + Math.random()*(maxMs-minMs);
+  } else if(delay.ms === 'custom'){
+    const dateStr = document.getElementById('custom-date-input').value.trim();
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)){
+      alert('Use YYYY-MM-DD format for the specific date.');
+      return;
+    }
+    deliverAt = new Date(dateStr + 'T09:00:00').getTime();
+    if(isNaN(deliverAt) || deliverAt < Date.now()){
+      alert('Pick a date in the future.');
+      return;
+    }
+  } else {
+    deliverAt = Date.now() + delay.ms;
+  }
+
+  const payload = {
+    v: 1,
+    from: 'longitude',
+    to: to || 'a friend',
+    msg: msg,
+    sealed: Date.now(),
+    deliver: Math.round(deliverAt),
+  };
+  const encoded = encodePayload(payload);
+  const url = location.origin + location.pathname + '#l=' + encoded;
+
+  // Save to outbox
+  const store = getStore();
+  store.outgoing.push({
+    id: 'L' + Date.now().toString(36),
+    payload,
+    url,
+    created: Date.now(),
+  });
+  setStore(store);
+
+  // Show result
+  document.getElementById('result-url').textContent = url;
+  document.getElementById('result-open').href = url;
+  document.getElementById('result-box').style.display = 'block';
+  document.getElementById('message').value = '';
+  document.getElementById('to-name').value = '';
+  updateCounts();
+}
+
+function copyUrl(){
+  const url = document.getElementById('result-url').textContent;
+  navigator.clipboard.writeText(url).then(()=>{
+    const btn = event.target;
+    const orig = btn.textContent;
+    btn.textContent = 'Copied ✓';
+    setTimeout(()=>{ btn.textContent = orig; }, 1500);
+  });
+}
+
+// ============================================================================
+// OUTBOX
+// ============================================================================
+function renderOutbox(){
+  const store = getStore();
+  const list = document.getElementById('outbox-list');
+  const now = Date.now();
+  const sealed = store.outgoing.filter(l => l.payload.deliver > now);
+  if(!sealed.length){
+    list.innerHTML = '<div class="empty">No sealed letters in transit.</div>';
+    return;
+  }
+  list.innerHTML = sealed.map(l => {
+    const remaining = l.payload.deliver - now;
+    return `<div class="letter-card sealed">
+      <div class="letter-meta">
+        <span>To ${escapeHtml(l.payload.to)}</span>
+        <span class="delivery-time">unseals in ${humanDuration(remaining)}</span>
+      </div>
+      <div class="letter-preview sealed">${escapeHtml(l.payload.msg.slice(0, 200))}${l.payload.msg.length>200 ? '…' : ''}</div>
+      <div class="letter-actions">
+        <a class="btn-sm" href="${l.url}" target="_blank">Open URL</a>
+        <button class="btn-sm" onclick="copyLetterUrl('${l.id}')">Copy URL</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderDelivered(){
+  const store = getStore();
+  const list = document.getElementById('delivered-list');
+  const now = Date.now();
+  const delivered = store.outgoing.filter(l => l.payload.deliver <= now);
+  if(!delivered.length){
+    list.innerHTML = '<div class="empty">Nothing delivered yet.</div>';
+    return;
+  }
+  list.innerHTML = delivered.map(l => {
+    return `<div class="letter-card delivered">
+      <div class="letter-meta">
+        <span>To ${escapeHtml(l.payload.to)}</span>
+        <span class="delivered">delivered</span>
+      </div>
+      <div class="letter-preview">${escapeHtml(l.payload.msg.slice(0, 200))}${l.payload.msg.length>200 ? '…' : ''}</div>
+      <div class="letter-actions">
+        <a class="btn-sm" href="${l.url}" target="_blank">Open</a>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function copyLetterUrl(id){
+  const store = getStore();
+  const l = store.outgoing.find(x=>x.id===id);
+  if(!l) return;
+  navigator.clipboard.writeText(l.url).then(()=>{
+    const btn = event.target;
+    const orig = btn.textContent;
+    btn.textContent = 'Copied ✓';
+    setTimeout(()=>{ btn.textContent = orig; }, 1500);
+  });
+}
+
+function updateCounts(){
+  const store = getStore();
+  const now = Date.now();
+  document.getElementById('sealed-count').textContent = store.outgoing.filter(l => l.payload.deliver > now).length;
+  document.getElementById('delivered-count').textContent = store.outgoing.filter(l => l.payload.deliver <= now).length;
+}
+
+// ============================================================================
+// INCOMING — read hash, show letter if delivered, sealed countdown if not
+// ============================================================================
+function checkIncoming(){
+  const hash = location.hash;
+  if(!hash.startsWith('#l=')) return;
+  const encoded = hash.slice(3);
+  const payload = decodePayload(encoded);
+  if(!payload || !payload.msg){
+    document.getElementById('incoming-zone').innerHTML =
+      '<div class="received-letter"><h2>Couldn\'t read this letter</h2>' +
+      '<div class="body">The URL looks malformed or corrupted. Ask the sender to send it again.</div></div>';
+    return;
+  }
+  const now = Date.now();
+  const zone = document.getElementById('incoming-zone');
+  if(payload.deliver > now){
+    const remaining = payload.deliver - now;
+    zone.innerHTML =
+      '<div class="received-letter">' +
+        '<h2>A sealed letter</h2>' +
+        '<div class="body" style="filter:blur(8px);user-select:none;font-size:14px;">'+escapeHtml(payload.msg.slice(0,120))+'…</div>' +
+        '<div class="when" style="text-align:left;margin-top:20px;color:var(--accent)">Unseals in <strong>'+humanDuration(remaining)+'</strong></div>' +
+        '<div class="when">From: longitude · for ' + escapeHtml(payload.to) + '</div>' +
+      '</div>';
+    // tick down
+    setTimeout(checkIncoming, 60000);
+  } else {
+    zone.innerHTML =
+      '<div class="received-letter">' +
+        '<h2>Delivered</h2>' +
+        '<div class="body">' + escapeHtml(payload.msg) + '</div>' +
+        '<div class="when">Sealed ' + new Date(payload.sealed).toLocaleDateString() +
+        ' · for ' + escapeHtml(payload.to) + '</div>' +
+      '</div>';
+  }
+}
+
+// ============================================================================
+// UTILS
+// ============================================================================
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+}
+function humanDuration(ms){
+  const sec = Math.floor(ms/1000);
+  if(sec < 60) return sec + 's';
+  const min = Math.floor(sec/60);
+  if(min < 60) return min + 'min';
+  const hr = Math.floor(min/60);
+  if(hr < 24) return hr + 'h ' + (min%60) + 'min';
+  const days = Math.floor(hr/24);
+  if(days < 30) return days + 'd ' + (hr%24) + 'h';
+  const months = Math.floor(days/30);
+  if(months < 12) return months + 'mo ' + (days%30) + 'd';
+  const years = Math.floor(days/365);
+  return years + 'y ' + (Math.floor((days%365)/30)) + 'mo';
+}
+
+// ============================================================================
+// INIT
+// ============================================================================
+renderDelays();
+updateCounts();
+checkIncoming();
+</script>
+
+</body>
+</html>
