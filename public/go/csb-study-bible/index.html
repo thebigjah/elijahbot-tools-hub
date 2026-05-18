@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Redirecting - CSB Study Bible (Amazon affiliate)</title>
+<meta name="robots" content="noindex">
+<meta http-equiv="refresh" content="1;url=https://amzn.to/PLACEHOLDER_CSB" />
+<link rel="canonical" href="https://amzn.to/PLACEHOLDER_CSB" />
+<style>
+  body { background:#0a0a14; color:#e8e8ea; font-family:-apple-system,system-ui,sans-serif;
+         display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; padding:2rem; }
+  .box { text-align:center; max-width:420px; }
+  h1 { font-size:1.1rem; margin:0 0 0.5rem; color:#c2a173; font-weight:500; }
+  p { font-size:0.92rem; margin:0; color:#aaa; line-height:1.5; }
+  a { color:#c2a173; }
+  .spinner { display:inline-block; width:14px; height:14px; border:2px solid #2a2a3a;
+              border-top-color:#c2a173; border-radius:50%;
+              animation:spin 0.9s linear infinite; margin-right:8px; vertical-align:middle; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1><span class="spinner"></span>CSB Study Bible (Amazon affiliate)</h1>
+  <p>Redirecting to <a href="https://amzn.to/PLACEHOLDER_CSB">https://amzn.to/PLACEHOLDER_CSB</a>...</p>
+</div>
+<script>
+  // Fire Vercel Analytics custom event so the click is tracked separately from pageview
+  if (window.va) {
+    try { window.va('event', { name: 'affiliate_click', data: { slug: 'csb-study-bible', channel: 'faith_content' } }); }
+    catch (e) {}
+  }
+  // Hard redirect after 800ms (covers cases where meta-refresh is blocked)
+  setTimeout(function() { window.location.href = "https://amzn.to/PLACEHOLDER_CSB"; }, 800);
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

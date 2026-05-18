@@ -1,0 +1,72 @@
+# Affiliate redirect map - slug -> destination URL.
+# Used by generate_redirects.py to produce public/go/<slug>/index.html files.
+# Each redirect page is counted as a pageview by Vercel Web Analytics, giving
+# you free per-link click totals.
+
+# Place each new affiliate link here, then run:
+#   python generate_redirects.py
+# Then commit + push - Vercel auto-redeploys.
+# Use the canonical URL `tools.purcellventures.co/go/<slug>` (or
+# elijahbot-tools-hub.vercel.app/go/<slug> until the domain is wired) in YouTube
+# descriptions, blog posts, Instagram bios, etc.
+
+links:
+  # === Finance channel affiliates ===
+  - slug: fidelity-roth
+    dest: https://www.fidelity.com/retirement-ira/roth-ira
+    label: "Open a Roth IRA at Fidelity (free)"
+    channel: finance
+  - slug: m1-finance
+    dest: https://m1.com
+    label: "Auto-investing on M1 Finance"
+    channel: finance
+  - slug: robinhood
+    dest: https://robinhood.com
+    label: "Robinhood — commission-free brokerage"
+    channel: finance
+  - slug: book-millionaire-next-door
+    dest: https://amzn.to/PLACEHOLDER_TMND
+    label: "The Millionaire Next Door (book) — Amazon affiliate"
+    channel: finance
+
+  # === AI Tools channel affiliates ===
+  - slug: claude-ai
+    dest: https://claude.ai
+    label: "Claude (AI assistant)"
+    channel: ai_tools
+  - slug: cursor-editor
+    dest: https://cursor.com
+    label: "Cursor — AI-native code editor"
+    channel: ai_tools
+  - slug: n8n
+    dest: https://n8n.io
+    label: "n8n — free automation tool"
+    channel: ai_tools
+
+  # === Faith Content channel affiliates ===
+  - slug: keller-reason-for-god
+    dest: https://amzn.to/PLACEHOLDER_KELLER
+    label: "Tim Keller - The Reason for God (Amazon affiliate)"
+    channel: faith_content
+  - slug: lewis-mere-christianity
+    dest: https://amzn.to/PLACEHOLDER_LEWIS
+    label: "C.S. Lewis - Mere Christianity (Amazon affiliate)"
+    channel: faith_content
+  - slug: csb-study-bible
+    dest: https://amzn.to/PLACEHOLDER_CSB
+    label: "CSB Study Bible (Amazon affiliate)"
+    channel: faith_content
+
+  # === Purcell Ventures direct (no third-party affiliate) ===
+  - slug: ai-audit
+    dest: https://purcellventures.co/consulting
+    label: "Free 30-min AI audit"
+    channel: purcell_ventures
+  - slug: ai-readiness-test
+    dest: /ai-readiness-test/
+    label: "Take the AI Readiness Test"
+    channel: purcell_ventures
+  - slug: ai-cost-calculator
+    dest: /ai-cost-calculator/
+    label: "AI Cost Calculator"
+    channel: purcell_ventures
