@@ -66,7 +66,7 @@
       "projects": [
         { "name": "Decision Journal", "progress": 93, "live": true, "note": "v0.2 — added visual SVG calibration chart with diagonal reference line (perfect = on-line), dot size = N, color by drift (green/gold/red). Plus calibration table + by-tag stats + due-now + search + 6 confidence buckets." },
         { "name": "Brag Doc", "progress": 85, "live": true, "note": "Wins log + dark-day shuffler + 5 entry types (shipped/kind-word/award/skill/metric) + resume export with type/date filter." },
-        { "name": "Friendship Map", "progress": 85, "live": true, "note": "Personal CRM by tier (7d/30d/90d/180d) + surface-overdue tab + recent-touch update + per-person history. Wants push notifications when overdue." },
+        { "name": "Friendship Map", "progress": 92, "live": true, "note": "v0.2 — added Map view: SVG concentric tier rings, dots sized by contact-recency, opacity by overdue-ratio, click-to-filter. Plus 4-tier CRM + surface + per-person history." },
         { "name": "Future Self", "progress": 85, "live": true, "note": "Sealed letters with countdown + date-locked release + quick-pick release buttons (UA move-in / +30d / +1yr) + sealed/ready/opened states." },
         { "name": "Reading Log", "progress": 85, "live": true, "note": "Personal Goodreads — reading/finished/wishlist + 5-star ratings + stats by author and month + CSV/JSON export." },
         { "name": "Weekly Skill", "progress": 85, "live": true, "note": "42 curated skills + ISO-week auto-rotation + Hannah-friendly filter + custom skill add + mastered-list share." },
