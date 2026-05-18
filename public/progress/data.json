@@ -1,6 +1,6 @@
 {
-  "updated": "2026-05-18T14:25:00Z",
-  "updated_human": "2026-05-18 — second workshop block (deeper read + 3 sample depth passes)",
+  "updated": "2026-05-18T23:15:00Z",
+  "updated_human": "2026-05-18 — late evening workshop (Longitude + Stage Fright shipped, PickIt WIP committed, Personal OS built but unpublished)",
   "sections": [
     {
       "title": "Personal AI & accountability",
@@ -9,6 +9,7 @@
         { "name": "elijahbot-tools-hub", "progress": 100, "live": true, "note": "Live at https://elijahbot-tools-hub.vercel.app. PWA-installable. Editorial redesign, /go/ affiliate redirects, /progress/ tool added today." },
         { "name": "Refresh (elijahbot-refresh)", "progress": 90, "live": true, "note": "Live in production. Editorial redesign shipped. v0.2 features (cal/tasks wiring, push notifications) pending." },
         { "name": "elibot-overlay", "progress": 70, "note": "Lockout system works. Codeword leaked. Idle-timeout daemon not built." },
+        { "name": "Personal OS (state-router)", "progress": 40, "note": "v0.05 built 2026-05-18 at ~/personal-os/index.html. Routes 27 tools based on time + state + intention. NOT yet deployed pending Elijah's go-ahead." },
         { "name": "persona-ai", "progress": 25, "note": "Original flagship. Stalled since late 2025. 'Where do you want to pick up?'" }
       ]
     },
@@ -43,7 +44,10 @@
         { "name": "Momentum (one intention/day)", "progress": 90, "live": true, "note": "Daily intention + scripture rotation + categories + 365-day heatmap + evening nudge + share-via-hash." },
         { "name": "Rival (self-competition)", "progress": 90, "live": true, "note": "Metric tracker + goal lines + sparklines + heatmap per metric + CSV export + archive when seasons change." },
         { "name": "Era (historical year sim)", "progress": 85, "live": true, "note": "12 hand-curated years 1955-2020 + headlines/charts/films/tech/culture/quote per year + year picker + share-via-hash." },
-        { "name": "Prayer Walk (mobile, native)", "progress": 75, "note": "Expo native app with GPS heatmap. APK installable. Pending Play Store + App Store submission." }
+        { "name": "Prayer Walk (mobile, native)", "progress": 75, "note": "Expo native app with GPS heatmap. APK installable. Pending Play Store + App Store submission." },
+        { "name": "Longitude (slow letters)", "progress": 30, "live": true, "note": "v0.05 shipped 2026-05-18 to /longitude/. URL-encoded sealed payloads, no server. Roadmap: random-stranger delivery pool (needs backend) for v0.1." },
+        { "name": "Stage Fright (voice mirror)", "progress": 30, "live": true, "note": "v0.05 shipped 2026-05-18 to /stage-fright/. 20-sec record + WPM/filler/volume-variance vs. calm baseline. Roadmap: Web Audio FFT for pitch analysis + offline PWA + native iOS." },
+        { "name": "PickIt (Play Store)", "progress": 70, "note": "App code complete on app-v1-wip-2026-05-18 branch (preserved 2026-05-18). Blockers before submission: $25 Console fee, service account JSON, RLS verification, AAB build, internal test track. See ~/pickit/SHIP-PUNCHLIST.md." }
       ]
     },
     {
