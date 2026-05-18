@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1a1611">
+<title>Park Waits · live ride times</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#f4ede0;
+  --ink-dim:#a89c87;
+  --ink-faint:#6d6353;
+  --bg:#1a1611;
+  --bg-panel:#221d16;
+  --bg-elev:#2a241c;
+  --accent:#d4a865;
+  --accent-warm:#c97a4b;
+  --good:#7da97d;
+  --med:#d4a865;
+  --bad:#b85959;
+  --rule:#3a3328;
+  --serif:'Fraunces',Georgia,serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-weight:400;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;line-height:1.45}
+header{padding:28px 24px 14px;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px}
+h1{font-family:var(--serif);font-weight:300;font-size:36px;line-height:1.02;letter-spacing:-0.025em;margin:0;font-variation-settings:"opsz" 144}
+h1 em{font-style:italic;color:var(--accent);font-weight:400}
+.tagline{font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin-top:10px}
+main{max-width:780px;margin:0 auto;padding:24px}
+.controls{
+  background:var(--bg-panel);
+  border:1px solid var(--rule);
+  border-radius:10px;
+  padding:16px 18px;
+  margin-bottom:24px;
+}
+.controls-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+label.control-label{
+  font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint);
+  display:block;margin-bottom:6px;
+}
+select{
+  background:var(--bg-elev);
+  border:1px solid var(--rule);
+  color:var(--ink);
+  font-family:var(--serif);font-size:15px;
+  padding:9px 12px;border-radius:6px;
+  outline:none;
+  min-width:220px;
+}
+select:focus{border-color:var(--accent)}
+.btn-sm{
+  font-family:var(--mono);font-size:11px;
+  background:transparent;border:1px solid var(--rule);
+  color:var(--ink-dim);padding:8px 14px;border-radius:14px;cursor:pointer;
+  transition:all .15s;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.btn-sm:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm.active{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.filter-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;padding-top:14px;border-top:1px dashed var(--rule)}
+.status{
+  font-family:var(--mono);font-size:11px;color:var(--ink-faint);
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
+  margin-bottom:14px;
+}
+.status-time{color:var(--accent)}
+.summary-grid{
+  display:grid;grid-template-columns:repeat(4, 1fr);gap:10px;
+  margin-bottom:24px;
+}
+@media(max-width:560px){.summary-grid{grid-template-columns:repeat(2,1fr)}}
+.summary-card{
+  background:var(--bg-panel);
+  border:1px solid var(--rule);
+  border-radius:8px;
+  padding:12px 14px;
+  text-align:center;
+}
+.summary-num{font-family:var(--serif);font-size:24px;font-weight:400;color:var(--ink);font-variation-settings:"opsz" 144}
+.summary-num.shortest{color:var(--good)}
+.summary-num.longest{color:var(--bad)}
+.summary-name{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);margin-top:4px;letter-spacing:0.05em;line-height:1.4}
+.land-section{margin-bottom:28px}
+.land-title{
+  font-family:var(--serif);font-weight:400;font-style:italic;
+  font-size:18px;color:var(--accent);
+  margin:0 0 12px 0;padding-bottom:6px;border-bottom:1px solid var(--rule);
+}
+.ride{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px;
+  background:var(--bg-panel);
+  border:1px solid var(--rule);
+  border-radius:8px;
+  margin-bottom:8px;
+  gap:14px;
+}
+.ride.closed{opacity:.5}
+.ride-name{font-family:var(--serif);font-size:15.5px;color:var(--ink);flex:1;line-height:1.3}
+.ride-wait{
+  font-family:var(--serif);font-size:24px;font-weight:400;font-variation-settings:"opsz" 144;
+  letter-spacing:-0.02em;
+  min-width:60px;text-align:right;
+}
+.ride-wait .unit{font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-left:4px;letter-spacing:0.05em}
+.ride-wait.good{color:var(--good)}
+.ride-wait.med{color:var(--med)}
+.ride-wait.bad{color:var(--bad)}
+.ride-wait.closed{color:var(--ink-faint);font-size:11px;font-family:var(--mono);font-style:italic;text-transform:uppercase;letter-spacing:0.08em;font-weight:400}
+.empty{font-family:var(--mono);font-size:12px;color:var(--ink-faint);text-align:center;padding:40px 0}
+.loading{text-align:center;padding:32px 0;font-family:var(--mono);font-size:12px;color:var(--ink-dim);letter-spacing:0.05em}
+.error{
+  background:var(--bg-elev);
+  border:1px solid var(--bad);
+  border-radius:6px;
+  padding:14px 18px;
+  font-family:var(--mono);font-size:12px;color:var(--ink-dim);
+  margin:20px 0;
+}
+.error strong{color:var(--bad)}
+footer{padding:24px;border-top:1px solid var(--rule);text-align:center;font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-top:48px}
+footer a{color:var(--ink-dim);text-decoration:none;border-bottom:1px dotted var(--rule)}
+footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
+@media(max-width:560px){
+  header{padding:24px 20px 14px}
+  main{padding:20px}
+  h1{font-size:28px}
+  .ride-name{font-size:14px}
+  .ride-wait{font-size:20px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Park Waits · v0.05</div>
+  <h1>Live <em>ride waits</em></h1>
+  <p class="tagline">Real-time queue data from queue-times.com · plan your next ride · default Six Flags Over Georgia</p>
+</header>
+
+<main>
+
+<div class="controls">
+  <div>
+    <label class="control-label">Park</label>
+    <select id="park-select" onchange="handleParkChange()">
+      <option value="35">Six Flags Over Georgia · Atlanta</option>
+      <option value="6">Disney Magic Kingdom · Orlando</option>
+      <option value="5">Epcot · Orlando</option>
+      <option value="7">Hollywood Studios · Orlando</option>
+      <option value="8">Animal Kingdom · Orlando</option>
+      <option value="64">Islands of Adventure · Orlando</option>
+      <option value="65">Universal Studios · Orlando</option>
+      <option value="67">Volcano Bay · Orlando</option>
+      <option value="34">Six Flags Over Texas · Dallas</option>
+      <option value="42">Six Flags America · Maryland</option>
+      <option value="48">La Ronde · Montreal</option>
+      <option value="16">Disneyland · Anaheim</option>
+      <option value="17">Disney California Adventure · Anaheim</option>
+      <option value="66">Universal Studios Hollywood</option>
+      <option value="334">Epic Universe · Orlando</option>
+    </select>
+  </div>
+  <div class="filter-row">
+    <button class="btn-sm active" id="sort-wait" onclick="setSort('wait')">Sort: shortest wait</button>
+    <button class="btn-sm" id="sort-name" onclick="setSort('name')">Sort: name</button>
+    <button class="btn-sm" id="sort-land" onclick="setSort('land')">Sort: by land</button>
+    <button class="btn-sm active" id="filter-open" onclick="toggleOpenOnly()">Open only</button>
+    <button class="btn-sm" onclick="loadWaits(true)">Refresh ↻</button>
+  </div>
+</div>
+
+<div class="status" id="status">
+  <span>Loading…</span>
+</div>
+
+<div class="summary-grid" id="summary" style="display:none"></div>
+
+<div id="results">
+  <div class="loading">fetching ride waits…</div>
+</div>
+
+</main>
+
+<footer>
+  Data: <a href="https://queue-times.com" target="_blank">queue-times.com</a> · refreshed manually · single-file · <a href="https://elijahbot-tools-hub.vercel.app">All tools →</a>
+</footer>
+
+<script>
+const STORE_KEY = 'park-waits-v0';
+const REFRESH_MS = 60_000; // auto-refresh every 60s
+
+const state = {
+  parkId: 35,
+  sort: 'wait',
+  openOnly: true,
+  data: null,
+  lastFetch: 0,
+};
+
+function loadState(){
+  try{
+    const s = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
+    if(s.parkId) state.parkId = s.parkId;
+    if(s.sort) state.sort = s.sort;
+    if(typeof s.openOnly === 'boolean') state.openOnly = s.openOnly;
+  } catch(e){}
+}
+function saveState(){
+  localStorage.setItem(STORE_KEY, JSON.stringify({
+    parkId: state.parkId, sort: state.sort, openOnly: state.openOnly,
+  }));
+}
+
+async function loadWaits(force){
+  const now = Date.now();
+  if(!force && state.data && (now - state.lastFetch) < 30_000){
+    render();
+    return;
+  }
+  document.getElementById('status').innerHTML = '<span>Loading…</span>';
+  document.getElementById('results').innerHTML = '<div class="loading">fetching ride waits…</div>';
+  document.getElementById('summary').style.display = 'none';
+  try{
+    const res = await fetch(`https://queue-times.com/parks/${state.parkId}/queue_times.json`);
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    state.data = data;
+    state.lastFetch = now;
+    render();
+  } catch(e){
+    document.getElementById('results').innerHTML =
+      '<div class="error"><strong>Couldn\'t reach queue-times.com.</strong><br>' +
+      'Check your connection and try refresh. The API may also be temporarily down.</div>';
+    document.getElementById('status').innerHTML = '<span>Failed to load.</span>';
+  }
+}
+
+function allRides(){
+  if(!state.data) return [];
+  const out = [];
+  if(state.data.lands && state.data.lands.length){
+    state.data.lands.forEach(land => {
+      (land.rides || []).forEach(r => {
+        out.push({ ...r, land: land.name });
+      });
+    });
+  }
+  (state.data.rides || []).forEach(r => out.push({ ...r, land: '' }));
+  return out;
+}
+
+function filteredSorted(){
+  let rides = allRides();
+  if(state.openOnly) rides = rides.filter(r => r.is_open);
+  if(state.sort === 'wait'){
+    rides.sort((a,b)=>{
+      if(a.is_open && !b.is_open) return -1;
+      if(!a.is_open && b.is_open) return 1;
+      return (a.wait_time || 0) - (b.wait_time || 0);
+    });
+  } else if(state.sort === 'name'){
+    rides.sort((a,b)=>a.name.localeCompare(b.name));
+  } else if(state.sort === 'land'){
+    rides.sort((a,b)=>{
+      const lc = (a.land||'').localeCompare(b.land||'');
+      if(lc !== 0) return lc;
+      return (a.wait_time || 0) - (b.wait_time || 0);
+    });
+  }
+  return rides;
+}
+
+function waitClass(min){
+  if(min <= 15) return 'good';
+  if(min <= 45) return 'med';
+  return 'bad';
+}
+
+function render(){
+  if(!state.data){ return; }
+  const rides = filteredSorted();
+  const open = allRides().filter(r => r.is_open);
+  const closed = allRides().length - open.length;
+  const lastUpdate = open[0]?.last_updated || null;
+
+  document.getElementById('status').innerHTML =
+    `<span>${open.length} open · ${closed} closed</span>` +
+    (lastUpdate ? `<span class="status-time">park data ${humanAgo(lastUpdate)} ago</span>` : '');
+
+  // summary cards
+  if(open.length > 0){
+    const waits = open.map(r => r.wait_time || 0);
+    const avg = Math.round(waits.reduce((a,b)=>a+b,0) / waits.length);
+    const shortest = open.reduce((a,b)=>(a.wait_time||0)<(b.wait_time||0)?a:b);
+    const longest = open.reduce((a,b)=>(a.wait_time||0)>(b.wait_time||0)?a:b);
+    const lowWait = open.filter(r => (r.wait_time || 0) <= 15).length;
+    document.getElementById('summary').style.display = 'grid';
+    document.getElementById('summary').innerHTML = `
+      <div class="summary-card"><div class="summary-num">${avg}</div><div class="summary-name">avg wait min</div></div>
+      <div class="summary-card"><div class="summary-num shortest">${shortest.wait_time}</div><div class="summary-name">${escapeHtml(shortest.name.slice(0,28))}</div></div>
+      <div class="summary-card"><div class="summary-num longest">${longest.wait_time}</div><div class="summary-name">${escapeHtml(longest.name.slice(0,28))}</div></div>
+      <div class="summary-card"><div class="summary-num shortest">${lowWait}</div><div class="summary-name">≤15 min rides</div></div>
+    `;
+  } else {
+    document.getElementById('summary').style.display = 'none';
+  }
+
+  // results
+  if(rides.length === 0){
+    document.getElementById('results').innerHTML =
+      `<div class="empty">No rides match. ${state.openOnly ? 'Toggle "open only" off to see closed rides.' : 'Try a different park.'}</div>`;
+    return;
+  }
+
+  if(state.sort === 'land'){
+    // group by land
+    const groups = {};
+    rides.forEach(r => {
+      const land = r.land || 'Other';
+      if(!groups[land]) groups[land] = [];
+      groups[land].push(r);
+    });
+    let html = '';
+    Object.keys(groups).forEach(land => {
+      html += `<div class="land-section">`;
+      html += `<h2 class="land-title">${escapeHtml(land)}</h2>`;
+      html += groups[land].map(rideHtml).join('');
+      html += '</div>';
+    });
+    document.getElementById('results').innerHTML = html;
+  } else {
+    document.getElementById('results').innerHTML = rides.map(rideHtml).join('');
+  }
+}
+
+function rideHtml(r){
+  const open = r.is_open;
+  const wait = r.wait_time || 0;
+  let waitDisplay;
+  if(!open){
+    waitDisplay = `<span class="ride-wait closed">closed</span>`;
+  } else {
+    waitDisplay = `<span class="ride-wait ${waitClass(wait)}">${wait}<span class="unit">min</span></span>`;
+  }
+  return `<div class="ride ${open ? '' : 'closed'}">
+    <span class="ride-name">${escapeHtml(r.name)}</span>
+    ${waitDisplay}
+  </div>`;
+}
+
+function setSort(s){
+  state.sort = s;
+  saveState();
+  ['wait','name','land'].forEach(k => {
+    document.getElementById('sort-'+k).classList.toggle('active', k===s);
+  });
+  render();
+}
+
+function toggleOpenOnly(){
+  state.openOnly = !state.openOnly;
+  saveState();
+  document.getElementById('filter-open').classList.toggle('active', state.openOnly);
+  document.getElementById('filter-open').textContent = state.openOnly ? 'Open only' : 'Show all';
+  render();
+}
+
+function handleParkChange(){
+  state.parkId = parseInt(document.getElementById('park-select').value);
+  saveState();
+  loadWaits(true);
+}
+
+function humanAgo(iso){
+  const then = new Date(iso).getTime();
+  const sec = Math.floor((Date.now() - then) / 1000);
+  if(sec < 60) return sec + 's';
+  if(sec < 3600) return Math.floor(sec/60) + 'min';
+  return Math.floor(sec/3600) + 'h';
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+}
+
+// init
+loadState();
+document.getElementById('park-select').value = String(state.parkId);
+document.getElementById('filter-open').classList.toggle('active', state.openOnly);
+document.getElementById('filter-open').textContent = state.openOnly ? 'Open only' : 'Show all';
+['wait','name','land'].forEach(k => {
+  document.getElementById('sort-'+k).classList.toggle('active', k===state.sort);
+});
+loadWaits();
+setInterval(()=>{ if(document.visibilityState === 'visible') loadWaits(); }, REFRESH_MS);
+</script>
+
+</body>
+</html>
