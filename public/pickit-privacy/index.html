@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PickIt — Privacy Policy</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 640px;
+            margin: 40px auto;
+            padding: 0 20px;
+            color: #392b21;
+            background: #faf6f1;
+            line-height: 1.6;
+        }
+        h1 { color: #8b6f47; font-size: 24px; }
+        h2 { color: #8b6f47; font-size: 18px; margin-top: 28px; }
+        p, li { margin: 12px 0; }
+        a { color: #8b6f47; }
+        ul { padding-left: 20px; }
+        .updated { color: #6b5744; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <h1>PickIt — Privacy Policy</h1>
+    <p class="updated">Last updated: February 13, 2026</p>
+
+    <h2>Overview</h2>
+    <p>PickIt is a free decision-making app developed by Purcell Ventures LLC. This policy explains how the app handles your data.</p>
+
+    <h2>Data We Collect</h2>
+    <p>PickIt collects and processes the following data, depending on which features you use:</p>
+
+    <h2>Local Data (stored on your device only)</h2>
+    <ul>
+        <li><strong>Custom lists</strong> — lists you create are saved locally on your device.</li>
+        <li><strong>Decision history</strong> — a log of past decisions is stored locally.</li>
+        <li><strong>OpenAI API key</strong> — if you use the AI generation feature, your API key is stored locally on your device. It is never sent to our servers.</li>
+    </ul>
+
+    <h2>Group Sessions (Supabase)</h2>
+    <p>When you use the Group Session feature, the following data is sent to our cloud database (hosted on Supabase):</p>
+    <ul>
+        <li><strong>Display name</strong> — the name you enter when creating or joining a session.</li>
+        <li><strong>Session data</strong> — list name, items, and join code for the session.</li>
+        <li><strong>Votes</strong> — your yes/no votes on each item in a group session.</li>
+    </ul>
+    <p>This data is associated with a randomly generated session, not with any personal account or login. Group session data is not linked to your identity.</p>
+
+    <h2>AI Generation (OpenAI)</h2>
+    <p>When you use the "Generate with AI" feature, your prompt text is sent directly from your device to OpenAI's API using your own API key. PickIt does not proxy, store, or log these requests. OpenAI's privacy policy applies to that data: <a href="https://openai.com/privacy">openai.com/privacy</a>.</p>
+
+    <h2>Location Data</h2>
+    <p>If you enable the "Use my location" toggle in AI generation, your device's GPS coordinates are used to determine your city name. This city name is included in the AI prompt to generate location-relevant suggestions. Your GPS coordinates are not stored, transmitted to our servers, or shared with any party other than OpenAI (as part of the prompt text).</p>
+
+    <h2>Third-Party Services</h2>
+    <ul>
+        <li><strong>Supabase</strong> — used for real-time group session functionality. <a href="https://supabase.com/privacy">supabase.com/privacy</a></li>
+        <li><strong>OpenAI</strong> — used for AI list generation (only when you provide your own API key). <a href="https://openai.com/privacy">openai.com/privacy</a></li>
+    </ul>
+    <p>No analytics, advertising, or tracking services are integrated into PickIt.</p>
+
+    <h2>Children's Privacy</h2>
+    <p>PickIt does not knowingly collect personal information from children under the age of 13. The app does not require account creation or login.</p>
+
+    <h2>Data Deletion</h2>
+    <p>Local data can be deleted by clearing the app's storage or uninstalling the app. Group session data in Supabase is ephemeral and not linked to any persistent identity. To request deletion of specific session data, contact us at the email below.</p>
+
+    <h2>Changes</h2>
+    <p>If this policy is updated, the changes will be reflected on this page with an updated date.</p>
+
+    <h2>Contact</h2>
+    <p>If you have questions about this privacy policy, contact us at support@purcell-ventures.com.</p>
+</body>
+</html>
