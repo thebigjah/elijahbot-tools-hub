@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1a1611">
+<title>Smart Calendar · rich event context</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#f4ede0;
+  --ink-dim:#a89c87;
+  --ink-faint:#6d6353;
+  --bg:#1a1611;
+  --bg-panel:#221d16;
+  --bg-elev:#2a241c;
+  --accent:#d4a865;
+  --accent-warm:#c97a4b;
+  --good:#7da97d;
+  --rule:#3a3328;
+  --serif:'Fraunces',Georgia,serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-weight:400;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;line-height:1.45}
+header{padding:28px 24px 14px;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px}
+h1{font-family:var(--serif);font-weight:300;font-size:36px;line-height:1.02;letter-spacing:-0.025em;margin:0;font-variation-settings:"opsz" 144}
+h1 em{font-style:italic;color:var(--accent);font-weight:400}
+.tagline{font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin-top:10px}
+main{max-width:780px;margin:0 auto;padding:24px}
+nav.tabs{display:flex;gap:0;border-bottom:1px solid var(--rule);margin-bottom:24px;overflow-x:auto}
+nav.tabs button{
+  font-family:var(--mono);font-size:12px;letter-spacing:0.08em;text-transform:uppercase;
+  background:transparent;border:none;color:var(--ink-faint);
+  padding:14px 16px;cursor:pointer;border-bottom:2px solid transparent;
+  transition:all .15s;white-space:nowrap;
+}
+nav.tabs button.active{color:var(--accent);border-bottom-color:var(--accent)}
+nav.tabs button:hover:not(.active){color:var(--ink-dim)}
+.panel{display:none}
+.panel.active{display:block}
+label.lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px;margin-top:14px}
+input[type=text], input[type=datetime-local], input[type=date], select, textarea{
+  width:100%;background:var(--bg-panel);border:1px solid var(--rule);color:var(--ink);
+  font-family:var(--serif);font-size:15px;padding:11px 14px;border-radius:6px;outline:none;
+  font-feature-settings:"ss01";
+}
+textarea{font-family:var(--serif);min-height:80px;line-height:1.55;resize:vertical}
+input:focus, select:focus, textarea:focus{border-color:var(--accent)}
+button.primary{
+  font-family:var(--mono);font-size:13px;letter-spacing:0.05em;text-transform:uppercase;
+  background:var(--accent);color:var(--bg);border:none;padding:13px 22px;border-radius:6px;cursor:pointer;
+  margin-top:20px;font-weight:500;transition:all .15s;
+}
+button.primary:hover{background:var(--accent-warm);color:var(--ink)}
+.event-card{
+  background:var(--bg-panel);border:1px solid var(--rule);border-radius:8px;
+  padding:16px 18px;margin-bottom:12px;cursor:pointer;transition:border .15s, transform .12s;
+}
+.event-card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.event-card.today{border-left:3px solid var(--accent-warm)}
+.event-card.soon{border-left:3px solid var(--accent)}
+.event-card.past{opacity:.6}
+.event-when{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:0.05em;margin-bottom:6px}
+.event-when.past{color:var(--ink-faint)}
+.event-name{font-family:var(--serif);font-size:18px;color:var(--ink);font-weight:400;margin:0 0 6px;line-height:1.25;letter-spacing:-0.01em}
+.event-meta{font-family:var(--mono);font-size:11px;color:var(--ink-faint);line-height:1.5}
+.event-context-flag{display:inline-block;font-family:var(--mono);font-size:10px;color:var(--accent-warm);margin-top:6px;letter-spacing:0.05em;text-transform:uppercase}
+.empty{font-family:var(--mono);font-size:12px;color:var(--ink-faint);text-align:center;padding:40px 0}
+.section-label{display:flex;align-items:baseline;gap:12px;margin:20px 0 12px}
+.section-num{font-family:var(--mono);font-size:11px;color:var(--accent-warm);letter-spacing:0.2em}
+.section-h{font-family:var(--serif);font-weight:400;font-size:17px;letter-spacing:0.01em;color:var(--ink)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;z-index:100}
+.modal.show{display:flex}
+.modal-card{
+  background:var(--bg);border:1px solid var(--rule);border-radius:10px;max-width:580px;width:100%;
+  padding:24px;margin-top:40px;margin-bottom:40px;
+}
+.modal-card h3{font-family:var(--serif);font-weight:400;font-size:24px;margin:0 0 6px;color:var(--accent);letter-spacing:-0.01em;line-height:1.15}
+.modal-when{font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);margin-bottom:14px;letter-spacing:0.04em}
+.context-block{
+  background:var(--bg-panel);border:1px solid var(--rule);border-radius:6px;
+  padding:14px 16px;margin-top:14px;
+}
+.context-label{font-family:var(--mono);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.context-body{font-family:var(--serif);font-size:14.5px;color:var(--ink-dim);line-height:1.6;white-space:pre-wrap}
+.context-empty{font-family:var(--mono);font-size:11px;color:var(--ink-faint);font-style:italic}
+.modal-actions{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+.btn-sm{font-family:var(--mono);font-size:11px;background:transparent;border:1px solid var(--rule);color:var(--ink-dim);padding:8px 14px;border-radius:14px;cursor:pointer;transition:all .15s}
+.btn-sm:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm.danger:hover{border-color:var(--accent-warm);color:var(--accent-warm)}
+.tag-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+.tag-chip{font-family:var(--mono);font-size:11.5px;padding:7px 13px;background:var(--bg-panel);border:1px solid var(--rule);border-radius:24px;color:var(--ink-dim);cursor:pointer;transition:all .15s;user-select:none}
+.tag-chip:hover{border-color:var(--accent);color:var(--ink)}
+.tag-chip.active{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:500}
+.import-area{background:var(--bg-elev);border:1px dashed var(--rule);border-radius:6px;padding:14px;margin-top:14px}
+footer{padding:24px;border-top:1px solid var(--rule);text-align:center;font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-top:48px}
+footer a{color:var(--ink-dim);text-decoration:none;border-bottom:1px dotted var(--rule)}
+footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
+@media(max-width:560px){header{padding:24px 20px 12px} main{padding:20px} h1{font-size:28px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Smart Calendar · v0.05</div>
+  <h1>Calendar with <em>real context</em></h1>
+  <p class="tagline">Google calendar gives you one description field. This gives you bio + prep + topics-to-bring-up + last-context per event. Open the event, get briefed.</p>
+</header>
+
+<main>
+
+<nav class="tabs">
+  <button id="tab-today" class="active" onclick="setTab('today')">Today <span id="today-count"></span></button>
+  <button id="tab-upcoming" onclick="setTab('upcoming')">Upcoming <span id="upcoming-count"></span></button>
+  <button id="tab-past" onclick="setTab('past')">Past <span id="past-count"></span></button>
+  <button id="tab-add" onclick="setTab('add')">Add event</button>
+  <button id="tab-import" onclick="setTab('import')">Import .ics</button>
+</nav>
+
+<section class="panel active" id="panel-today"><div id="today-list"></div></section>
+<section class="panel" id="panel-upcoming"><div id="upcoming-list"></div></section>
+<section class="panel" id="panel-past"><div id="past-list"></div></section>
+
+<section class="panel" id="panel-add">
+  <label class="lbl" for="ev-name">Event name</label>
+  <input type="text" id="ev-name" placeholder="e.g. Call with Reza">
+
+  <label class="lbl" for="ev-when">When</label>
+  <input type="datetime-local" id="ev-when">
+
+  <label class="lbl" for="ev-where">Where (optional)</label>
+  <input type="text" id="ev-where" placeholder="Google Meet / Acworth coffee shop / Cleveland TN">
+
+  <label class="lbl">Kind</label>
+  <div class="tag-row" id="kind-row"></div>
+
+  <label class="lbl" for="ev-bio">Who is this person / what is this event</label>
+  <textarea id="ev-bio" placeholder="Reza Hosseini Ghomi MD — neuropsychiatrist + biomedical engineer. 15 years ahead of where you want to be."></textarea>
+
+  <label class="lbl" for="ev-prep">Prep / what to do beforehand</label>
+  <textarea id="ev-prep" placeholder="Reread cheat sheet at 12:45. Pick 2 openers. Don't pitch yourself. Don't reference NeuroLex as current."></textarea>
+
+  <label class="lbl" for="ev-topics">Topics to bring up</label>
+  <textarea id="ev-topics" placeholder="40% dementia preventable; gap between AI capability and clinical workflow; what would you have a smart undergrad work on"></textarea>
+
+  <label class="lbl" for="ev-watch">Watch out for (don'ts)</label>
+  <textarea id="ev-watch" placeholder="Don't lead with Christianity. Don't ask for formal mentorship — ask for quarterly check-ins instead. Don't dwell on his cancer story."></textarea>
+
+  <button class="primary" id="save-btn" onclick="saveEvent()">Save event</button>
+</section>
+
+<section class="panel" id="panel-import">
+  <p style="font-family:var(--serif);font-size:15px;color:var(--ink-dim);line-height:1.55">Paste an .ics block (the part between BEGIN:VEVENT and END:VEVENT). I'll parse it into a Smart Calendar event you can add context to.</p>
+  <div class="import-area">
+    <textarea id="ics-input" style="min-height:200px;font-family:var(--mono);font-size:12.5px" placeholder="BEGIN:VEVENT&#10;UID:r4vrkjcih5ismd9t9vfn0dl1do&#10;DTSTART:20260519T170000Z&#10;DTEND:20260519T173000Z&#10;SUMMARY:Call with Reza&#10;...&#10;END:VEVENT"></textarea>
+  </div>
+  <button class="primary" onclick="parseIcs()">Parse + add</button>
+  <p id="ics-result" style="margin-top:14px;font-family:var(--mono);font-size:12px;color:var(--ink-dim)"></p>
+</section>
+
+</main>
+
+<!-- detail modal -->
+<div class="modal" id="modal" onclick="if(event.target===this) closeModal()">
+  <div class="modal-card" id="modal-card"></div>
+</div>
+
+<footer>
+  All event data stored locally. Nothing leaves this device.
+  · <a href="https://elijahbot-tools-hub.vercel.app">All tools →</a>
+</footer>
+
+<script>
+const STORE_KEY = 'smart-calendar-v0';
+const KINDS = [
+  { id:'call', label:'Call / Meeting' },
+  { id:'social', label:'Social' },
+  { id:'family', label:'Family' },
+  { id:'church', label:'Church / Faith' },
+  { id:'academic', label:'Academic / Class' },
+  { id:'work', label:'Work / Business' },
+  { id:'medical', label:'Medical' },
+  { id:'travel', label:'Travel' },
+  { id:'milestone', label:'Milestone' },
+  { id:'other', label:'Other' },
+];
+
+function load(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch(e){ return {}; } }
+function save(s){ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }
+function getStore(){ const s = load(); if(!s.events) s.events = []; return s; }
+function setStore(s){ save(s); }
+
+const state = { selectedKind: 'call' };
+
+function setTab(tab){
+  ['today','upcoming','past','add','import'].forEach(t => {
+    document.getElementById('tab-'+t).classList.toggle('active', t===tab);
+    document.getElementById('panel-'+t).classList.toggle('active', t===tab);
+  });
+  if(tab==='today' || tab==='upcoming' || tab==='past') renderLists();
+  if(tab==='add') renderKinds();
+}
+
+function renderKinds(){
+  const row = document.getElementById('kind-row');
+  row.innerHTML = '';
+  KINDS.forEach(k => {
+    const el = document.createElement('div');
+    el.className = 'tag-chip' + (state.selectedKind===k.id ? ' active' : '');
+    el.textContent = k.label;
+    el.onclick = () => { state.selectedKind = k.id; renderKinds(); };
+    row.appendChild(el);
+  });
+}
+
+function saveEvent(){
+  const name = document.getElementById('ev-name').value.trim();
+  if(!name){ alert('Give it a name.'); return; }
+  const when = document.getElementById('ev-when').value;
+  if(!when){ alert('Pick a date/time.'); return; }
+  const where = document.getElementById('ev-where').value.trim();
+  const bio = document.getElementById('ev-bio').value.trim();
+  const prep = document.getElementById('ev-prep').value.trim();
+  const topics = document.getElementById('ev-topics').value.trim();
+  const watch = document.getElementById('ev-watch').value.trim();
+
+  const ev = {
+    id: 'E' + Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    name, when, where, kind: state.selectedKind,
+    bio, prep, topics, watch,
+    createdAt: Date.now(),
+  };
+  const store = getStore();
+  store.events.push(ev);
+  setStore(store);
+  // reset
+  document.getElementById('ev-name').value = '';
+  document.getElementById('ev-when').value = '';
+  document.getElementById('ev-where').value = '';
+  document.getElementById('ev-bio').value = '';
+  document.getElementById('ev-prep').value = '';
+  document.getElementById('ev-topics').value = '';
+  document.getElementById('ev-watch').value = '';
+  state.selectedKind = 'call';
+  setTab('upcoming');
+}
+
+function isToday(iso){
+  const d = new Date(iso);
+  const now = new Date();
+  return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth() && d.getDate()===now.getDate();
+}
+
+function renderLists(){
+  const store = getStore();
+  const evs = store.events;
+  const now = Date.now();
+  const today = [], upcoming = [], past = [];
+  evs.forEach(e => {
+    const t = new Date(e.when).getTime();
+    if(isToday(e.when)) today.push(e);
+    else if(t > now) upcoming.push(e);
+    else past.push(e);
+  });
+  today.sort((a,b)=>new Date(a.when)-new Date(b.when));
+  upcoming.sort((a,b)=>new Date(a.when)-new Date(b.when));
+  past.sort((a,b)=>new Date(b.when)-new Date(a.when));
+
+  document.getElementById('today-count').textContent = today.length ? '('+today.length+')' : '';
+  document.getElementById('upcoming-count').textContent = upcoming.length ? '('+upcoming.length+')' : '';
+  document.getElementById('past-count').textContent = past.length ? '('+past.length+')' : '';
+
+  renderListInto('today-list', today, 'today');
+  renderListInto('upcoming-list', upcoming, 'soon');
+  renderListInto('past-list', past, 'past');
+}
+
+function renderListInto(elId, evs, klass){
+  const el = document.getElementById(elId);
+  if(!evs.length){
+    el.innerHTML = '<div class="empty">' +
+      (elId==='today-list' ? 'Nothing on the calendar today.' :
+       elId==='upcoming-list' ? 'Nothing upcoming. Add an event to get briefed.' :
+       'No past events captured.') + '</div>';
+    return;
+  }
+  el.innerHTML = evs.map(e => {
+    const d = new Date(e.when);
+    const whenStr = e.when ? d.toLocaleString(undefined, { weekday:'short', month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }) : '';
+    const hasContext = !!(e.bio || e.prep || e.topics || e.watch);
+    const kindLabel = (KINDS.find(k => k.id === e.kind) || {label: e.kind || ''}).label;
+    return `<div class="event-card ${klass}" onclick="openEvent('${e.id}')">
+      <div class="event-when ${klass==='past' ? 'past' : ''}">${escapeHtml(whenStr)}${e.where ? ' · '+escapeHtml(e.where) : ''}</div>
+      <div class="event-name">${escapeHtml(e.name)}</div>
+      <div class="event-meta">${escapeHtml(kindLabel)}</div>
+      ${hasContext ? '<div class="event-context-flag">briefing ready</div>' : '<div class="event-context-flag" style="color:var(--ink-faint)">no context yet · tap to add</div>'}
+    </div>`;
+  }).join('');
+}
+
+function openEvent(id){
+  const store = getStore();
+  const e = store.events.find(x => x.id === id);
+  if(!e) return;
+  const d = new Date(e.when);
+  const whenStr = d.toLocaleString(undefined, { weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'numeric', minute:'2-digit' });
+  const kindLabel = (KINDS.find(k => k.id === e.kind) || {label: e.kind || ''}).label;
+  let html = `
+    <h3>${escapeHtml(e.name)}</h3>
+    <div class="modal-when">${escapeHtml(whenStr)}${e.where ? ' · ' + escapeHtml(e.where) : ''} · ${escapeHtml(kindLabel)}</div>
+  `;
+  if(e.bio){
+    html += `<div class="context-block"><div class="context-label">Who / What</div><div class="context-body">${escapeHtml(e.bio)}</div></div>`;
+  }
+  if(e.prep){
+    html += `<div class="context-block"><div class="context-label">Prep</div><div class="context-body">${escapeHtml(e.prep)}</div></div>`;
+  }
+  if(e.topics){
+    html += `<div class="context-block"><div class="context-label">Topics to bring up</div><div class="context-body">${escapeHtml(e.topics)}</div></div>`;
+  }
+  if(e.watch){
+    html += `<div class="context-block"><div class="context-label">Watch out for</div><div class="context-body">${escapeHtml(e.watch)}</div></div>`;
+  }
+  if(!e.bio && !e.prep && !e.topics && !e.watch){
+    html += `<div class="context-block"><div class="context-empty">No context attached yet. Tap "Edit" to brief yourself.</div></div>`;
+  }
+  html += `
+    <div class="modal-actions">
+      <button class="btn-sm" onclick="editEvent('${e.id}')">Edit</button>
+      <button class="btn-sm danger" onclick="deleteEvent('${e.id}')">Delete</button>
+      <button class="btn-sm" onclick="closeModal()">Close</button>
+    </div>
+  `;
+  document.getElementById('modal-card').innerHTML = html;
+  document.getElementById('modal').classList.add('show');
+}
+
+function editEvent(id){
+  const store = getStore();
+  const e = store.events.find(x => x.id === id);
+  if(!e) return;
+  document.getElementById('ev-name').value = e.name || '';
+  document.getElementById('ev-when').value = e.when || '';
+  document.getElementById('ev-where').value = e.where || '';
+  document.getElementById('ev-bio').value = e.bio || '';
+  document.getElementById('ev-prep').value = e.prep || '';
+  document.getElementById('ev-topics').value = e.topics || '';
+  document.getElementById('ev-watch').value = e.watch || '';
+  state.selectedKind = e.kind || 'call';
+  // mark for replacement
+  state.editingId = id;
+  // patch save behavior
+  const saveBtn = document.getElementById('save-btn');
+  saveBtn.textContent = 'Update event';
+  saveBtn.onclick = function(){
+    e.name = document.getElementById('ev-name').value.trim();
+    e.when = document.getElementById('ev-when').value;
+    e.where = document.getElementById('ev-where').value.trim();
+    e.kind = state.selectedKind;
+    e.bio = document.getElementById('ev-bio').value.trim();
+    e.prep = document.getElementById('ev-prep').value.trim();
+    e.topics = document.getElementById('ev-topics').value.trim();
+    e.watch = document.getElementById('ev-watch').value.trim();
+    setStore(store);
+    state.editingId = null;
+    saveBtn.textContent = 'Save event';
+    saveBtn.onclick = saveEvent;
+    setTab('upcoming');
+  };
+  closeModal();
+  setTab('add');
+}
+
+function deleteEvent(id){
+  if(!confirm('Delete this event + its context?')) return;
+  const store = getStore();
+  store.events = store.events.filter(e => e.id !== id);
+  setStore(store);
+  closeModal();
+  renderLists();
+}
+
+function closeModal(){ document.getElementById('modal').classList.remove('show'); }
+
+function parseIcs(){
+  const text = document.getElementById('ics-input').value;
+  const result = document.getElementById('ics-result');
+  // Extract first VEVENT
+  const vevent = text.match(/BEGIN:VEVENT([\s\S]*?)END:VEVENT/);
+  if(!vevent){
+    result.textContent = 'Couldn\'t find a VEVENT block. Paste the full BEGIN:VEVENT ... END:VEVENT.';
+    return;
+  }
+  const block = vevent[1];
+  const get = (key) => {
+    const m = block.match(new RegExp('^' + key + '[^:]*:(.+)$', 'mi'));
+    return m ? m[1].trim() : '';
+  };
+  const summary = get('SUMMARY');
+  const location = get('LOCATION');
+  const dtstart = get('DTSTART');
+  const description = get('DESCRIPTION');
+
+  // parse DTSTART (basic forms: YYYYMMDDTHHMMSSZ or YYYYMMDDTHHMMSS or YYYYMMDD)
+  let isoWhen = '';
+  if(dtstart){
+    const m = dtstart.match(/(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2})(\d{2}))?Z?/);
+    if(m){
+      const y = m[1], mo = m[2], d = m[3];
+      const h = m[4] || '12', mi = m[5] || '00';
+      isoWhen = `${y}-${mo}-${d}T${h}:${mi}`;
+      // if Z (UTC), convert to local datetime-local
+      if(dtstart.endsWith('Z')){
+        const utc = new Date(`${y}-${mo}-${d}T${h}:${mi}:00Z`);
+        const local = new Date(utc.getTime() - utc.getTimezoneOffset()*60000);
+        isoWhen = local.toISOString().slice(0,16);
+      }
+    }
+  }
+
+  document.getElementById('ev-name').value = summary || '';
+  document.getElementById('ev-when').value = isoWhen;
+  document.getElementById('ev-where').value = location || '';
+  if(description){
+    document.getElementById('ev-bio').value = description.replace(/\\n/g, '\n');
+  }
+  result.innerHTML = `<span style="color:var(--good)">Parsed.</span> Review on the Add tab, then Save event.`;
+  setTimeout(()=>{ setTab('add'); }, 500);
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+}
+
+// Seed first-time user with the Reza event so they see how context works.
+function seedIfEmpty(){
+  const store = getStore();
+  if(store.events.length === 0 && !store.seededOnce){
+    store.events.push({
+      id: 'E_seed_reza',
+      name: 'Call with Reza Hosseini Ghomi',
+      when: '2026-05-19T13:00',
+      where: 'Google Meet',
+      kind: 'call',
+      bio: "Neuropsychiatrist + biomedical engineer. Survived Hodgkin's at 22, pivoted from naval engineering to medicine. Four health-tech companies (NeuroLex exited 2020 → Sonde, Frontier Psychiatry ~$12M ARR, MedFlow, OpenHi). Treats patients across MT/ID/AK/WY. Currently obsessed with early dementia detection via voice biomarkers + lifestyle prevention.",
+      prep: "12:45 reread the morning-of cheat sheet at ~/.claude/elijahbot/drafts/reza-call-ammo-2026-05-19.md. Use Stage Fright at 12:30 to baseline your voice. Camera + Shure mic + water + tabs closed.",
+      topics: "1) 40% of dementia is preventable — is the lifestyle conversation actually changing patient behavior or is it academic? 2) Gap between AI capability and what regulated clinical workflow allows? Mentor ask (last 5 min): \"Would you be open to talking periodically — maybe once a quarter — as I think through the pre-med path?\"",
+      watch: "DON'T pitch yourself. DON'T lead with Christianity (faith status unknown). DON'T reference NeuroLex as current — it exited 5 years ago. DON'T match his pedigree — you can't. DON'T fill silence — let him think.",
+      createdAt: Date.now(),
+    });
+    store.seededOnce = true;
+    setStore(store);
+  }
+}
+
+// init
+seedIfEmpty();
+renderKinds();
+renderLists();
+</script>
+
+</body>
+</html>
