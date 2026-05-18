@@ -10,6 +10,13 @@
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22 fill=%22%23c2a173%22>P</text></svg>">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="EBTools">
+<meta name="theme-color" content="#0a0a14">
+<script src="/lock.js"></script>
 <style>
 :root { color-scheme: dark; }
 * { box-sizing: border-box; }
@@ -185,5 +192,12 @@ footer a:hover { text-decoration: underline; }
 <p style="margin-top: 1.5rem; opacity: 0.6;">Want one of these tools customized for your business or church? <a href="https://purcellventures.co">Purcell Ventures</a> builds custom tools and consults on AI implementation for small organizations.</p>
 </footer>
 </div>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(e => console.warn('sw registration failed', e));
+  });
+}
+</script>
 </body>
 </html>

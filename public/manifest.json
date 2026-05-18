@@ -1,0 +1,25 @@
+{
+  "name": "ElijahBot Tools",
+  "short_name": "EBTools",
+  "description": "Elijah Purcell's personal tool suite — faith, productivity, business, growth. 27 single-file tools in one installable app.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a14",
+  "theme_color": "#c2a173",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
