@@ -1,6 +1,6 @@
 {
-  "updated": "2026-05-18T23:55:00Z",
-  "updated_human": "2026-05-18 — late evening workshop (Longitude + Stage Fright + Park Waits shipped, PickIt WIP committed, Personal OS built but unpublished)",
+  "updated": "2026-05-19T00:05:00Z",
+  "updated_human": "2026-05-18 evening workshop — 8 ships in ~3h: Longitude + Stage Fright (v0.1) + Park Waits + Personal OS + Magic Closet + Smart Calendar + PickIt WIP+punchlist",
   "sections": [
     {
       "title": "Personal AI & accountability",
@@ -49,6 +49,7 @@
         { "name": "Stage Fright (voice mirror)", "progress": 55, "live": true, "note": "v0.1 shipped 2026-05-18 to /stage-fright/. 20-sec record + WPM/filler/volume + AUTOCORRELATION PITCH DETECTION vs. calm baseline. Diagnoses: F0 elevation = vocal-fold tension (yawn+hum prescription), pitch CV swings, monotone, fast/slow talking, filler density. Built for Reza call use tomorrow. Roadmap: offline PWA + native iOS." },
         { "name": "Park Waits (queue times)", "progress": 30, "live": true, "note": "v0.05 shipped 2026-05-18 to /park-waits/. Live data from queue-times.com for 15 parks incl. Six Flags Over Georgia. Sort, filter, summary cards, 60s auto-refresh." },
         { "name": "Magic Closet", "progress": 35, "live": true, "note": "v0.05 shipped 2026-05-18 to /magic-closet/. Wardrobe catalog with IndexedDB photo storage (Blob, no cloud). Tags: type/color/seasons/formality. Outfit picker weighted by recency (60d cap), weather→season mapping. Replaces Apr Expo scaffold. Roadmap: AI BYOK outfit critique." },
+        { "name": "Smart Calendar", "progress": 40, "live": true, "note": "v0.05 shipped 2026-05-18 to /smart-calendar/. Rich per-event context (bio/prep/topics/watch-for) — 4 fields where Google Calendar gives one. .ics paste-in parser, datetime-local input, edit/delete. Seeded with the Reza call as a worked example. Roadmap: AI BYOK auto-context, two-way Google sync, ntfy reminders." }
         { "name": "PickIt (Play Store)", "progress": 70, "note": "App code complete on app-v1-wip-2026-05-18 branch (preserved 2026-05-18). Blockers before submission: $25 Console fee, service account JSON, RLS verification, AAB build, internal test track. See ~/pickit/SHIP-PUNCHLIST.md." }
       ]
     },
