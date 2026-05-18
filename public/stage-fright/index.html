@@ -107,8 +107,9 @@ main{max-width:680px;margin:0 auto;padding:32px 24px}
 
 .results{margin-top:20px;display:none}
 .results.show{display:block}
-.metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:8px}
-@media(max-width:560px){.metric-grid{grid-template-columns:1fr}}
+.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px}
+@media(max-width:760px){.metric-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.metric-grid{grid-template-columns:1fr}}
 .metric{
   background:var(--bg-panel);
   border:1px solid var(--rule);
@@ -165,7 +166,7 @@ footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
 <body>
 
 <header>
-  <div class="eyebrow">Stage Fright · v0.05</div>
+  <div class="eyebrow">Stage Fright · v0.1</div>
   <h1>Mirror your <em>voice</em></h1>
   <p class="tagline">Speak into the mic for 20 seconds. Stage Fright tells you how you sound vs. your calm baseline — and what to do about it.</p>
 </header>
@@ -239,7 +240,7 @@ let mediaRecorder = null;
 let audioChunks = [];
 let audioContext = null;
 let analyser = null;
-let dataArray = null;
+let timeDataArray = null;
 let micStream = null;
 let recognition = null;
 let transcript = '';
@@ -248,6 +249,8 @@ let recordStart = 0;
 let recordTimer = null;
 let recordEnd = null;
 let volumeSamples = [];
+let pitchSamples = [];     // detected fundamental frequencies (Hz), null when unvoiced
+let sampleRate = 48000;    // updated when audio context created
 let volumeFrame = null;
 
 // ============================================================================
@@ -298,12 +301,14 @@ async function startRecording(){
   }
 
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  sampleRate = audioContext.sampleRate;
   const source = audioContext.createMediaStreamSource(micStream);
   analyser = audioContext.createAnalyser();
-  analyser.fftSize = 1024;
+  analyser.fftSize = 2048; // larger window helps autocorrelation
   source.connect(analyser);
-  dataArray = new Uint8Array(analyser.fftSize);
+  timeDataArray = new Float32Array(analyser.fftSize);
   volumeSamples = [];
+  pitchSamples = [];
 
   transcript = '';
   recognition = setupRecognition();
@@ -318,18 +323,27 @@ async function startRecording(){
   document.getElementById('status').textContent = 'Listening… speak naturally for 20 seconds.';
   document.getElementById('results').classList.remove('show');
 
-  // sample volume + meter
+  // sample volume + pitch + meter
+  let pitchCooldown = 0;
   function tick(){
     if(!isRecording) return;
-    analyser.getByteTimeDomainData(dataArray);
+    analyser.getFloatTimeDomainData(timeDataArray);
+    // RMS volume from float [-1, 1]
     let sum = 0;
-    for(let i=0; i<dataArray.length; i++){
-      const v = (dataArray[i] - 128)/128;
-      sum += v*v;
+    for(let i=0; i<timeDataArray.length; i++){
+      sum += timeDataArray[i] * timeDataArray[i];
     }
-    const rms = Math.sqrt(sum / dataArray.length);
+    const rms = Math.sqrt(sum / timeDataArray.length);
     volumeSamples.push(rms);
     document.getElementById('meter').style.width = Math.min(100, rms*350) + '%';
+    // detect pitch every ~3rd frame to save CPU
+    pitchCooldown = (pitchCooldown + 1) % 3;
+    if(pitchCooldown === 0 && rms > 0.01){
+      const hz = detectPitch(timeDataArray, sampleRate);
+      if(hz && hz > 60 && hz < 600){ // human voice range
+        pitchSamples.push(hz);
+      }
+    }
     const elapsed = (Date.now() - recordStart) / 1000;
     document.getElementById('mode-indicator').textContent = `recording · ${elapsed.toFixed(1)}s / ${RECORD_SECONDS}s`;
     volumeFrame = requestAnimationFrame(tick);
@@ -362,6 +376,68 @@ function stopRecording(){
 }
 
 // ============================================================================
+// PITCH DETECTION — autocorrelation with parabolic interpolation
+// ============================================================================
+// Returns fundamental frequency in Hz, or null if no clear pitch.
+// Acceptable for human voice (60-600 Hz). Faster than YIN, less accurate.
+function detectPitch(buf, sr){
+  const SIZE = buf.length;
+  // RMS check — bail on silence
+  let rms = 0;
+  for(let i=0; i<SIZE; i++) rms += buf[i]*buf[i];
+  rms = Math.sqrt(rms / SIZE);
+  if(rms < 0.005) return null;
+
+  // Trim leading/trailing low-amplitude samples
+  const THRESH = 0.2;
+  let r1 = 0, r2 = SIZE - 1;
+  for(let i=0; i<SIZE/2; i++) if(Math.abs(buf[i]) < THRESH){ r1 = i; break; }
+  for(let i=1; i<SIZE/2; i++) if(Math.abs(buf[SIZE-i]) < THRESH){ r2 = SIZE - i; break; }
+  const trimmed = buf.subarray(r1, r2);
+  const N = trimmed.length;
+  if(N < 256) return null;
+
+  // Autocorrelation
+  const c = new Float32Array(N);
+  for(let lag = 0; lag < N; lag++){
+    let sum = 0;
+    for(let i = 0; i < N - lag; i++){
+      sum += trimmed[i] * trimmed[i + lag];
+    }
+    c[lag] = sum;
+  }
+
+  // Find first dip after lag 0 (first zero crossing of derivative going up)
+  let d = 0;
+  while(d < N - 1 && c[d] > c[d+1]) d++;
+
+  // Find max after that point
+  let maxVal = -Infinity, maxLag = -1;
+  // Pitch range: 60-600 Hz → corresponding lags
+  const minLag = Math.floor(sr / 600);
+  const maxLagBound = Math.floor(sr / 60);
+  for(let lag = Math.max(d, minLag); lag < Math.min(N, maxLagBound); lag++){
+    if(c[lag] > maxVal){
+      maxVal = c[lag];
+      maxLag = lag;
+    }
+  }
+  if(maxLag < 0) return null;
+
+  // Parabolic interpolation for sub-sample accuracy
+  let bestLag = maxLag;
+  if(maxLag > 0 && maxLag < N - 1){
+    const y1 = c[maxLag - 1], y2 = c[maxLag], y3 = c[maxLag + 1];
+    const denom = y1 - 2*y2 + y3;
+    if(Math.abs(denom) > 1e-6){
+      const shift = 0.5 * (y1 - y3) / denom;
+      bestLag = maxLag + shift;
+    }
+  }
+  return sr / bestLag;
+}
+
+// ============================================================================
 // ANALYZE
 // ============================================================================
 function analyze(){
@@ -390,7 +466,20 @@ function analyze(){
   volVar = Math.sqrt(volVar / Math.max(1, volumeSamples.length));
   const volCV = volMean > 0 ? (volVar / volMean) : 0;
 
-  const metrics = { wpm, fillerCount, fillerRate, volMean, volCV, wordCount, durationSec };
+  // pitch stats — median is more robust than mean for vocal F0
+  let pitchMedian = 0, pitchCV = 0, pitchCount = pitchSamples.length;
+  if(pitchCount > 5){
+    const sorted = [...pitchSamples].sort((a,b)=>a-b);
+    pitchMedian = sorted[Math.floor(sorted.length / 2)];
+    let pMean = 0;
+    for(const p of pitchSamples) pMean += p;
+    pMean = pMean / pitchCount;
+    let pVar = 0;
+    for(const p of pitchSamples) pVar += (p - pMean)*(p - pMean);
+    pitchCV = pMean > 0 ? Math.sqrt(pVar / pitchCount) / pMean : 0;
+  }
+
+  const metrics = { wpm, fillerCount, fillerRate, volMean, volCV, wordCount, durationSec, pitchMedian, pitchCV, pitchCount };
 
   // is this the baseline?
   const store = loadStore();
@@ -425,11 +514,17 @@ function showBaselineCard(){
   const store = loadStore();
   if(!store.baseline) return;
   document.getElementById('baseline-card').style.display = 'flex';
+  const b = store.baseline;
+  let pitchPart = '';
+  if(b.pitchMedian && b.pitchMedian > 0){
+    pitchPart = ' · pitch <strong>' + Math.round(b.pitchMedian) + ' Hz</strong>';
+  }
   document.getElementById('baseline-stats').innerHTML =
-    'Saved <strong>' + new Date(store.baseline.savedAt).toLocaleDateString() + '</strong> · ' +
-    '<strong>' + Math.round(store.baseline.wpm) + '</strong> wpm · ' +
-    '<strong>' + store.baseline.fillerCount + '</strong> fillers · ' +
-    'volume CV <strong>' + store.baseline.volCV.toFixed(2) + '</strong>';
+    'Saved <strong>' + new Date(b.savedAt).toLocaleDateString() + '</strong> · ' +
+    '<strong>' + Math.round(b.wpm) + '</strong> wpm · ' +
+    '<strong>' + b.fillerCount + '</strong> fillers · ' +
+    'volume CV <strong>' + b.volCV.toFixed(2) + '</strong>' +
+    pitchPart;
 }
 
 function renderResults(m, base){
@@ -454,6 +549,14 @@ function metricsHtml(m, base){
       flipDelta: false,
     },
     {
+      name: 'Pitch (median)',
+      value: m.pitchCount > 5 ? Math.round(m.pitchMedian) + ' Hz' : 'n/a',
+      baseline: base && base.pitchMedian ? Math.round(base.pitchMedian) + ' Hz' : null,
+      delta: base && base.pitchMedian && m.pitchCount > 5 ? ((m.pitchMedian - base.pitchMedian)/base.pitchMedian)*100 : null,
+      unit: '',
+      flipDelta: false,
+    },
+    {
       name: 'Fillers',
       value: m.fillerCount,
       baseline: base ? base.fillerCount : null,
@@ -467,6 +570,14 @@ function metricsHtml(m, base){
       value: m.volCV.toFixed(2),
       baseline: base ? base.volCV.toFixed(2) : null,
       delta: base && base.volCV > 0 ? ((m.volCV - base.volCV)/base.volCV)*100 : null,
+      unit: '',
+      flipDelta: false,
+    },
+    {
+      name: 'Pitch variability',
+      value: m.pitchCount > 5 ? m.pitchCV.toFixed(2) : 'n/a',
+      baseline: base && base.pitchCV ? base.pitchCV.toFixed(2) : null,
+      delta: base && base.pitchCV && m.pitchCount > 5 ? ((m.pitchCV - base.pitchCV)/base.pitchCV)*100 : null,
       unit: '',
       flipDelta: false,
     },
@@ -513,6 +624,42 @@ function metricsHtml(m, base){
 
 function diagnosesHtml(m, base){
   const issues = [];
+
+  // Pitch elevated? (raised pitch is the classic anxiety tell)
+  if(base && base.pitchMedian && base.pitchMedian > 0 && m.pitchCount > 5){
+    const pitchDelta = ((m.pitchMedian - base.pitchMedian) / base.pitchMedian) * 100;
+    if(pitchDelta > 8){
+      issues.push({
+        type: 'alert',
+        title: `Your pitch is ${pitchDelta.toFixed(1)}% higher than calm baseline.`,
+        body: `Elevated F0 is the most reliable acoustic anxiety marker. Your vocal folds are tensing. Quick reset: yawn deeply 3 times (resets larynx position) + hum 5 seconds at your lowest comfortable note before joining the call. Lowers pitch back to baseline range almost instantly.`,
+      });
+    } else if(pitchDelta < -8){
+      issues.push({
+        type: 'alert',
+        title: `Your pitch is ${Math.abs(pitchDelta).toFixed(1)}% lower than calm baseline.`,
+        body: `Could be fatigue, post-meal grogginess, or you're projecting "calm" too hard (sometimes a fake-low voice). If genuinely tired: stand up. Drink cold water. Read three sentences aloud at your normal volume to wake the vocal cords. If forcing calm: stop, just be normal-you.`,
+      });
+    }
+  }
+
+  // Pitch variability (monotone vs. animated)
+  if(base && base.pitchCV && base.pitchCV > 0 && m.pitchCount > 5){
+    const pitchCVDelta = m.pitchCV / base.pitchCV;
+    if(pitchCVDelta > 1.6){
+      issues.push({
+        type: 'alert',
+        title: 'Your pitch is swinging more than usual.',
+        body: 'Wide pitch variance often signals anxiety-driven over-emphasis or strained excitement. Try a controlled "lift" only on key words instead of every other word. The listener picks up the most important word more clearly when emphasis is rationed.',
+      });
+    } else if(pitchCVDelta < 0.55){
+      issues.push({
+        type: 'alert',
+        title: 'Your pitch is flatter than usual — sounding monotone.',
+        body: "Monotone pitch reads as disengaged or rehearsed. Mark 2-3 key phrases in your opening and deliberately give them a lift. Even slight pitch variation on 'this is what I wanted to ask you' makes the question land.",
+      });
+    }
+  }
 
   // WPM elevated?
   if(base && base.wpm > 0){
