@@ -213,6 +213,7 @@
 <div class="tabs">
   <button class="tab active" data-view="pray">Pray</button>
   <button class="tab" data-view="history">History</button>
+  <button class="tab" data-view="stats">Stats</button>
   <button class="tab" data-view="manage">Manage</button>
 </div>
 
@@ -267,6 +268,36 @@
     <div id="history-list"></div>
   </div>
 </div>
+
+<div id="view-stats" class="view" style="display:none;">
+  <div class="movement">
+    <h2 style="font-size:1.1rem;">Examen practice — the long view</h2>
+    <div id="stats-summary" class="stats-summary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0.75rem;margin:1rem 0 1.5rem;"></div>
+    <h3 style="font-family:var(--serif);font-size:1rem;color:var(--ink-soft);margin:1.5rem 0 0.6rem;">Last 30 days</h3>
+    <div id="stats-heatmap" style="display:grid;grid-template-columns:repeat(15,1fr);gap:3px;font-family:ui-monospace,monospace;font-size:0.7rem;"></div>
+    <p id="stats-streak-note" style="font-family:var(--serif);font-style:italic;color:var(--ink-soft);font-size:0.9rem;margin-top:1rem;"></p>
+    <h3 style="font-family:var(--serif);font-size:1rem;color:var(--ink-soft);margin:1.5rem 0 0.6rem;">Most-named in gratitude (top 8)</h3>
+    <div id="stats-words" style="font-size:0.92rem;line-height:1.9;"></div>
+  </div>
+</div>
+<style>
+  .stats-summary .stat {
+    background: var(--bg-alt); border: 1px solid var(--ink-faint); border-radius: 8px;
+    padding: 0.8rem 0.9rem; text-align: center;
+  }
+  .stats-summary .stat .n { font-family: Georgia, serif; font-size: 1.5rem; color: var(--ink); display: block; }
+  .stats-summary .stat .l { font-size: 0.68rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.08em; }
+  #stats-heatmap .cell {
+    aspect-ratio: 1; border-radius: 3px; background: var(--bg-alt); position: relative;
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+  #stats-heatmap .cell.kept { background: var(--accent); }
+  #stats-heatmap .cell.today { outline: 2px solid var(--gold); outline-offset: 1px; }
+  #stats-heatmap .cell::after { content: attr(data-day); position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; color: var(--ink-soft); }
+  #stats-heatmap .cell.kept::after { color: var(--bg); }
+  #stats-words .word { display: inline-block; margin: 0 0.5rem 0.5rem 0; padding: 4px 12px; background: var(--bg-alt); border-radius: 999px; color: var(--ink); font-size: 0.85rem; }
+  #stats-words .word .count { color: var(--ink-soft); margin-left: 6px; font-size: 0.78rem; }
+</style>
 
 <div id="view-manage" class="view" style="display:none;">
   <div class="movement">
@@ -425,12 +456,84 @@ function resetAll() {
   navigateTo(currentDate); renderHistory();
 }
 
+function renderStats() {
+  // Days that count as "kept": have any of the 5 movements with content
+  const FIELDS = ['gratitude','light','review','forgiveness','tomorrow'];
+  const keptDays = Object.entries(all).filter(([d, e]) => FIELDS.some(f => (e[f] || '').trim().length > 0))
+    .map(([d]) => d).sort();
+
+  // Total + streak
+  const total = keptDays.length;
+  const today = todayKey();
+  let streak = 0;
+  let cur = today;
+  while (keptDays.includes(cur)) {
+    streak++;
+    const d = new Date(cur + 'T00:00:00');
+    d.setDate(d.getDate() - 1);
+    cur = d.toISOString().split('T')[0];
+  }
+  // Last-30 completion rate
+  const last30 = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(today + 'T00:00:00');
+    d.setDate(d.getDate() - i);
+    last30.push(d.toISOString().split('T')[0]);
+  }
+  const last30Kept = last30.filter(d => keptDays.includes(d)).length;
+
+  // Average movements per kept day (depth, not just attendance)
+  const avgMovements = total
+    ? (keptDays.reduce((sum, d) => sum + FIELDS.filter(f => (all[d][f] || '').trim()).length, 0) / total).toFixed(1)
+    : '—';
+
+  document.getElementById('stats-summary').innerHTML = `
+    <div class="stat"><span class="n">${total}</span><span class="l">total kept</span></div>
+    <div class="stat"><span class="n">${streak}</span><span class="l">day streak</span></div>
+    <div class="stat"><span class="n">${last30Kept}/30</span><span class="l">last 30d</span></div>
+    <div class="stat"><span class="n">${avgMovements}/5</span><span class="l">avg depth</span></div>
+  `;
+
+  // Heatmap last 30
+  document.getElementById('stats-heatmap').innerHTML = last30.map(d => {
+    const kept = keptDays.includes(d);
+    const isToday = d === today;
+    const day = parseInt(d.split('-')[2], 10);
+    return `<div class="cell ${kept ? 'kept' : ''} ${isToday ? 'today' : ''}" data-day="${day}" title="${d}${kept ? ' · kept' : ''}"></div>`;
+  }).join('');
+
+  // Streak note
+  const note = document.getElementById('stats-streak-note');
+  if (streak >= 7) note.textContent = `${streak} days in a row. The rhythm is doing its work.`;
+  else if (streak >= 3) note.textContent = `${streak} days. Don't break it tonight.`;
+  else if (streak === 0 && last30Kept > 0) note.textContent = `You've missed a few. Tonight is the next examen.`;
+  else if (total === 0) note.textContent = `No examens yet. The first one is the hardest. Try writing one line in each movement.`;
+  else note.textContent = ``;
+
+  // Top words in gratitude
+  const stopwords = new Set('a an the and or but in on for to of with my our this that is was were be been being had have has having do did i you he she we they it not so as if at by from up out down too very can will would could should about into over after before because when where who what which how all some'.split(' '));
+  const wordCounts = {};
+  keptDays.forEach(d => {
+    const text = (all[d].gratitude || '').toLowerCase();
+    text.replace(/[^a-z\s']/g, ' ').split(/\s+/).forEach(w => {
+      w = w.replace(/^'+|'+$/g, '');
+      if (w.length < 4 || stopwords.has(w)) return;
+      wordCounts[w] = (wordCounts[w] || 0) + 1;
+    });
+  });
+  const top = Object.entries(wordCounts).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  document.getElementById('stats-words').innerHTML = top.length
+    ? top.map(([w, n]) => `<span class="word">${escapeHtml(w)}<span class="count">${n}</span></span>`).join('')
+    : '<span style="color:var(--ink-faint);font-style:italic;">No gratitude words yet.</span>';
+}
+
 function showView(name) {
   document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('view-' + name).style.display = '';
   document.querySelector(`.tab[data-view="${name}"]`).classList.add('active');
   if (name === 'history') renderHistory();
+  if (name === 'stats') renderStats();
 }
 
 document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
