@@ -278,6 +278,7 @@
   <button class="tab active" data-view="today">Today</button>
   <button class="tab" data-view="favorites">Favorites</button>
   <button class="tab" data-view="all">Browse</button>
+  <button class="tab" data-view="stats">Stats</button>
   <button class="tab" data-view="manage">Manage</button>
 </div>
 
@@ -321,6 +322,38 @@
     <div id="all-list"></div>
   </div>
 </div>
+
+<div id="view-stats" class="view" style="display:none;">
+  <div class="panel">
+    <h2>What this practice has built</h2>
+    <p style="color:var(--ink-soft);font-size:0.88rem;margin-bottom:1rem;">A quiet daily practice compounds. Here's what yours looks like.</p>
+    <div id="solomon-stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0.75rem;margin-bottom:1.5rem;"></div>
+    <h3 style="font-family:var(--serif);font-size:1rem;color:var(--ink-soft);margin:1.5rem 0 0.6rem;">Favorites by tradition</h3>
+    <div id="solomon-trad-bars"></div>
+    <h3 style="font-family:var(--serif);font-size:1rem;color:var(--ink-soft);margin:1.5rem 0 0.6rem;">Most-recent reflection</h3>
+    <div id="solomon-recent-reflection" style="background:var(--bg-alt);border:1px solid var(--border);border-radius:8px;padding:1rem;font-size:0.9rem;color:var(--ink);line-height:1.55;"></div>
+  </div>
+</div>
+<style>
+  #solomon-stats-grid .stat {
+    background: var(--bg-alt); border: 1px solid var(--border); border-radius: 8px;
+    padding: 0.8rem 0.9rem; text-align: center;
+  }
+  #solomon-stats-grid .stat .n { font-family: var(--serif); font-size: 1.5rem; color: var(--accent); display: block; }
+  #solomon-stats-grid .stat .l { font-size: 0.68rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.08em; }
+  #solomon-trad-bars .row {
+    display: grid; grid-template-columns: 110px 1fr 40px; align-items: center; gap: 0.8rem;
+    padding: 0.4rem 0; font-size: 0.88rem;
+  }
+  #solomon-trad-bars .row .label { color: var(--ink); }
+  #solomon-trad-bars .row .bar-wrap { background: var(--border); height: 8px; border-radius: 4px; overflow: hidden; }
+  #solomon-trad-bars .row .bar { height: 100%; border-radius: 4px; }
+  #solomon-trad-bars .row .bar.proverbs { background: var(--proverbs); }
+  #solomon-trad-bars .row .bar.christian { background: var(--christian); }
+  #solomon-trad-bars .row .bar.classical { background: var(--classical); }
+  #solomon-trad-bars .row .bar.modern { background: var(--modern); }
+  #solomon-trad-bars .row .pct { font-family: ui-monospace, monospace; font-size: 0.78rem; color: var(--ink-soft); text-align: right; }
+</style>
 
 <div id="view-manage" class="view" style="display:none;">
   <div class="panel">
@@ -546,6 +579,65 @@ function resetData() {
   renderQuote(); renderFavorites(); renderAll();
 }
 
+function renderStats() {
+  const favKeys = state.favorites || [];
+  const reflections = state.reflections || {};
+  const refKeys = Object.keys(reflections).filter(k => (reflections[k] || '').trim().length);
+
+  // Map fav keys back to quote types
+  const tradCounts = { proverbs: 0, christian: 0, classical: 0, modern: 0 };
+  let resolvedFavs = 0;
+  favKeys.forEach(key => {
+    const idx = QUOTES.findIndex((q, i) => quoteKey(i) === key);
+    if (idx >= 0) {
+      const t = QUOTES[idx].type;
+      if (t in tradCounts) tradCounts[t]++;
+      resolvedFavs++;
+    }
+  });
+
+  // Total reflection word count
+  const totalReflectionWords = refKeys.reduce((sum, k) => sum + (reflections[k] || '').split(/\s+/).filter(Boolean).length, 0);
+
+  // Quotes browsed (favs + reflections + at-least-implied-via-today-visits not tracked, so use favs+reflections as proxy)
+  const uniqueTouched = new Set([...favKeys, ...refKeys]).size;
+  const browsedPct = Math.round((uniqueTouched / QUOTES.length) * 100);
+
+  document.getElementById('solomon-stats-grid').innerHTML = `
+    <div class="stat"><span class="n">${resolvedFavs}</span><span class="l">favorites</span></div>
+    <div class="stat"><span class="n">${refKeys.length}</span><span class="l">reflections</span></div>
+    <div class="stat"><span class="n">${totalReflectionWords}</span><span class="l">words written</span></div>
+    <div class="stat"><span class="n">${browsedPct}%</span><span class="l">of ${QUOTES.length} touched</span></div>
+  `;
+
+  const total = Object.values(tradCounts).reduce((a, b) => a + b, 0);
+  const tradLabels = { proverbs: 'Proverbs', christian: 'Christian', classical: 'Classical', modern: 'Modern' };
+  const order = ['proverbs', 'christian', 'classical', 'modern'];
+  document.getElementById('solomon-trad-bars').innerHTML = total ? order.map(t => {
+    const pct = total ? Math.round(tradCounts[t] / total * 100) : 0;
+    return `
+      <div class="row">
+        <span class="label">${tradLabels[t]}</span>
+        <div class="bar-wrap"><div class="bar ${t}" style="width:${pct}%;"></div></div>
+        <span class="pct">${tradCounts[t]}</span>
+      </div>
+    `;
+  }).join('') : '<div class="empty" style="color:var(--ink-soft);font-style:italic;padding:0.8rem 0;">No favorites yet. Star quotes as they speak to you.</div>';
+
+  // Most-recent reflection
+  const sortedRefs = refKeys.sort().reverse();
+  if (sortedRefs.length) {
+    const k = sortedRefs[0];
+    const idx = QUOTES.findIndex((q, i) => quoteKey(i) === k);
+    const q = idx >= 0 ? QUOTES[idx] : null;
+    document.getElementById('solomon-recent-reflection').innerHTML = q
+      ? `<div style="font-style:italic;color:var(--ink-soft);margin-bottom:0.6rem;">"${escapeHtml(q.text.length > 200 ? q.text.slice(0, 200) + '…' : q.text)}"<br><span style="font-size:0.78rem;">— ${escapeHtml(q.source)}</span></div><div style="border-left:2px solid var(--accent);padding-left:0.8rem;color:var(--ink);">${escapeHtml(reflections[k])}</div>`
+      : '<div style="color:var(--ink-faint);font-style:italic;">Quote unresolved.</div>';
+  } else {
+    document.getElementById('solomon-recent-reflection').innerHTML = '<div style="color:var(--ink-faint);font-style:italic;">No reflections yet. Save one on a quote that speaks to you, then come back.</div>';
+  }
+}
+
 function showView(name) {
   document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -554,6 +646,7 @@ function showView(name) {
   if (name === 'today') renderQuote();
   if (name === 'favorites') renderFavorites();
   if (name === 'all') renderAll();
+  if (name === 'stats') renderStats();
 }
 
 document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
