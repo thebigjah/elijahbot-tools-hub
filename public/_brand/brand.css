@@ -1,0 +1,130 @@
+/* ========================================================================
+   PURCELL VENTURES · shared brand foundation
+   ========================================================================
+   Anchors that appear on every tool to create family resemblance.
+   Tools layer their own distinct fonts, palettes, and treatments on top.
+
+   USAGE:  <link rel="stylesheet" href="/_brand/brand.css">
+   ======================================================================== */
+
+:root {
+  /* Palette — verified against purcell-ventures-site/app/brand */
+  --pv-bg: #0a0604;
+  --pv-bg-warm: #14100a;
+  --pv-bg-elev: #1f1810;
+  --pv-ink: #f4ede0;
+  --pv-ink-dim: #a89c87;
+  --pv-ink-faint: #6d6353;
+
+  --pv-gold: #d4af37;        /* the panopticon-mark gold — primary brand color */
+  --pv-brass: #c2a173;       /* muted gold for surfaces + secondary accents */
+  --pv-brass-bright: #e8b968; /* warm bright gold for emphasis */
+  --pv-red: #e54a28;          /* intrusion red — sparingly */
+
+  --pv-rule: #3a3328;
+  --pv-rule-strong: #524a3e;
+
+  /* Brand fonts — load via Google Fonts in each tool */
+  --pv-display: 'Cinzel', 'EB Garamond', Georgia, serif;
+  --pv-body: 'DM Sans', system-ui, sans-serif;
+  --pv-ui: 'Inter', system-ui, sans-serif;
+  --pv-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* ========================================================================
+   PHI ARRAY — golden-angle phyllotaxis pattern
+   ========================================================================
+   Inline SVG class. Drop into any tool as a background-image or as a
+   decorative element. The pattern is procedurally generated so it tiles
+   visually without seams. Use at low opacity (0.04-0.10).
+   ======================================================================== */
+
+.pv-phi-bg {
+  background-image: url("/_brand/phi-pattern.svg");
+  background-repeat: repeat;
+  background-size: 480px 480px;
+  background-position: center;
+}
+.pv-phi-bg-faint {
+  background-image: url("/_brand/phi-pattern.svg");
+  background-repeat: repeat;
+  background-size: 480px 480px;
+  opacity: 0.06;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ========================================================================
+   SLASH MARK — the current PV logo glyph
+   ========================================================================
+   Subtle brand mark that can appear in headers, footers, or as a
+   decorative anchor. Use Cinzel-styled `/` with the brass color.
+   ======================================================================== */
+
+.pv-slash {
+  display: inline-block;
+  font-family: var(--pv-display);
+  font-weight: 700;
+  color: var(--pv-brass);
+  letter-spacing: 0.02em;
+}
+.pv-slash::before { content: "/"; }
+
+.pv-mark {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35em;
+  font-family: var(--pv-display);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pv-brass);
+  text-decoration: none;
+}
+.pv-mark .pv-mark-slash { color: var(--pv-brass-bright); }
+.pv-mark:hover .pv-mark-slash { color: var(--pv-red); }
+
+/* ========================================================================
+   GRAIN OVERLAY — subtle film-grain for tactile feel
+   ========================================================================
+   Position: fixed top-layer non-interactive overlay. Adds analog warmth
+   to any dark interface. Opt-in per tool — not required.
+   ======================================================================== */
+
+.pv-grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/></svg>");
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+}
+
+/* ========================================================================
+   SHARED SMALL UTILITIES — accent rules, glyph dividers
+   ======================================================================== */
+
+.pv-divider {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  margin: 2em 0;
+  color: var(--pv-ink-faint);
+}
+.pv-divider::before,
+.pv-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--pv-rule), transparent);
+}
+.pv-divider-mark {
+  font-family: var(--pv-display);
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  color: var(--pv-brass);
+}

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Purcell Ventures · Panopticon mark
+  Extracted from purcell-ventures-site/app/components/PanopticonMark.tsx
+  Default config: 8 groups, flankers ±10°, 10 rings, filled bars
+  Gold #d4af37, dark #0c0a08
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
+  <rect width="300" height="300" fill="#0c0a08" rx="8"/>
+  <circle cx="150" cy="150" r="135" stroke="#d4af37" stroke-width="20" fill="none"/>
+  <g fill="#d4af37">
+    <!-- 8 main bars at every 45deg -->
+    <rect x="146.5" y="26" width="7" height="32"/>
+    <rect x="146.5" y="26" width="7" height="32" transform="rotate(45 150 150)"/>
+    <rect x="146.5" y="26" width="7" height="32" transform="rotate(90 150 150)"/>
+    <rect x="146.5" y="26" width="7" height="32" transform="rotate(135 150 150)"/>
+    <rect x="146.5" y="26" width="7" height="32" transform="rotate(180 150 150)"/>
+    <rect x="146.5" y="26" width="7" height="32" transform="rotate(225 150 150)"/>
+    <rect x="146.5" y="26" width="7" height="32" transform="rotate(270 150 150)"/>
+    <rect x="146.5" y="26" width="7" height="32" transform="rotate(315 150 150)"/>
+    <!-- 16 flankers at ±10° from each main -->
+    <rect x="147.75" y="26" width="4.5" height="16" transform="rotate(-10 150 150)"/>
+    <rect x="147.75" y="26" width="4.5" height="16" transform="rotate(10 150 150)"/>
+    <rect x="147.75" y="26" width="4.5" height="16" transform="rotate(35 150 150)"/>
+    <rect x="147.75" y="26" width="4.5" height="16" transform="rotate(55 150 150)"/>
+    <rect x="147.75" y="26" width="4.5" height="16" transform="rotate(80 150 150)"/>
+    <rect x="147.75" y="26" width="4.5" height="16" transform="rotate(100 150 150)"/>
+    <rect x="147.75" y="26" width="4.5" height="16" transform="rotate(125 150 150)"/>
+    <rect x="147.75" y="26" width="4.5" height="16" transform="rotate(145 150 150)"/>
+    <rect x="147.75" y="26" width="4.5" height="16" transform="rotate(170 150 150)"/>
+    <rect x="147.75" y="26" width="4.5" height="16" transform="rotate(190 150 150)"/>
+    <rect x="147.75" y="26" width="4.5" height="16" transform="rotate(215 150 150)"/>
+    <rect x="147.75" y="26" width="4.5" height="16" transform="rotate(235 150 150)"/>
+    <rect x="147.75" y="26" width="4.5" height="16" transform="rotate(260 150 150)"/>
+    <rect x="147.75" y="26" width="4.5" height="16" transform="rotate(280 150 150)"/>
+    <rect x="147.75" y="26" width="4.5" height="16" transform="rotate(305 150 150)"/>
+    <rect x="147.75" y="26" width="4.5" height="16" transform="rotate(325 150 150)"/>
+  </g>
+  <!-- 10 concentric inner rings, opacity scaling -->
+  <g stroke="#d4af37" stroke-width="1.1" fill="none">
+    <circle cx="150" cy="150" r="42" opacity="0.38"/>
+    <circle cx="150" cy="150" r="46.78" opacity="0.44"/>
+    <circle cx="150" cy="150" r="51.56" opacity="0.50"/>
+    <circle cx="150" cy="150" r="56.33" opacity="0.56"/>
+    <circle cx="150" cy="150" r="61.11" opacity="0.62"/>
+    <circle cx="150" cy="150" r="65.89" opacity="0.68"/>
+    <circle cx="150" cy="150" r="70.67" opacity="0.74"/>
+    <circle cx="150" cy="150" r="75.44" opacity="0.80"/>
+    <circle cx="150" cy="150" r="80.22" opacity="0.86"/>
+    <circle cx="150" cy="150" r="85" opacity="0.92"/>
+  </g>
+  <!-- Center clearing + PV monogram -->
+  <circle cx="150" cy="150" r="34" fill="#0c0a08"/>
+  <text x="150" y="150" text-anchor="middle" dominant-baseline="central"
+    font-family="'Cinzel', Georgia, serif" font-size="30" font-weight="700"
+    fill="#d4af37" letter-spacing="1.8">PV</text>
+</svg>
