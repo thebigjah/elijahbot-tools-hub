@@ -3,154 +3,335 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#1a1611">
-<title>Park Waits · live ride times</title>
+<meta name="theme-color" content="#1c1612">
+<title>The Midway · Live Ride Waits</title>
+<link rel="icon" href="/_brand/panopticon-mark.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Cinzel:wght@500;700&family=Marcellus&family=Special+Elite&display=swap" rel="stylesheet">
 <style>
+/*  ============================================================
+    PARK WAITS · "The Midway" edition
+    -----------------------------------------------------------
+    Concept: a 1940s travelling carnival poster — slab-serif
+    shouting headlines, cream stock with red/gold ink, ticket-
+    stub rides, vintage frame border. Live data hidden inside
+    nostalgic chrome.
+    ============================================================ */
+
 :root{
-  --ink:#f4ede0;
-  --ink-dim:#a89c87;
-  --ink-faint:#6d6353;
-  --bg:#1a1611;
-  --bg-panel:#221d16;
-  --bg-elev:#2a241c;
-  --accent:#d4a865;
-  --accent-warm:#c97a4b;
-  --good:#7da97d;
-  --med:#d4a865;
-  --bad:#b85959;
-  --rule:#3a3328;
-  --serif:'Fraunces',Georgia,serif;
-  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --paper:#f1e3c2;
+  --paper-deep:#e6d3a4;
+  --paper-edge:#c8b07d;
+  --ink:#1c1612;
+  --ink-soft:#3d2e22;
+  --red:#b8332a;
+  --red-deep:#7a1f18;
+  --gold:#d4af37;
+  --gold-deep:#8a6d18;
+  --navy:#1a2940;
+  --green:#3d6638;
+  --amber:#c87f23;
+
+  --display:'Alfa Slab One', 'Rockwell', Georgia, serif;
+  --headline:'Marcellus', 'Trajan Pro', Georgia, serif;
+  --type:'Special Elite', 'Courier New', monospace;
+  --brand:'Cinzel', Georgia, serif;
 }
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-weight:400;-webkit-font-smoothing:antialiased}
-body{min-height:100vh;line-height:1.45}
-header{padding:28px 24px 14px;border-bottom:1px solid var(--rule)}
-.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px}
-h1{font-family:var(--serif);font-weight:300;font-size:36px;line-height:1.02;letter-spacing:-0.025em;margin:0;font-variation-settings:"opsz" 144}
-h1 em{font-style:italic;color:var(--accent);font-weight:400}
-.tagline{font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin-top:10px}
-main{max-width:780px;margin:0 auto;padding:24px}
-.controls{
-  background:var(--bg-panel);
-  border:1px solid var(--rule);
-  border-radius:10px;
-  padding:16px 18px;
-  margin-bottom:24px;
-}
-.controls-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-label.control-label{
-  font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint);
-  display:block;margin-bottom:6px;
-}
-select{
-  background:var(--bg-elev);
-  border:1px solid var(--rule);
+html,body{margin:0;padding:0;background:var(--ink);color:var(--paper);font-family:var(--headline);font-weight:400;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;line-height:1.4;letter-spacing:0.005em}
+
+/* ============================================================
+   POSTER FRAME — cream sheet inset on dark background
+   ============================================================ */
+.poster{
+  max-width:780px;margin:0 auto;
+  background:var(--paper);
   color:var(--ink);
-  font-family:var(--serif);font-size:15px;
-  padding:9px 12px;border-radius:6px;
-  outline:none;
-  min-width:220px;
+  position:relative;
+  min-height:100vh;
+  /* paper grain */
+  background-image:
+    radial-gradient(circle at 30% 20%, rgba(180, 140, 80, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 70% 80%, rgba(140, 100, 50, 0.04) 0%, transparent 50%);
 }
-select:focus{border-color:var(--accent)}
-.btn-sm{
-  font-family:var(--mono);font-size:11px;
-  background:transparent;border:1px solid var(--rule);
-  color:var(--ink-dim);padding:8px 14px;border-radius:14px;cursor:pointer;
-  transition:all .15s;
-  display:inline-flex;align-items:center;gap:6px;
+/* paper noise overlay */
+.poster::before{
+  content:"";
+  position:absolute;inset:0;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>");
+  opacity:0.08;
+  mix-blend-mode:multiply;
 }
-.btn-sm:hover{border-color:var(--accent);color:var(--accent)}
-.btn-sm.active{background:var(--accent);color:var(--bg);border-color:var(--accent)}
-.filter-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;padding-top:14px;border-top:1px dashed var(--rule)}
-.status{
-  font-family:var(--mono);font-size:11px;color:var(--ink-faint);
-  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
-  margin-bottom:14px;
+/* decorative double-border */
+.poster::after{
+  content:"";
+  position:absolute;
+  top:14px;left:14px;right:14px;bottom:14px;
+  border:2px solid var(--ink);
+  pointer-events:none;
+  outline:1px solid var(--ink);
+  outline-offset:4px;
 }
-.status-time{color:var(--accent)}
-.summary-grid{
-  display:grid;grid-template-columns:repeat(4, 1fr);gap:10px;
-  margin-bottom:24px;
-}
-@media(max-width:560px){.summary-grid{grid-template-columns:repeat(2,1fr)}}
-.summary-card{
-  background:var(--bg-panel);
-  border:1px solid var(--rule);
-  border-radius:8px;
-  padding:12px 14px;
+
+/* ============================================================
+   HEADER — the marquee
+   ============================================================ */
+header{
+  position:relative;z-index:2;
+  padding:42px 36px 24px;
   text-align:center;
 }
-.summary-num{font-family:var(--serif);font-size:24px;font-weight:400;color:var(--ink);font-variation-settings:"opsz" 144}
-.summary-num.shortest{color:var(--good)}
-.summary-num.longest{color:var(--bad)}
-.summary-name{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);margin-top:4px;letter-spacing:0.05em;line-height:1.4}
-.land-section{margin-bottom:28px}
-.land-title{
-  font-family:var(--serif);font-weight:400;font-style:italic;
-  font-size:18px;color:var(--accent);
-  margin:0 0 12px 0;padding-bottom:6px;border-bottom:1px solid var(--rule);
+.brand-strip{
+  font-family:var(--brand);
+  font-size:9px;letter-spacing:0.45em;text-transform:uppercase;
+  color:var(--gold-deep);
+  font-weight:700;
+  margin-bottom:6px;
 }
-.ride{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px 14px;
-  background:var(--bg-panel);
-  border:1px solid var(--rule);
-  border-radius:8px;
+.brand-strip::before, .brand-strip::after{
+  content:"❋";
+  margin:0 0.8em;
+  color:var(--red);
+  font-size:11px;
+  vertical-align:1px;
+}
+h1{
+  font-family:var(--display);
+  font-size:62px;line-height:0.95;letter-spacing:0.005em;
+  margin:0;color:var(--red);
+  text-transform:uppercase;
+  text-shadow:
+    2px 2px 0 var(--ink),
+    -1px -1px 0 var(--paper-deep);
+  transform:rotate(-1deg);
+}
+h1 .small{font-size:30px;color:var(--ink);display:block;letter-spacing:0.05em;margin-top:6px;transform:rotate(2deg)}
+.tagline{
+  font-family:var(--headline);font-style:italic;
+  font-size:14px;color:var(--ink-soft);
+  margin-top:14px;letter-spacing:0.01em;
+}
+.divider-row{
+  display:flex;align-items:center;justify-content:center;gap:14px;
+  margin-top:16px;
+}
+.divider-row::before, .divider-row::after{
+  content:"";
+  flex:1;max-width:120px;
+  height:2px;background:var(--ink);
+  position:relative;
+}
+.divider-glyph{
+  font-family:var(--brand);font-size:11px;letter-spacing:0.3em;color:var(--gold-deep);font-weight:700;
+}
+
+/* ============================================================
+   CONTROLS — ticket booth
+   ============================================================ */
+.booth{
+  position:relative;z-index:2;
+  margin:0 36px 24px;
+  background:var(--ink);
+  color:var(--paper);
+  padding:18px 22px;
+  border:3px solid var(--paper);
+  outline:1px solid var(--ink);
+  outline-offset:-7px;
+}
+.booth-label{
+  font-family:var(--display);
+  font-size:11px;letter-spacing:0.25em;text-transform:uppercase;
+  color:var(--gold);
   margin-bottom:8px;
-  gap:14px;
 }
-.ride.closed{opacity:.5}
-.ride-name{font-family:var(--serif);font-size:15.5px;color:var(--ink);flex:1;line-height:1.3}
+select{
+  width:100%;
+  background:var(--paper);
+  color:var(--ink);
+  border:2px solid var(--ink);
+  font-family:var(--headline);font-size:16px;
+  padding:10px 14px;outline:none;
+  cursor:pointer;
+}
+.controls-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.btn{
+  font-family:var(--type);font-size:11px;letter-spacing:0.05em;
+  background:var(--paper);color:var(--ink);
+  border:2px solid var(--paper);
+  padding:7px 12px;cursor:pointer;
+  text-transform:uppercase;
+  transition:all .12s;
+}
+.btn:hover{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+.btn.active{background:var(--red);color:var(--paper);border-color:var(--red)}
+.btn.refresh{margin-left:auto}
+
+/* ============================================================
+   SUMMARY ROW — barker billboard
+   ============================================================ */
+.status-line{
+  position:relative;z-index:2;
+  margin:0 36px 18px;
+  font-family:var(--type);font-size:11px;color:var(--ink-soft);
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  letter-spacing:0.04em;text-transform:uppercase;
+}
+.status-line .timestamp{color:var(--red)}
+
+.summary-strip{
+  position:relative;z-index:2;
+  margin:0 36px 28px;
+  display:grid;grid-template-columns:repeat(4, 1fr);gap:0;
+  border:3px double var(--ink);
+}
+@media(max-width:560px){.summary-strip{grid-template-columns:repeat(2,1fr)}}
+.summary-cell{
+  padding:14px 12px;text-align:center;
+  border-right:1px solid var(--ink);
+  background:rgba(255,255,255,0.2);
+  position:relative;
+}
+.summary-cell:last-child{border-right:none}
+.summary-cell:nth-child(2n){background:rgba(255,255,255,0.05)}
+.sum-val{
+  font-family:var(--display);font-size:30px;line-height:1;color:var(--ink);
+  letter-spacing:0.01em;
+}
+.sum-val.green{color:var(--green)}
+.sum-val.red{color:var(--red)}
+.sum-label{
+  font-family:var(--type);font-size:9.5px;color:var(--ink-soft);
+  margin-top:6px;letter-spacing:0.1em;text-transform:uppercase;
+  line-height:1.3;
+}
+
+/* ============================================================
+   RIDES — ticket stubs
+   ============================================================ */
+.rides-section{position:relative;z-index:2;padding:0 36px 50px}
+.land-title{
+  font-family:var(--display);font-size:22px;color:var(--red);
+  margin:24px 0 10px;letter-spacing:0.04em;text-transform:uppercase;
+  padding-bottom:6px;
+  border-bottom:2px solid var(--ink);
+  position:relative;
+}
+.land-title::after{
+  content:"";
+  position:absolute;left:0;bottom:-5px;
+  height:1px;width:100%;background:var(--ink);
+}
+
+.ride{
+  display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;
+  padding:14px 16px;margin-bottom:8px;
+  background:rgba(255,255,255,0.15);
+  border:1px solid var(--ink);
+  position:relative;
+}
+.ride.closed{opacity:0.45}
+/* ticket-stub notched corners */
+.ride::before, .ride::after{
+  content:"";
+  position:absolute;top:50%;
+  width:12px;height:12px;
+  background:var(--paper);
+  border:1px solid var(--ink);
+  border-radius:50%;
+  transform:translateY(-50%);
+}
+.ride::before{left:-7px}
+.ride::after{right:-7px}
+
+.ride-num{
+  font-family:var(--display);font-size:18px;color:var(--gold-deep);
+  width:32px;text-align:center;letter-spacing:0;
+}
+.ride-name{
+  font-family:var(--headline);font-size:17px;color:var(--ink);
+  line-height:1.25;letter-spacing:0;
+}
 .ride-wait{
-  font-family:var(--serif);font-size:24px;font-weight:400;font-variation-settings:"opsz" 144;
-  letter-spacing:-0.02em;
-  min-width:60px;text-align:right;
+  font-family:var(--display);font-size:36px;line-height:1;
+  letter-spacing:0;
+  text-align:right;
+  min-width:90px;
+  position:relative;
 }
-.ride-wait .unit{font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-left:4px;letter-spacing:0.05em}
-.ride-wait.good{color:var(--good)}
-.ride-wait.med{color:var(--med)}
-.ride-wait.bad{color:var(--bad)}
-.ride-wait.closed{color:var(--ink-faint);font-size:11px;font-family:var(--mono);font-style:italic;text-transform:uppercase;letter-spacing:0.08em;font-weight:400}
-.empty{font-family:var(--mono);font-size:12px;color:var(--ink-faint);text-align:center;padding:40px 0}
-.loading{text-align:center;padding:32px 0;font-family:var(--mono);font-size:12px;color:var(--ink-dim);letter-spacing:0.05em}
+.ride-wait .unit{
+  display:block;
+  font-family:var(--type);font-size:9.5px;font-weight:normal;
+  color:var(--ink-soft);
+  margin-top:4px;letter-spacing:0.12em;text-transform:uppercase;
+}
+.ride-wait.good{color:var(--green)}
+.ride-wait.med{color:var(--amber)}
+.ride-wait.bad{color:var(--red)}
+.ride-wait.closed{
+  font-family:var(--type);font-size:11px;color:var(--ink-soft);
+  font-style:italic;text-transform:uppercase;letter-spacing:0.15em;
+  font-weight:normal;
+}
+
+.empty{
+  font-family:var(--headline);font-style:italic;font-size:14px;color:var(--ink-soft);
+  text-align:center;padding:40px 0;
+}
+.loading{
+  text-align:center;padding:40px 0;
+  font-family:var(--type);font-size:11px;color:var(--ink-soft);letter-spacing:0.15em;
+  text-transform:uppercase;
+}
 .error{
-  background:var(--bg-elev);
-  border:1px solid var(--bad);
-  border-radius:6px;
-  padding:14px 18px;
-  font-family:var(--mono);font-size:12px;color:var(--ink-dim);
-  margin:20px 0;
+  margin:20px 0;padding:18px;
+  background:var(--red-deep);color:var(--paper);
+  font-family:var(--type);font-size:13px;line-height:1.5;
+  border:2px solid var(--ink);
 }
-.error strong{color:var(--bad)}
-footer{padding:24px;border-top:1px solid var(--rule);text-align:center;font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-top:48px}
-footer a{color:var(--ink-dim);text-decoration:none;border-bottom:1px dotted var(--rule)}
-footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ============================================================
+   FOOTER — broadside fine print
+   ============================================================ */
+footer{
+  position:relative;z-index:2;
+  text-align:center;
+  padding:22px 36px 36px;
+  border-top:2px solid var(--ink);
+  margin:0 36px;
+  font-family:var(--type);font-size:10px;color:var(--ink-soft);
+  letter-spacing:0.12em;text-transform:uppercase;
+}
+footer a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--ink-soft)}
+footer a:hover{color:var(--red);border-bottom-color:var(--red)}
+
 @media(max-width:560px){
-  header{padding:24px 20px 14px}
-  main{padding:20px}
-  h1{font-size:28px}
-  .ride-name{font-size:14px}
-  .ride-wait{font-size:20px}
+  header{padding:30px 24px 18px}
+  h1{font-size:42px}
+  h1 .small{font-size:20px}
+  .booth, .status-line, .summary-strip, .rides-section, footer{margin-left:24px;margin-right:24px}
+  .rides-section{padding-left:0;padding-right:0;margin:0 24px 30px}
+  .land-title{font-size:18px}
+  .ride{grid-template-columns:auto 1fr auto;gap:10px}
+  .ride-name{font-size:15px}
+  .ride-wait{font-size:28px;min-width:70px}
+  .poster::after{top:8px;left:8px;right:8px;bottom:8px;outline-offset:3px}
 }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="eyebrow">Park Waits · v0.05</div>
-  <h1>Live <em>ride waits</em></h1>
-  <p class="tagline">Real-time queue data from queue-times.com · plan your next ride · default Six Flags Over Georgia</p>
-</header>
+<div class="poster">
+  <header>
+    <div class="brand-strip">Purcell Ventures presents</div>
+    <h1>The Midway<span class="small">live ride waits</span></h1>
+    <p class="tagline">Step right up. Pick a park. The wheel never sleeps.</p>
+    <div class="divider-row"><span class="divider-glyph">XV PARKS · LIVE FROM QUEUE-TIMES</span></div>
+  </header>
 
-<main>
-
-<div class="controls">
-  <div>
-    <label class="control-label">Park</label>
+  <div class="booth">
+    <div class="booth-label">Choose your park</div>
     <select id="park-select" onchange="handleParkChange()">
       <option value="35">Six Flags Over Georgia · Atlanta</option>
       <option value="6">Disney Magic Kingdom · Orlando</option>
@@ -160,86 +341,67 @@ footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
       <option value="64">Islands of Adventure · Orlando</option>
       <option value="65">Universal Studios · Orlando</option>
       <option value="67">Volcano Bay · Orlando</option>
+      <option value="334">Epic Universe · Orlando</option>
       <option value="34">Six Flags Over Texas · Dallas</option>
       <option value="42">Six Flags America · Maryland</option>
       <option value="48">La Ronde · Montreal</option>
       <option value="16">Disneyland · Anaheim</option>
       <option value="17">Disney California Adventure · Anaheim</option>
       <option value="66">Universal Studios Hollywood</option>
-      <option value="334">Epic Universe · Orlando</option>
     </select>
+    <div class="controls-row">
+      <button class="btn active" id="sort-wait" onclick="setSort('wait')">Shortest first</button>
+      <button class="btn" id="sort-name" onclick="setSort('name')">A to Z</button>
+      <button class="btn" id="sort-land" onclick="setSort('land')">By land</button>
+      <button class="btn active" id="filter-open" onclick="toggleOpenOnly()">Open only</button>
+      <button class="btn refresh" onclick="loadWaits(true)">↻ Refresh</button>
+    </div>
   </div>
-  <div class="filter-row">
-    <button class="btn-sm active" id="sort-wait" onclick="setSort('wait')">Sort: shortest wait</button>
-    <button class="btn-sm" id="sort-name" onclick="setSort('name')">Sort: name</button>
-    <button class="btn-sm" id="sort-land" onclick="setSort('land')">Sort: by land</button>
-    <button class="btn-sm active" id="filter-open" onclick="toggleOpenOnly()">Open only</button>
-    <button class="btn-sm" onclick="loadWaits(true)">Refresh ↻</button>
+
+  <div class="status-line" id="status">
+    <span>Loading…</span>
   </div>
+
+  <div class="summary-strip" id="summary" style="display:none"></div>
+
+  <div class="rides-section" id="results">
+    <div class="loading">Pulling the lever…</div>
+  </div>
+
+  <footer>
+    Data: <a href="https://queue-times.com" target="_blank">queue-times.com</a> · refreshes every minute · <a href="/">All tools →</a>
+  </footer>
 </div>
-
-<div class="status" id="status">
-  <span>Loading…</span>
-</div>
-
-<div class="summary-grid" id="summary" style="display:none"></div>
-
-<div id="results">
-  <div class="loading">fetching ride waits…</div>
-</div>
-
-</main>
-
-<footer>
-  Data: <a href="https://queue-times.com" target="_blank">queue-times.com</a> · refreshed manually · single-file · <a href="https://elijahbot-tools-hub.vercel.app">All tools →</a>
-</footer>
 
 <script>
 const STORE_KEY = 'park-waits-v0';
-const REFRESH_MS = 60_000; // auto-refresh every 60s
-
-const state = {
-  parkId: 35,
-  sort: 'wait',
-  openOnly: true,
-  data: null,
-  lastFetch: 0,
-};
+const REFRESH_MS = 60_000;
+const state = { parkId: 35, sort: 'wait', openOnly: true, data: null, lastFetch: 0 };
 
 function loadState(){
-  try{
-    const s = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
+  try{ const s = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
     if(s.parkId) state.parkId = s.parkId;
     if(s.sort) state.sort = s.sort;
     if(typeof s.openOnly === 'boolean') state.openOnly = s.openOnly;
   } catch(e){}
 }
-function saveState(){
-  localStorage.setItem(STORE_KEY, JSON.stringify({
-    parkId: state.parkId, sort: state.sort, openOnly: state.openOnly,
-  }));
-}
+function saveState(){ localStorage.setItem(STORE_KEY, JSON.stringify({ parkId: state.parkId, sort: state.sort, openOnly: state.openOnly })); }
 
 async function loadWaits(force){
   const now = Date.now();
-  if(!force && state.data && (now - state.lastFetch) < 30_000){
-    render();
-    return;
-  }
+  if(!force && state.data && (now - state.lastFetch) < 30_000){ render(); return; }
   document.getElementById('status').innerHTML = '<span>Loading…</span>';
-  document.getElementById('results').innerHTML = '<div class="loading">fetching ride waits…</div>';
+  document.getElementById('results').innerHTML = '<div class="loading">Pulling the lever…</div>';
   document.getElementById('summary').style.display = 'none';
   try{
     const res = await fetch(`https://queue-times.com/parks/${state.parkId}/queue_times.json`);
-    if(!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    state.data = data;
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    state.data = await res.json();
     state.lastFetch = now;
     render();
   } catch(e){
     document.getElementById('results').innerHTML =
-      '<div class="error"><strong>Couldn\'t reach queue-times.com.</strong><br>' +
-      'Check your connection and try refresh. The API may also be temporarily down.</div>';
+      '<div class="error">Couldn\'t reach queue-times.com. Check your connection and try refresh. The API may be temporarily down.</div>';
     document.getElementById('status').innerHTML = '<span>Failed to load.</span>';
   }
 }
@@ -248,13 +410,9 @@ function allRides(){
   if(!state.data) return [];
   const out = [];
   if(state.data.lands && state.data.lands.length){
-    state.data.lands.forEach(land => {
-      (land.rides || []).forEach(r => {
-        out.push({ ...r, land: land.name });
-      });
-    });
+    state.data.lands.forEach(land => (land.rides||[]).forEach(r => out.push({...r, land: land.name})));
   }
-  (state.data.rides || []).forEach(r => out.push({ ...r, land: '' }));
+  (state.data.rides||[]).forEach(r => out.push({...r, land:''}));
   return out;
 }
 
@@ -262,59 +420,53 @@ function filteredSorted(){
   let rides = allRides();
   if(state.openOnly) rides = rides.filter(r => r.is_open);
   if(state.sort === 'wait'){
-    rides.sort((a,b)=>{
+    rides.sort((a,b) => {
       if(a.is_open && !b.is_open) return -1;
       if(!a.is_open && b.is_open) return 1;
-      return (a.wait_time || 0) - (b.wait_time || 0);
+      return (a.wait_time||0) - (b.wait_time||0);
     });
   } else if(state.sort === 'name'){
-    rides.sort((a,b)=>a.name.localeCompare(b.name));
+    rides.sort((a,b) => a.name.localeCompare(b.name));
   } else if(state.sort === 'land'){
-    rides.sort((a,b)=>{
+    rides.sort((a,b) => {
       const lc = (a.land||'').localeCompare(b.land||'');
       if(lc !== 0) return lc;
-      return (a.wait_time || 0) - (b.wait_time || 0);
+      return (a.wait_time||0) - (b.wait_time||0);
     });
   }
   return rides;
 }
 
-function waitClass(min){
-  if(min <= 15) return 'good';
-  if(min <= 45) return 'med';
-  return 'bad';
-}
+function waitClass(min){ if(min <= 15) return 'good'; if(min <= 45) return 'med'; return 'bad'; }
 
 function render(){
-  if(!state.data){ return; }
+  if(!state.data) return;
   const rides = filteredSorted();
   const open = allRides().filter(r => r.is_open);
   const closed = allRides().length - open.length;
   const lastUpdate = open[0]?.last_updated || null;
 
   document.getElementById('status').innerHTML =
-    `<span>${open.length} open · ${closed} closed</span>` +
-    (lastUpdate ? `<span class="status-time">park data ${humanAgo(lastUpdate)} ago</span>` : '');
+    `<span>${open.length} OPEN · ${closed} CLOSED</span>` +
+    (lastUpdate ? `<span class="timestamp">Last ping: ${humanAgo(lastUpdate)} ago</span>` : '');
 
-  // summary cards
   if(open.length > 0){
-    const waits = open.map(r => r.wait_time || 0);
-    const avg = Math.round(waits.reduce((a,b)=>a+b,0) / waits.length);
+    const waits = open.map(r => r.wait_time||0);
+    const avg = Math.round(waits.reduce((a,b)=>a+b,0)/waits.length);
     const shortest = open.reduce((a,b)=>(a.wait_time||0)<(b.wait_time||0)?a:b);
     const longest = open.reduce((a,b)=>(a.wait_time||0)>(b.wait_time||0)?a:b);
-    const lowWait = open.filter(r => (r.wait_time || 0) <= 15).length;
+    const lowWait = open.filter(r => (r.wait_time||0) <= 15).length;
     document.getElementById('summary').style.display = 'grid';
     document.getElementById('summary').innerHTML = `
-      <div class="summary-card"><div class="summary-num">${avg}</div><div class="summary-name">avg wait min</div></div>
-      <div class="summary-card"><div class="summary-num shortest">${shortest.wait_time}</div><div class="summary-name">${escapeHtml(shortest.name.slice(0,28))}</div></div>
-      <div class="summary-card"><div class="summary-num longest">${longest.wait_time}</div><div class="summary-name">${escapeHtml(longest.name.slice(0,28))}</div></div>
-      <div class="summary-card"><div class="summary-num shortest">${lowWait}</div><div class="summary-name">≤15 min rides</div></div>
+      <div class="summary-cell"><div class="sum-val">${avg}</div><div class="sum-label">avg wait min</div></div>
+      <div class="summary-cell"><div class="sum-val green">${shortest.wait_time}</div><div class="sum-label">${escapeHtml(shortest.name.slice(0,22))}</div></div>
+      <div class="summary-cell"><div class="sum-val red">${longest.wait_time}</div><div class="sum-label">${escapeHtml(longest.name.slice(0,22))}</div></div>
+      <div class="summary-cell"><div class="sum-val green">${lowWait}</div><div class="sum-label">≤15 min rides</div></div>
     `;
   } else {
     document.getElementById('summary').style.display = 'none';
   }
 
-  // results
   if(rides.length === 0){
     document.getElementById('results').innerHTML =
       `<div class="empty">No rides match. ${state.openOnly ? 'Toggle "open only" off to see closed rides.' : 'Try a different park.'}</div>`;
@@ -322,86 +474,68 @@ function render(){
   }
 
   if(state.sort === 'land'){
-    // group by land
     const groups = {};
-    rides.forEach(r => {
-      const land = r.land || 'Other';
-      if(!groups[land]) groups[land] = [];
-      groups[land].push(r);
-    });
+    rides.forEach(r => { const land = r.land || 'Other'; (groups[land] ||= []).push(r); });
     let html = '';
     Object.keys(groups).forEach(land => {
-      html += `<div class="land-section">`;
-      html += `<h2 class="land-title">${escapeHtml(land)}</h2>`;
-      html += groups[land].map(rideHtml).join('');
-      html += '</div>';
+      html += `<div class="land-title">${escapeHtml(land)}</div>`;
+      html += groups[land].map((r,i) => rideHtml(r, i+1)).join('');
     });
     document.getElementById('results').innerHTML = html;
   } else {
-    document.getElementById('results').innerHTML = rides.map(rideHtml).join('');
+    document.getElementById('results').innerHTML = rides.map((r,i)=>rideHtml(r,i+1)).join('');
   }
 }
 
-function rideHtml(r){
+function rideHtml(r, num){
   const open = r.is_open;
   const wait = r.wait_time || 0;
   let waitDisplay;
   if(!open){
     waitDisplay = `<span class="ride-wait closed">closed</span>`;
   } else {
-    waitDisplay = `<span class="ride-wait ${waitClass(wait)}">${wait}<span class="unit">min</span></span>`;
+    waitDisplay = `<span class="ride-wait ${waitClass(wait)}">${wait}<span class="unit">min wait</span></span>`;
   }
-  return `<div class="ride ${open ? '' : 'closed'}">
+  return `<div class="ride ${open?'':'closed'}">
+    <span class="ride-num">${num.toString().padStart(2,'0')}</span>
     <span class="ride-name">${escapeHtml(r.name)}</span>
     ${waitDisplay}
   </div>`;
 }
 
 function setSort(s){
-  state.sort = s;
-  saveState();
-  ['wait','name','land'].forEach(k => {
-    document.getElementById('sort-'+k).classList.toggle('active', k===s);
-  });
+  state.sort = s;saveState();
+  ['wait','name','land'].forEach(k => document.getElementById('sort-'+k).classList.toggle('active', k===s));
   render();
 }
-
 function toggleOpenOnly(){
-  state.openOnly = !state.openOnly;
-  saveState();
-  document.getElementById('filter-open').classList.toggle('active', state.openOnly);
-  document.getElementById('filter-open').textContent = state.openOnly ? 'Open only' : 'Show all';
+  state.openOnly = !state.openOnly;saveState();
+  const b = document.getElementById('filter-open');
+  b.classList.toggle('active', state.openOnly);
+  b.textContent = state.openOnly ? 'Open only' : 'Show all';
   render();
 }
-
 function handleParkChange(){
   state.parkId = parseInt(document.getElementById('park-select').value);
-  saveState();
-  loadWaits(true);
+  saveState();loadWaits(true);
 }
-
 function humanAgo(iso){
-  const then = new Date(iso).getTime();
-  const sec = Math.floor((Date.now() - then) / 1000);
-  if(sec < 60) return sec + 's';
-  if(sec < 3600) return Math.floor(sec/60) + 'min';
-  return Math.floor(sec/3600) + 'h';
+  const sec = Math.floor((Date.now() - new Date(iso).getTime())/1000);
+  if(sec<60) return sec+'s';
+  if(sec<3600) return Math.floor(sec/60)+'m';
+  return Math.floor(sec/3600)+'h';
 }
-
 function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 }
 
-// init
 loadState();
 document.getElementById('park-select').value = String(state.parkId);
 document.getElementById('filter-open').classList.toggle('active', state.openOnly);
 document.getElementById('filter-open').textContent = state.openOnly ? 'Open only' : 'Show all';
-['wait','name','land'].forEach(k => {
-  document.getElementById('sort-'+k).classList.toggle('active', k===state.sort);
-});
+['wait','name','land'].forEach(k => document.getElementById('sort-'+k).classList.toggle('active', k===state.sort));
 loadWaits();
-setInterval(()=>{ if(document.visibilityState === 'visible') loadWaits(); }, REFRESH_MS);
+setInterval(() => { if(document.visibilityState === 'visible') loadWaits(); }, REFRESH_MS);
 </script>
 
 </body>

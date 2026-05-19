@@ -3,197 +3,363 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#1a1611">
-<title>Notepad · scratch paper</title>
+<meta name="theme-color" content="#f4ecd8">
+<title>Notes · Underwood</title>
+<link rel="icon" href="/_brand/panopticon-mark.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Special+Elite&family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
 <style>
+/*  ============================================================
+    NOTEPAD · "Underwood" edition
+    -----------------------------------------------------------
+    Concept: a beat-up portable typewriter on a writer's desk.
+    Aged paper · ink that bleeds slightly · pencil marginalia ·
+    coffee-stained edges. The brand mark and gold accent remain
+    so this still reads as part of the family — but everything
+    else: typewriter.
+    ============================================================ */
+
 :root{
-  --ink:#f4ede0;
-  --ink-dim:#a89c87;
-  --ink-faint:#6d6353;
-  --bg:#1a1611;
-  --bg-panel:#221d16;
-  --bg-elev:#2a241c;
-  --accent:#d4a865;
-  --accent-warm:#c97a4b;
-  --good:#7da97d;
-  --rule:#3a3328;
-  --serif:'Fraunces',Georgia,serif;
-  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --paper:#f4ecd8;
+  --paper-shade:#ede2c4;
+  --paper-edge:#d4c4a0;
+  --ink:#2a1f15;
+  --ink-soft:#4d3d2a;
+  --ink-faint:#7a6a52;
+  --pencil:#a89678;
+  --coffee:#8d6242;
+  --red-ink:#a83020;
+  --gold:#c2871f;
+  --gold-deep:#8a5d12;
+  --rule:rgba(74, 58, 38, 0.18);
+
+  --display:'IBM Plex Serif', 'Hoefler Text', Georgia, serif;
+  --type:'Special Elite', 'Courier New', monospace;
+  --brand:'Cinzel', Georgia, serif;
 }
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-weight:400;-webkit-font-smoothing:antialiased}
-body{min-height:100vh;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+html,body{
+  margin:0;padding:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--type);
+  -webkit-font-smoothing:antialiased;
+  font-size:15px;
+  line-height:1.6;
+}
+body{
+  min-height:100vh;height:100vh;
+  display:flex;flex-direction:column;overflow:hidden;
+  background-image:
+    /* paper texture — subtle fibers via radial gradients */
+    radial-gradient(circle at 20% 30%, rgba(180, 150, 110, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(140, 110, 70, 0.06) 0%, transparent 35%),
+    radial-gradient(circle at 50% 90%, rgba(200, 170, 130, 0.04) 0%, transparent 50%);
+  background-color:var(--paper);
+  background-attachment:fixed;
+}
 
+/* Subtle paper grain overlay — pseudoelement on body */
+body::before{
+  content:"";
+  position:fixed;inset:0;pointer-events:none;z-index:1;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/></svg>");
+  opacity:0.08;
+  mix-blend-mode:multiply;
+}
+
+/* Coffee ring stain — pure decoration, top-right corner */
+body::after{
+  content:"";
+  position:fixed;
+  top:-30px;right:-30px;
+  width:180px;height:180px;
+  border:4px solid var(--coffee);
+  border-radius:50%;
+  opacity:0.07;
+  pointer-events:none;
+  z-index:1;
+  transform:rotate(-15deg);
+  box-shadow:
+    inset 0 0 60px rgba(141, 98, 66, 0.3),
+    0 0 0 6px transparent,
+    0 0 0 10px rgba(141, 98, 66, 0.04);
+}
+
+/* ============================================================
+   MASTHEAD — the typewriter header strip
+   ============================================================ */
 header{
-  padding:14px 22px;
-  border-bottom:1px solid var(--rule);
-  display:flex;align-items:center;justify-content:space-between;
-  gap:14px;flex-wrap:wrap;
-  background:var(--bg-panel);
+  position:relative;z-index:2;
+  padding:18px 28px 16px;
+  border-bottom:2px solid var(--ink);
+  background:linear-gradient(180deg, var(--paper-shade) 0%, var(--paper) 100%);
+  flex-shrink:0;
 }
-.brand{display:flex;align-items:baseline;gap:14px;min-width:0}
-.brand-mark{
-  font-family:var(--serif);font-weight:300;font-size:22px;color:var(--ink);
-  letter-spacing:-0.02em;font-variation-settings:"opsz" 144;
+.masthead{
+  display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
 }
-.brand-mark em{font-style:italic;color:var(--accent);font-weight:400}
-.brand-sub{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);letter-spacing:0.15em;text-transform:uppercase}
-.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.btn{
-  font-family:var(--mono);font-size:11.5px;letter-spacing:0.05em;
-  background:transparent;border:1px solid var(--rule);color:var(--ink-dim);
-  padding:7px 14px;border-radius:14px;cursor:pointer;
-  transition:all .15s;
+.brand-block{display:flex;align-items:center;gap:14px;min-width:0}
+.mark{width:36px;height:36px;flex-shrink:0;opacity:0.85;filter:sepia(0.3)}
+.mark img{width:100%;height:100%;display:block}
+.brand-text{display:flex;flex-direction:column;min-width:0}
+.brand-row1{
+  font-family:var(--brand);
+  font-size:9.5px;letter-spacing:0.35em;text-transform:uppercase;
+  color:var(--gold-deep);font-weight:600;
 }
-.btn:hover{border-color:var(--accent);color:var(--accent)}
-.btn.primary{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:500}
-.btn.primary:hover{background:var(--accent-warm);color:var(--ink);border-color:var(--accent-warm)}
-.btn.danger:hover{border-color:var(--accent-warm);color:var(--accent-warm)}
+.brand-name{
+  font-family:var(--display);
+  font-style:italic;font-weight:500;font-size:28px;
+  color:var(--ink);
+  letter-spacing:-0.005em;
+  line-height:1;
+  margin-top:2px;
+  text-shadow:0 1px 0 rgba(0,0,0,0.04);
+}
+.brand-name::first-letter{
+  font-size:38px;color:var(--red-ink);font-style:italic;
+}
+.subhead{
+  font-family:var(--type);
+  font-size:11px;color:var(--ink-faint);letter-spacing:0.04em;
+  margin-top:4px;font-style:italic;
+}
 
-.wrap{flex:1;display:flex;min-height:0}
+.toolbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.key{
+  font-family:var(--type);font-size:11.5px;letter-spacing:0.06em;
+  background:linear-gradient(180deg, var(--paper) 0%, var(--paper-shade) 100%);
+  border:1px solid var(--ink);
+  color:var(--ink);
+  padding:7px 13px 5px;
+  border-radius:3px;
+  cursor:pointer;
+  box-shadow:
+    0 2px 0 rgba(42, 31, 21, 0.5),
+    inset 0 1px 0 rgba(255, 250, 230, 0.8);
+  transition:all .08s;
+  text-transform:uppercase;
+}
+.key:hover{
+  background:linear-gradient(180deg, var(--paper-shade) 0%, var(--paper-edge) 100%);
+}
+.key:active{
+  transform:translateY(2px);
+  box-shadow:0 0 0 rgba(0,0,0,0), inset 0 1px 2px rgba(42, 31, 21, 0.2);
+}
+.key.primary{
+  background:var(--ink);color:var(--paper);
+  border-color:var(--ink);
+}
+.key.primary:hover{background:var(--ink-soft)}
+.key.danger:hover{background:var(--red-ink);color:var(--paper);border-color:var(--red-ink)}
 
+/* ============================================================
+   WRAP — sidebar + editor
+   ============================================================ */
+.wrap{flex:1;display:flex;min-height:0;position:relative;z-index:2}
+
+/* Sidebar — a stack of paper folders */
 .sidebar{
-  width:260px;flex-shrink:0;
-  background:var(--bg-panel);
-  border-right:1px solid var(--rule);
+  width:280px;flex-shrink:0;
+  background:rgba(237, 226, 196, 0.5);
+  border-right:1px dashed var(--rule);
   display:flex;flex-direction:column;
   overflow:hidden;
+  position:relative;
 }
-.sidebar-toolbar{padding:12px 14px;border-bottom:1px solid var(--rule)}
+.sidebar-toolbar{padding:14px 16px 10px;border-bottom:1px dashed var(--rule)}
 .sidebar-search{
-  width:100%;background:var(--bg);border:1px solid var(--rule);color:var(--ink);
-  font-family:var(--mono);font-size:12px;
-  padding:8px 12px;border-radius:6px;outline:none;
+  width:100%;background:transparent;border:none;
+  border-bottom:1px solid var(--ink-faint);
+  color:var(--ink);
+  font-family:var(--type);font-size:13px;
+  padding:5px 0 4px;
+  outline:none;
 }
-.sidebar-search:focus{border-color:var(--accent)}
-.sidebar-list{flex:1;overflow-y:auto;padding:8px 0}
-.note-tile{
-  padding:11px 16px;cursor:pointer;border-left:3px solid transparent;
-  transition:background .12s, border-color .12s;
-}
-.note-tile:hover{background:var(--bg-elev)}
-.note-tile.active{background:var(--bg-elev);border-left-color:var(--accent)}
-.note-tile-title{
-  font-family:var(--serif);font-size:14.5px;color:var(--ink);
-  line-height:1.25;font-weight:400;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.note-tile-meta{
-  font-family:var(--mono);font-size:10px;color:var(--ink-faint);
-  margin-top:3px;letter-spacing:0.04em;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.note-tile.active .note-tile-title{color:var(--accent)}
+.sidebar-search::placeholder{color:var(--ink-faint);font-style:italic}
+.sidebar-search:focus{border-bottom-color:var(--ink)}
 
+.sidebar-list{flex:1;overflow-y:auto;padding:6px 0}
+.note-tile{
+  padding:14px 18px 12px;cursor:pointer;
+  border-bottom:1px dashed var(--rule);
+  position:relative;
+  transition:background .12s;
+}
+.note-tile::before{
+  content:"☞";
+  position:absolute;left:4px;top:14px;
+  font-size:12px;color:var(--gold-deep);opacity:0;
+  transition:opacity .12s, transform .12s;
+}
+.note-tile:hover{background:rgba(244, 236, 216, 0.7)}
+.note-tile:hover::before{opacity:0.7;transform:translateX(2px)}
+.note-tile.active{background:var(--paper)}
+.note-tile.active::before{
+  content:"●";opacity:1;color:var(--red-ink);
+  font-size:11px;top:16px;
+}
+.note-tile-title{
+  font-family:var(--display);font-style:italic;font-size:15px;
+  color:var(--ink);
+  font-weight:400;line-height:1.25;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  padding-left:8px;
+}
+.note-tile.active .note-tile-title{font-weight:500;color:var(--red-ink)}
+.note-tile-meta{
+  font-family:var(--type);font-size:10.5px;color:var(--ink-faint);
+  margin-top:3px;padding-left:8px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-style:italic;
+}
+
+/* ============================================================
+   EDITOR — the platen + sheet of paper
+   ============================================================ */
 .editor{
   flex:1;display:flex;flex-direction:column;min-width:0;
-  background:var(--bg);
+  background:transparent;
+  position:relative;
 }
-.editor-header{padding:16px 28px 8px;border-bottom:1px dashed var(--rule)}
+/* Vertical center red rule — like a typewriter platen guide */
+.editor::before{
+  content:"";
+  position:absolute;
+  left:50%;top:0;bottom:0;width:1px;
+  background:repeating-linear-gradient(to bottom, transparent 0, transparent 6px, var(--red-ink) 6px, var(--red-ink) 8px);
+  opacity:0.06;pointer-events:none;
+}
+
+.editor-header{
+  padding:24px 36px 6px;
+  border-bottom:1px solid var(--rule);
+  position:relative;
+}
 .editor-title{
   width:100%;background:transparent;border:none;color:var(--ink);
-  font-family:var(--serif);font-weight:300;font-size:28px;line-height:1.15;
-  letter-spacing:-0.02em;outline:none;
-  font-variation-settings:"opsz" 96;
+  font-family:var(--display);font-style:italic;font-weight:500;
+  font-size:36px;line-height:1.1;
+  letter-spacing:-0.01em;outline:none;
 }
-.editor-title::placeholder{color:var(--ink-faint);font-style:italic}
-.editor-meta{
-  font-family:var(--mono);font-size:11px;color:var(--ink-faint);
-  margin-top:6px;letter-spacing:0.05em;
-  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
-}
-.editor-meta .saved{color:var(--good)}
-.editor-meta .unsaved{color:var(--accent-warm)}
+.editor-title::placeholder{color:var(--ink-faint);font-style:italic;font-weight:400}
+.editor-title::first-letter{color:var(--red-ink);font-size:46px}
 
-.editor-body-wrap{flex:1;overflow-y:auto;padding:18px 28px 60px}
+.editor-meta{
+  font-family:var(--type);font-size:10.5px;color:var(--ink-faint);
+  margin-top:8px;letter-spacing:0.06em;
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  text-transform:uppercase;
+}
+.meta-saved{color:var(--gold-deep)}
+.meta-unsaved{color:var(--red-ink)}
+
+.editor-body-wrap{
+  flex:1;overflow-y:auto;
+  padding:24px 36px 60px;
+  /* ruled lines — light horizontal rules every 28px */
+  background-image:repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 27px,
+    rgba(74, 58, 38, 0.08) 27px,
+    rgba(74, 58, 38, 0.08) 28px
+  );
+  background-position:0 27px;
+}
 .editor-body{
   width:100%;min-height:100%;
   background:transparent;border:none;color:var(--ink);
-  font-family:var(--serif);font-size:17px;line-height:1.65;font-weight:400;
+  font-family:var(--type);
+  font-size:16px;line-height:28px;
   outline:none;resize:none;
-  font-feature-settings:"ss01";
-  letter-spacing:-0.005em;
+  letter-spacing:0.01em;
 }
-.editor-body::placeholder{color:var(--ink-faint);font-style:italic;font-weight:300}
+.editor-body::placeholder{color:var(--ink-faint);font-style:italic}
 
+/* Empty state */
 .empty{
-  font-family:var(--mono);font-size:12px;color:var(--ink-faint);
-  text-align:center;padding:40px 20px;letter-spacing:0.04em;line-height:1.6;
+  font-family:var(--display);font-style:italic;font-size:14px;color:var(--ink-faint);
+  text-align:center;padding:50px 20px;
 }
 
-@media(max-width:720px){
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media(max-width:760px){
   .wrap{flex-direction:column}
-  .sidebar{width:100%;max-height:38vh;border-right:none;border-bottom:1px solid var(--rule)}
-  .editor-title{font-size:22px}
-  .editor-body{font-size:16px}
-  .editor-header{padding:14px 20px 6px}
-  .editor-body-wrap{padding:14px 20px 60px}
-  header{padding:11px 18px}
-  .brand-mark{font-size:18px}
+  .sidebar{width:100%;max-height:36vh;border-right:none;border-bottom:2px solid var(--ink)}
+  .editor-title{font-size:26px}
+  .editor-body{font-size:15px}
+  .editor-header{padding:18px 22px 6px}
+  .editor-body-wrap{padding:18px 22px 60px}
+  header{padding:14px 20px 12px}
+  .brand-name{font-size:24px}
+  .key{padding:6px 11px 4px;font-size:10.5px}
 }
 
 @media print{
-  body{background:white;color:#1a1611;overflow:visible}
+  body::before, body::after{display:none}
+  body{background:white;color:black}
   header, .sidebar{display:none}
-  .editor{background:white}
-  .editor-title{color:#1a1611}
-  .editor-body{color:#1a1611;font-size:13pt;line-height:1.6}
-  .editor-meta{color:#666}
+  .editor::before{display:none}
+  .editor-title{color:black}
+  .editor-body{color:black;font-size:12pt;line-height:1.6;background:none}
+  .editor-body-wrap{background:white;padding:0}
 }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="brand">
-    <span class="brand-mark">Note<em>pad</em></span>
-    <span class="brand-sub">scratch · auto-saved</span>
-  </div>
-  <div class="toolbar">
-    <button class="btn primary" onclick="newNote()">+ New</button>
-    <button class="btn" onclick="window.print()">Print</button>
-    <button class="btn danger" onclick="deleteCurrent()">Delete</button>
-    <a class="btn" href="https://elijahbot-tools-hub.vercel.app" style="text-decoration:none">Tools ↗</a>
+  <div class="masthead">
+    <div class="brand-block">
+      <div class="mark"><img src="/_brand/panopticon-mark.svg" alt="PV"></div>
+      <div class="brand-text">
+        <div class="brand-row1">Purcell Ventures · Notes</div>
+        <div class="brand-name">Underwood</div>
+        <div class="subhead">scratch paper · auto-saved as you type</div>
+      </div>
+    </div>
+    <div class="toolbar">
+      <button class="key primary" onclick="newNote()">+ New leaf</button>
+      <button class="key" onclick="window.print()">Print</button>
+      <button class="key danger" onclick="deleteCurrent()">Tear out</button>
+      <a class="key" href="/" style="text-decoration:none">← Tools</a>
+    </div>
   </div>
 </header>
 
 <div class="wrap">
   <aside class="sidebar">
     <div class="sidebar-toolbar">
-      <input type="text" class="sidebar-search" id="search" placeholder="search notes…" oninput="renderList()">
+      <input type="text" class="sidebar-search" id="search" placeholder="search the stack…" oninput="renderList()">
     </div>
     <div class="sidebar-list" id="list"></div>
   </aside>
 
-  <main class="editor" id="editor-wrap">
+  <main class="editor">
     <div class="editor-header">
       <input type="text" class="editor-title" id="title" placeholder="Untitled" oninput="onChange()">
       <div class="editor-meta">
         <span id="meta-created">—</span>
-        <span id="meta-saved" class="saved">saved</span>
+        <span id="meta-saved" class="meta-saved">saved</span>
       </div>
     </div>
     <div class="editor-body-wrap">
-      <textarea class="editor-body" id="body" placeholder="Start writing. Notes auto-save as you type.
-
-Tip: keep this open in a tab during meetings — it stores everything locally, never sends anything anywhere." oninput="onChange()"></textarea>
+      <textarea class="editor-body" id="body" placeholder="Begin." oninput="onChange()"></textarea>
     </div>
   </main>
 </div>
 
 <script>
 const STORE_KEY = 'notepad-v0';
-
 function load(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch(e){ return {}; } }
 function save(s){ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }
-function getStore(){
-  const s = load();
-  if(!s.notes) s.notes = [];
-  return s;
-}
+function getStore(){ const s = load(); if(!s.notes) s.notes = []; return s; }
 function setStore(s){ save(s); }
 
 let currentId = null;
@@ -204,17 +370,16 @@ function uid(){ return 'N' + Date.now().toString(36) + Math.random().toString(36
 function seedIfFirstTime(){
   const s = getStore();
   if(s.notes.length > 0) return;
-  // Seed with a Reza-call template so first-time users see the shape.
   s.notes.push({
     id: uid(),
-    title: 'Reza · May 19 · 1:00 PM',
-    body: "NOTES DURING CALL (keywords only, 3-5 per topic)\n———————————————————————————\n\n\n\n\nWHAT HE LIT UP ABOUT:\n\n\n\nNAMES / PAPERS / PEOPLE HE REFERENCED:\n\n\n\nDOORS HE OPENED:\n\n\n\n———————————————————————————\nAT 1:30 — write follow-up email referencing ONE specific thing.\nSend within the hour.",
+    title: 'Reza — Wed May 20, 1:15 PM',
+    body: "Keywords during the call (3-5 per topic):\n\n· what he lit up about\n\n\n· names / papers / people he referenced\n\n\n· doors he opened\n\n\n· my answers he reacted to\n\n\n— — —\n\nat 1:45 — write the follow-up note. one specific thing. 4-6 sentences. within the hour.",
     createdAt: Date.now(),
     updatedAt: Date.now(),
   });
   s.notes.push({
     id: uid(),
-    title: 'Blank note',
+    title: 'A fresh sheet',
     body: '',
     createdAt: Date.now(),
     updatedAt: Date.now(),
@@ -227,19 +392,16 @@ function renderList(){
   const q = document.getElementById('search').value.toLowerCase().trim();
   const list = document.getElementById('list');
   let notes = s.notes.slice().sort((a,b)=>b.updatedAt - a.updatedAt);
-  if(q){
-    notes = notes.filter(n =>
-      (n.title || '').toLowerCase().includes(q) ||
-      (n.body || '').toLowerCase().includes(q)
-    );
-  }
+  if(q) notes = notes.filter(n =>
+    (n.title||'').toLowerCase().includes(q) ||
+    (n.body||'').toLowerCase().includes(q));
   if(notes.length === 0){
-    list.innerHTML = '<div class="empty">' + (q ? 'No matches.' : 'No notes yet. Tap + New.') + '</div>';
+    list.innerHTML = '<div class="empty">' + (q ? 'nothing in the stack' : 'no notes yet') + '</div>';
     return;
   }
   list.innerHTML = notes.map(n => {
     const isActive = n.id === currentId;
-    const titleStr = n.title || (n.body ? n.body.slice(0,40) : 'Untitled');
+    const titleStr = n.title || (n.body ? n.body.slice(0,40) : 'untitled');
     const updated = new Date(n.updatedAt);
     const today = new Date();
     let when;
@@ -248,7 +410,7 @@ function renderList(){
     } else {
       when = updated.toLocaleDateString(undefined, {month:'short', day:'numeric'});
     }
-    const preview = (n.body || '').replace(/\s+/g,' ').slice(0,60);
+    const preview = (n.body || '').replace(/\s+/g,' ').slice(0,48);
     return `<div class="note-tile ${isActive ? 'active' : ''}" onclick="selectNote('${n.id}')">
       <div class="note-tile-title">${escapeHtml(titleStr)}</div>
       <div class="note-tile-meta">${escapeHtml(when)} · ${escapeHtml(preview)}</div>
@@ -264,7 +426,7 @@ function selectNote(id){
   if(!n) return;
   document.getElementById('title').value = n.title || '';
   document.getElementById('body').value = n.body || '';
-  document.getElementById('meta-created').textContent = 'Created ' + formatDate(n.createdAt);
+  document.getElementById('meta-created').textContent = 'logged ' + formatDate(n.createdAt);
   setSaved('saved');
   renderList();
 }
@@ -272,19 +434,13 @@ function selectNote(id){
 function newNote(){
   saveImmediate();
   const s = getStore();
-  const n = {
-    id: uid(),
-    title: '',
-    body: '',
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-  };
+  const n = { id: uid(), title: '', body: '', createdAt: Date.now(), updatedAt: Date.now() };
   s.notes.push(n);
   setStore(s);
   currentId = n.id;
   document.getElementById('title').value = '';
   document.getElementById('body').value = '';
-  document.getElementById('meta-created').textContent = 'Created just now';
+  document.getElementById('meta-created').textContent = 'logged just now';
   setSaved('saved');
   renderList();
   document.getElementById('title').focus();
@@ -295,12 +451,11 @@ function deleteCurrent(){
   const s = getStore();
   const n = s.notes.find(x => x.id === currentId);
   if(!n) return;
-  const label = (n.title || n.body || '').slice(0,40) || 'this note';
-  if(!confirm(`Delete "${label}"? Cannot be undone.`)) return;
+  if(!confirm(`Tear out "${(n.title||n.body||'').slice(0,40) || 'this note'}"? Gone for good.`)) return;
   s.notes = s.notes.filter(x => x.id !== currentId);
   setStore(s);
   if(s.notes.length > 0){
-    selectNote(s.notes.sort((a,b)=>b.updatedAt - a.updatedAt)[0].id);
+    selectNote(s.notes.sort((a,b)=>b.updatedAt-a.updatedAt)[0].id);
   } else {
     currentId = null;
     document.getElementById('title').value = '';
@@ -331,13 +486,8 @@ function saveImmediate(){
 
 function setSaved(state){
   const el = document.getElementById('meta-saved');
-  if(state === 'saved'){
-    el.textContent = 'saved';
-    el.className = 'saved';
-  } else {
-    el.textContent = 'saving…';
-    el.className = 'unsaved';
-  }
+  if(state === 'saved'){ el.textContent = '✓ saved'; el.className = 'meta-saved'; }
+  else { el.textContent = '· typing'; el.className = 'meta-unsaved'; }
 }
 
 function formatDate(ts){
@@ -349,28 +499,15 @@ function escapeHtml(s){
   return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 }
 
-// keyboard: Ctrl+S (defensive — already auto-saving)
-document.addEventListener('keydown', (e) => {
-  if((e.ctrlKey || e.metaKey) && e.key === 's'){
-    e.preventDefault();
-    saveImmediate();
-  }
-  if((e.ctrlKey || e.metaKey) && e.key === 'n'){
-    e.preventDefault();
-    newNote();
-  }
+document.addEventListener('keydown', e => {
+  if((e.ctrlKey||e.metaKey) && e.key === 's'){ e.preventDefault(); saveImmediate(); }
+  if((e.ctrlKey||e.metaKey) && e.key === 'n'){ e.preventDefault(); newNote(); }
 });
-
-// save before tab close
 window.addEventListener('beforeunload', saveImmediate);
 
-// init
 seedIfFirstTime();
-const s = getStore();
-const sorted = s.notes.slice().sort((a,b)=>b.updatedAt - a.updatedAt);
-if(sorted.length > 0){
-  selectNote(sorted[0].id);
-}
+const sorted = getStore().notes.slice().sort((a,b)=>b.updatedAt-a.updatedAt);
+if(sorted.length) selectNote(sorted[0].id);
 renderList();
 </script>
 
