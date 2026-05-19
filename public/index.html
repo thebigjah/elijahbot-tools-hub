@@ -39,11 +39,19 @@ header{
   border-bottom:1px solid var(--rule);
   background:linear-gradient(180deg, var(--bg-panel) 0%, var(--bg) 100%);
 }
-.brand-row{display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap}
 .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-faint)}
 h1{font-family:var(--serif);font-weight:300;font-size:38px;line-height:1.0;letter-spacing:-0.025em;margin:6px 0 0;font-variation-settings:"opsz" 144}
 h1 em{font-style:italic;color:var(--accent);font-weight:400}
 .tagline{font-family:var(--mono);font-size:11px;color:var(--ink-dim);margin-top:10px;letter-spacing:0.04em}
+.apps-link{
+  display:inline-block;
+  margin-top:14px;
+  font-family:var(--mono);font-size:11px;letter-spacing:0.08em;
+  color:var(--accent);text-decoration:none;
+  padding:6px 12px;border:1px solid var(--rule);border-radius:14px;
+  transition:all .15s;
+}
+.apps-link:hover{border-color:var(--accent);background:var(--bg-elev)}
 
 main{max-width:1080px;margin:0 auto;padding:28px 24px 80px}
 
@@ -75,16 +83,16 @@ main{max-width:1080px;margin:0 auto;padding:28px 24px 80px}
   background:var(--bg-panel);
   border:1px solid var(--rule);
   border-radius:14px;
-  padding:14px 8px 12px;
+  padding:16px 8px 13px;
   text-decoration:none;
   color:inherit;
   text-align:center;
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:7px;
+  gap:10px;
   transition:transform .12s ease, border-color .12s ease, background .12s ease;
-  min-height:108px;
+  min-height:112px;
 }
 .tile:hover, .tile:focus-visible{
   border-color:var(--accent);
@@ -92,12 +100,17 @@ main{max-width:1080px;margin:0 auto;padding:28px 24px 80px}
   transform:translateY(-2px);
   outline:none;
 }
-.tile-icon{
-  font-size:32px;
-  line-height:1;
-  filter:saturate(0.85);
-  font-feature-settings:normal;
+.tile:hover .tile-icon, .tile:focus-visible .tile-icon{
+  color:var(--accent);
+  transform:scale(1.04);
 }
+.tile-icon{
+  width:30px;height:30px;
+  color:var(--ink-dim);
+  display:flex;align-items:center;justify-content:center;
+  transition:color .15s ease, transform .15s ease;
+}
+.tile-icon svg{width:100%;height:100%;stroke-width:1.5}
 .tile-name{
   font-family:var(--serif);
   font-size:14px;
@@ -105,6 +118,7 @@ main{max-width:1080px;margin:0 auto;padding:28px 24px 80px}
   color:var(--ink);
   font-weight:400;
   letter-spacing:-0.005em;
+  font-variation-settings:"opsz" 36;
 }
 .tile:hover .tile-name{color:var(--accent)}
 
@@ -127,8 +141,8 @@ footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
 }
 @media(max-width:480px){
   .grid{grid-template-columns:repeat(3, 1fr); gap:5px}
-  .tile{padding:12px 5px 10px;min-height:96px}
-  .tile-icon{font-size:28px}
+  .tile{padding:14px 5px 11px;min-height:98px;gap:8px}
+  .tile-icon{width:26px;height:26px}
   .tile-name{font-size:12.5px}
   header{padding:22px 20px 14px}
   h1{font-size:26px}
@@ -138,58 +152,12 @@ footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
 <body>
 
 <header>
-  <div class="brand-row">
-    <div>
-      <div class="eyebrow">Personal tool library</div>
-      <h1>Tools · <em>Elijah Purcell</em></h1>
-    </div>
-  </div>
-  <div class="tagline">Tap an icon. Built one weekend at a time.</div>
+  <div class="eyebrow">Personal tool library</div>
+  <h1>Tools · <em>Elijah Purcell</em></h1>
+  <div class="tagline">Single-screen utilities. Apps live in the master app, not here.</div>
 </header>
 
 <main>
-
-<section class="section">
-  <div class="section-header">
-    <h2 class="section-title">Apps</h2>
-    <span class="section-count">11 · full workflows</span>
-  </div>
-  <div class="grid">
-    <a class="tile" href="https://thebigjah.github.io/echo/" target="_blank">
-      <span class="tile-icon">👴</span><span class="tile-name">Echo</span>
-    </a>
-    <a class="tile" href="https://thebigjah.github.io/hangout/" target="_blank">
-      <span class="tile-icon">🍽️</span><span class="tile-name">Hangout</span>
-    </a>
-    <a class="tile" href="https://thebigjah.github.io/momentum/" target="_blank">
-      <span class="tile-icon">🌅</span><span class="tile-name">Momentum</span>
-    </a>
-    <a class="tile" href="https://thebigjah.github.io/rival/" target="_blank">
-      <span class="tile-icon">⚔️</span><span class="tile-name">Rival</span>
-    </a>
-    <a class="tile" href="https://thebigjah.github.io/era/" target="_blank">
-      <span class="tile-icon">🕰️</span><span class="tile-name">Era</span>
-    </a>
-    <a class="tile" href="https://expo.dev/artifacts/eas/aT5ufmwQVBGzKhotw12GKs.apk" target="_blank">
-      <span class="tile-icon">🚶</span><span class="tile-name">Prayer Walk</span>
-    </a>
-    <a class="tile" href="/longitude/" target="_blank">
-      <span class="tile-icon">✉️</span><span class="tile-name">Longitude</span>
-    </a>
-    <a class="tile" href="/stage-fright/" target="_blank">
-      <span class="tile-icon">🎙️</span><span class="tile-name">Stage Fright</span>
-    </a>
-    <a class="tile" href="/park-waits/" target="_blank">
-      <span class="tile-icon">🎢</span><span class="tile-name">Park Waits</span>
-    </a>
-    <a class="tile" href="/magic-closet/" target="_blank">
-      <span class="tile-icon">👔</span><span class="tile-name">Magic Closet</span>
-    </a>
-    <a class="tile" href="/smart-calendar/" target="_blank">
-      <span class="tile-icon">📆</span><span class="tile-name">Smart Calendar</span>
-    </a>
-  </div>
-</section>
 
 <section class="section">
   <div class="section-header">
@@ -197,63 +165,107 @@ footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
     <span class="section-count">8 · daily practice</span>
   </div>
   <div class="grid">
+
     <a class="tile" href="https://thebigjah.github.io/examen/" target="_blank">
-      <span class="tile-icon">🌙</span><span class="tile-name">Examen</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span>
+      <span class="tile-name">Examen</span>
     </a>
+
     <a class="tile" href="https://thebigjah.github.io/verse-vault/" target="_blank">
-      <span class="tile-icon">📖</span><span class="tile-name">Verse Vault</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
+      <span class="tile-name">Verse Vault</span>
     </a>
+
     <a class="tile" href="https://thebigjah.github.io/prayer-journal/" target="_blank">
-      <span class="tile-icon">🙏</span><span class="tile-name">Prayer Journal</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M19 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1z"/><path d="M6 4v18"/><path d="M10 9h6"/><path d="M10 13h4"/></svg></span>
+      <span class="tile-name">Prayer Journal</span>
     </a>
+
     <a class="tile" href="https://thebigjah.github.io/sermon-notes/" target="_blank">
-      <span class="tile-icon">⛪</span><span class="tile-name">Sermon Notes</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M10 9h4"/><path d="M12 7v5"/><path d="M14 22v-4a2 2 0 0 0-4 0v4"/><path d="M18 22V5.618a1 1 0 0 0-.553-.894l-4.553-2.277a2 2 0 0 0-1.788 0L6.553 4.724A1 1 0 0 0 6 5.618V22"/><path d="M18 7h.5a1 1 0 0 1 .89 1.452l-.78 1.548H21a1 1 0 0 1 1 1V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V11a1 1 0 0 1 1-1h2.39l-.78-1.548A1 1 0 0 1 5.5 7H6"/></svg></span>
+      <span class="tile-name">Sermon Notes</span>
     </a>
+
     <a class="tile" href="https://thebigjah.github.io/counter/" target="_blank">
-      <span class="tile-icon">🛡️</span><span class="tile-name">Counter</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg></span>
+      <span class="tile-name">Counter</span>
     </a>
+
     <a class="tile" href="https://thebigjah.github.io/solomon/" target="_blank">
-      <span class="tile-icon">📜</span><span class="tile-name">Solomon</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M2 21a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2H2"/><path d="M2 3v16"/></svg></span>
+      <span class="tile-name">Solomon</span>
     </a>
+
     <a class="tile" href="https://thebigjah.github.io/worship-set/" target="_blank">
-      <span class="tile-icon">🎵</span><span class="tile-name">Worship Set</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
+      <span class="tile-name">Worship Set</span>
     </a>
+
     <a class="tile" href="https://thebigjah.github.io/calvinism-test/" target="_blank">
-      <span class="tile-icon">🌷</span><span class="tile-name">Calvinism Test</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.5 6 4 8.5 4 12.5A8 8 0 0 0 20 12.5C20 8.5 17.5 6 12 2z"/><path d="M12 12v10"/></svg></span>
+      <span class="tile-name">Calvinism Test</span>
     </a>
+
   </div>
 </section>
 
 <section class="section">
   <div class="section-header">
     <h2 class="section-title">Productivity &amp; growth</h2>
-    <span class="section-count">8 · self-tracking</span>
+    <span class="section-count">10 · self-tracking</span>
   </div>
   <div class="grid">
+
     <a class="tile" href="https://thebigjah.github.io/decision-journal/" target="_blank">
-      <span class="tile-icon">⚖️</span><span class="tile-name">Decision Journal</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg></span>
+      <span class="tile-name">Decision Journal</span>
     </a>
+
     <a class="tile" href="https://thebigjah.github.io/brag-doc/" target="_blank">
-      <span class="tile-icon">🏆</span><span class="tile-name">Brag Doc</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg></span>
+      <span class="tile-name">Brag Doc</span>
     </a>
+
     <a class="tile" href="https://thebigjah.github.io/friendship-map/" target="_blank">
-      <span class="tile-icon">🕸️</span><span class="tile-name">Friendship Map</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+      <span class="tile-name">Friendship Map</span>
     </a>
+
     <a class="tile" href="https://thebigjah.github.io/future-self/" target="_blank">
-      <span class="tile-icon">⏳</span><span class="tile-name">Future Self</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg></span>
+      <span class="tile-name">Future Self</span>
     </a>
+
     <a class="tile" href="https://thebigjah.github.io/reading-log/" target="_blank">
-      <span class="tile-icon">📚</span><span class="tile-name">Reading Log</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg></span>
+      <span class="tile-name">Reading Log</span>
     </a>
+
     <a class="tile" href="https://thebigjah.github.io/weekly-skill/" target="_blank">
-      <span class="tile-icon">🎯</span><span class="tile-name">Weekly Skill</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>
+      <span class="tile-name">Weekly Skill</span>
     </a>
+
     <a class="tile" href="https://thebigjah.github.io/wisdom-prep/" target="_blank">
-      <span class="tile-icon">💬</span><span class="tile-name">Wisdom Prep</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg></span>
+      <span class="tile-name">Wisdom Prep</span>
     </a>
+
     <a class="tile" href="/notepad/" target="_blank">
-      <span class="tile-icon">📝</span><span class="tile-name">Notepad</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg></span>
+      <span class="tile-name">Notepad</span>
     </a>
+
+    <a class="tile" href="/smart-calendar/" target="_blank">
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg></span>
+      <span class="tile-name">Smart Calendar</span>
+    </a>
+
+    <a class="tile" href="/stage-fright/" target="_blank">
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="6" height="12" x="9" y="2" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M12 18v4"/><path d="M8 22h8"/></svg></span>
+      <span class="tile-name">Stage Fright</span>
+    </a>
+
   </div>
 </section>
 
@@ -263,45 +275,77 @@ footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
     <span class="section-count">3 · move-in soon</span>
   </div>
   <div class="grid">
+
     <a class="tile" href="https://thebigjah.github.io/milestone/" target="_blank">
-      <span class="tile-icon">⏰</span><span class="tile-name">Milestone</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></svg></span>
+      <span class="tile-name">Milestone</span>
     </a>
+
     <a class="tile" href="https://thebigjah.github.io/dorm-pack/" target="_blank">
-      <span class="tile-icon">📦</span><span class="tile-name">Dorm Pack</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><path d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7"/><path d="m7.5 4.27 9 5.15"/></svg></span>
+      <span class="tile-name">Dorm Pack</span>
     </a>
+
     <a class="tile" href="https://thebigjah.github.io/day-sheet/" target="_blank">
-      <span class="tile-icon">📋</span><span class="tile-name">Day Sheet</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg></span>
+      <span class="tile-name">Day Sheet</span>
     </a>
+
   </div>
 </section>
 
 <section class="section">
   <div class="section-header">
-    <h2 class="section-title">Cryptography &amp; play</h2>
-    <span class="section-count">2</span>
+    <h2 class="section-title">Lifestyle &amp; play</h2>
+    <span class="section-count">4</span>
   </div>
   <div class="grid">
+
+    <a class="tile" href="/magic-closet/" target="_blank">
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg></span>
+      <span class="tile-name">Magic Closet</span>
+    </a>
+
+    <a class="tile" href="/park-waits/" target="_blank">
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.77.04"/></svg></span>
+      <span class="tile-name">Park Waits</span>
+    </a>
+
     <a class="tile" href="https://thebigjah.github.io/cipher-lab/" target="_blank">
-      <span class="tile-icon">🔐</span><span class="tile-name">Cipher Lab</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+      <span class="tile-name">Cipher Lab</span>
     </a>
+
     <a class="tile" href="https://thebigjah.github.io/project-prowess/" target="_blank">
-      <span class="tile-icon">🦑</span><span class="tile-name">Project Prowess</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M19.439 7.85c-.049.322.059.648.289.878l1.568 1.568c.47.47.706 1.087.706 1.704s-.235 1.233-.706 1.704l-1.611 1.611a.98.98 0 0 1-.837.276c-.47-.07-.802-.48-.968-.925a2.501 2.501 0 1 0-3.214 3.214c.446.166.855.497.925.968a.979.979 0 0 1-.276.837l-1.61 1.61a2.404 2.404 0 0 1-1.705.707 2.402 2.402 0 0 1-1.704-.706l-1.568-1.568a1.026 1.026 0 0 0-.877-.29c-.493.074-.84.504-1.02.968a2.5 2.5 0 1 1-3.237-3.237c.464-.18.894-.527.967-1.02a1.026 1.026 0 0 0-.289-.877l-1.568-1.568A2.402 2.402 0 0 1 1.998 12c0-.617.236-1.234.706-1.704L4.23 8.77a.98.98 0 0 1 .837-.276c.47.07.802.48.968.925a2.501 2.501 0 1 0 3.214-3.214c-.446-.166-.855-.497-.925-.968a.979.979 0 0 1 .276-.837l1.61-1.61a2.404 2.404 0 0 1 1.705-.707c.617 0 1.234.236 1.704.706l1.568 1.568c.23.23.556.338.877.29.493-.074.84-.504 1.02-.968a2.5 2.5 0 1 1 3.237 3.237c-.464.18-.894.527-.967 1.02Z"/></svg></span>
+      <span class="tile-name">Project Prowess</span>
     </a>
+
   </div>
 </section>
 
 <section class="section">
   <div class="section-header">
-    <h2 class="section-title">Routing &amp; meta</h2>
-    <span class="section-count">2</span>
+    <h2 class="section-title">Letters &amp; meta</h2>
+    <span class="section-count">3</span>
   </div>
   <div class="grid">
+
+    <a class="tile" href="/longitude/" target="_blank">
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
+      <span class="tile-name">Longitude</span>
+    </a>
+
     <a class="tile" href="/personal-os/" target="_blank">
-      <span class="tile-icon">🧭</span><span class="tile-name">Personal OS</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/><circle cx="12" cy="12" r="10"/></svg></span>
+      <span class="tile-name">Personal OS</span>
     </a>
+
     <a class="tile" href="/progress/" target="_blank">
-      <span class="tile-icon">📊</span><span class="tile-name">Progress</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 12v5"/><path d="M11 8v9"/><path d="M15 5v12"/><path d="M19 10v7"/></svg></span>
+      <span class="tile-name">Progress</span>
     </a>
+
   </div>
 </section>
 
@@ -311,22 +355,29 @@ footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
     <span class="section-count">3 · for prospects</span>
   </div>
   <div class="grid">
+
     <a class="tile" href="/ai-readiness-test/" target="_blank">
-      <span class="tile-icon">📊</span><span class="tile-name">AI Readiness</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.5.5 0 0 1-.96 0L9.68 3.18a.5.5 0 0 0-.96 0l-2.35 8.36A2 2 0 0 1 4.45 13H2"/></svg></span>
+      <span class="tile-name">AI Readiness</span>
     </a>
+
     <a class="tile" href="/ai-cost-calculator/" target="_blank">
-      <span class="tile-icon">💰</span><span class="tile-name">AI Cost Calc</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg></span>
+      <span class="tile-name">AI Cost Calc</span>
     </a>
+
     <a class="tile" href="/ai-will/" target="_blank">
-      <span class="tile-icon">📜</span><span class="tile-name">AI Will</span>
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></span>
+      <span class="tile-name">AI Will</span>
     </a>
+
   </div>
 </section>
 
 </main>
 
 <footer>
-  <a href="https://elijahbot-refresh.vercel.app">Refresh</a> · <a href="https://purcellventures.co">Purcell Ventures</a> · <a href="/personal-os/">Personal OS (state router)</a>
+  Apps live in <a href="https://elijahbot-tools-hub.vercel.app">the master app</a>, not here · <a href="https://elijahbot-refresh.vercel.app">Refresh</a> · <a href="https://purcellventures.co">Purcell Ventures</a>
 </footer>
 
 </body>
