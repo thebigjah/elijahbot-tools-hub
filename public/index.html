@@ -3,165 +3,227 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Tools · Elijah Purcell</title>
+<title>Tools · Purcell Ventures</title>
 <meta name="description" content="A personal library of tools for faith, focus, and small-business clarity.">
-<meta name="theme-color" content="#1a1611">
+<meta name="theme-color" content="#0a0604">
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Tools">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22 fill=%22%23d4a865%22 font-family=%22serif%22>P</text></svg>">
+<link rel="icon" href="/_brand/panopticon-mark.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=DM+Sans:wght@300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/_brand/brand.css">
 <script src="/lock.js"></script>
 <style>
-:root{
-  --ink:#f4ede0;
-  --ink-dim:#a89c87;
-  --ink-faint:#6d6353;
-  --bg:#1a1611;
-  --bg-panel:#221d16;
-  --bg-elev:#2a241c;
-  --accent:#d4a865;
-  --accent-warm:#c97a4b;
-  --rule:#3a3328;
-  --serif:'Fraunces',Georgia,serif;
-  --mono:'JetBrains Mono',ui-monospace,monospace;
-}
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-weight:400;-webkit-font-smoothing:antialiased;font-feature-settings:"ss01"}
-body{min-height:100vh;line-height:1.4}
+html,body{margin:0;padding:0;background:var(--pv-bg);color:var(--pv-ink);font-family:var(--pv-body);font-weight:400;-webkit-font-smoothing:antialiased}
+body{
+  min-height:100vh;line-height:1.5;
+  position:relative;
+  /* atmospheric radial glow from top */
+  background-image:
+    radial-gradient(ellipse 90% 50% at 50% -10%, rgba(212, 175, 55, 0.07), transparent 60%),
+    radial-gradient(ellipse 70% 40% at 100% 100%, rgba(212, 175, 55, 0.03), transparent 60%);
+}
 
+/* Subtle phi pattern wash on hero, fading down */
+.phi-wash{
+  position:absolute;
+  top:0;left:0;right:0;height:420px;
+  background-image:url("/_brand/phi-pattern.svg");
+  background-repeat:repeat;
+  background-size:480px 480px;
+  opacity:0.06;
+  pointer-events:none;
+  mask-image:linear-gradient(to bottom, black 30%, transparent 100%);
+  -webkit-mask-image:linear-gradient(to bottom, black 30%, transparent 100%);
+}
+
+/* Header — editorial masthead with panopticon mark + Cinzel wordmark */
 header{
-  padding:28px 28px 18px;
-  border-bottom:1px solid var(--rule);
-  background:linear-gradient(180deg, var(--bg-panel) 0%, var(--bg) 100%);
+  position:relative;
+  padding:48px 32px 32px;
+  border-bottom:1px solid rgba(212, 175, 55, 0.18);
 }
-.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-faint)}
-h1{font-family:var(--serif);font-weight:300;font-size:38px;line-height:1.0;letter-spacing:-0.025em;margin:6px 0 0;font-variation-settings:"opsz" 144}
-h1 em{font-style:italic;color:var(--accent);font-weight:400}
-.tagline{font-family:var(--mono);font-size:11px;color:var(--ink-dim);margin-top:10px;letter-spacing:0.04em}
-.apps-link{
-  display:inline-block;
-  margin-top:14px;
-  font-family:var(--mono);font-size:11px;letter-spacing:0.08em;
-  color:var(--accent);text-decoration:none;
-  padding:6px 12px;border:1px solid var(--rule);border-radius:14px;
-  transition:all .15s;
+.masthead{
+  max-width:1080px;margin:0 auto;
+  display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;
 }
-.apps-link:hover{border-color:var(--accent);background:var(--bg-elev)}
+.mark{width:74px;height:74px;flex-shrink:0}
+.mark img{width:100%;height:100%;display:block}
+.wordmark{display:flex;flex-direction:column;gap:6px;min-width:0}
+.eyebrow{
+  font-family:var(--pv-ui);font-size:10.5px;letter-spacing:0.32em;text-transform:uppercase;
+  color:var(--pv-gold);opacity:0.85;
+}
+h1{
+  font-family:var(--pv-display);font-weight:500;font-size:36px;line-height:1.0;letter-spacing:0.04em;
+  margin:0;color:var(--pv-ink);text-transform:uppercase;
+}
+h1 .div{color:var(--pv-gold);margin:0 0.35em;font-weight:400}
+h1 .name{font-style:italic;font-weight:400;letter-spacing:0.02em;text-transform:none;color:var(--pv-brass)}
+.tagline{
+  font-family:var(--pv-body);font-size:13.5px;color:var(--pv-ink-dim);
+  margin-top:14px;max-width:520px;line-height:1.5;
+}
+.masthead-meta{
+  font-family:var(--pv-mono);font-size:10.5px;letter-spacing:0.12em;color:var(--pv-ink-faint);
+  text-align:right;line-height:1.7;
+}
+.masthead-meta strong{color:var(--pv-brass);font-weight:500}
 
-main{max-width:1080px;margin:0 auto;padding:28px 24px 80px}
+/* Main */
+main{
+  position:relative;z-index:1;
+  max-width:1080px;margin:0 auto;padding:36px 32px 80px;
+}
 
-.section{margin-bottom:36px}
+/* Sections — magazine spread style */
+.section{margin-bottom:48px}
 .section-header{
-  display:flex;align-items:baseline;gap:14px;
-  margin-bottom:16px;
-  padding-bottom:8px;
-  border-bottom:1px solid var(--rule);
+  display:grid;grid-template-columns:auto 1fr auto;align-items:baseline;gap:16px;
+  margin-bottom:20px;padding-bottom:10px;
+  border-bottom:1px solid rgba(212, 175, 55, 0.18);
+}
+.section-roman{
+  font-family:var(--pv-display);font-weight:400;
+  font-size:14px;color:var(--pv-gold);letter-spacing:0.2em;
+  min-width:32px;
 }
 .section-title{
-  font-family:var(--serif);font-weight:400;font-size:20px;
-  letter-spacing:-0.01em;color:var(--ink);
-  margin:0;
-  font-variation-settings:"opsz" 96;
+  font-family:var(--pv-display);font-weight:500;font-size:20px;
+  letter-spacing:0.05em;color:var(--pv-ink);
+  margin:0;text-transform:uppercase;
 }
 .section-count{
-  font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:0.1em;
-  margin-left:auto;
+  font-family:var(--pv-mono);font-size:10.5px;color:var(--pv-ink-faint);
+  letter-spacing:0.12em;text-align:right;
 }
 
 .grid{
   display:grid;
   grid-template-columns:repeat(6, 1fr);
-  gap:6px;
+  gap:8px;
 }
 
 .tile{
-  background:var(--bg-panel);
-  border:1px solid var(--rule);
-  border-radius:14px;
-  padding:16px 8px 13px;
+  background:rgba(31, 24, 16, 0.6);
+  border:1px solid rgba(212, 175, 55, 0.12);
+  border-radius:10px;
+  padding:18px 8px 14px;
   text-decoration:none;
   color:inherit;
   text-align:center;
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:10px;
-  transition:transform .12s ease, border-color .12s ease, background .12s ease;
-  min-height:112px;
+  gap:11px;
+  transition:transform .18s ease, border-color .18s ease, background .18s ease;
+  min-height:118px;
+  position:relative;
+  overflow:hidden;
+}
+.tile::before{
+  content:"";
+  position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(to right, transparent, rgba(212, 175, 55, 0.4), transparent);
+  opacity:0;transition:opacity .2s;
 }
 .tile:hover, .tile:focus-visible{
-  border-color:var(--accent);
-  background:var(--bg-elev);
+  border-color:rgba(212, 175, 55, 0.55);
+  background:rgba(45, 34, 22, 0.7);
   transform:translateY(-2px);
   outline:none;
 }
+.tile:hover::before, .tile:focus-visible::before{opacity:1}
 .tile:hover .tile-icon, .tile:focus-visible .tile-icon{
-  color:var(--accent);
-  transform:scale(1.04);
+  color:var(--pv-gold);
+  transform:scale(1.05);
 }
 .tile-icon{
   width:30px;height:30px;
-  color:var(--ink-dim);
+  color:var(--pv-brass);opacity:0.85;
   display:flex;align-items:center;justify-content:center;
-  transition:color .15s ease, transform .15s ease;
+  transition:color .15s ease, transform .18s ease;
 }
 .tile-icon svg{width:100%;height:100%;stroke-width:1.5}
 .tile-name{
-  font-family:var(--serif);
-  font-size:14px;
-  line-height:1.15;
-  color:var(--ink);
-  font-weight:400;
-  letter-spacing:-0.005em;
-  font-variation-settings:"opsz" 36;
+  font-family:var(--pv-display);
+  font-weight:500;
+  font-size:13px;
+  line-height:1.2;
+  color:var(--pv-ink);
+  letter-spacing:0.04em;
+  text-transform:uppercase;
 }
-.tile:hover .tile-name{color:var(--accent)}
+.tile:hover .tile-name{color:var(--pv-brass-bright)}
 
+/* Footer */
 footer{
-  border-top:1px solid var(--rule);
-  padding:24px;
+  border-top:1px solid rgba(212, 175, 55, 0.18);
+  padding:32px;
   text-align:center;
-  font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:0.05em;
+  font-family:var(--pv-mono);font-size:10.5px;color:var(--pv-ink-faint);letter-spacing:0.12em;
 }
-footer a{color:var(--ink-dim);text-decoration:none;border-bottom:1px dotted var(--rule)}
-footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
+footer .div{color:var(--pv-gold);margin:0 0.7em}
+footer a{color:var(--pv-ink-dim);text-decoration:none;border-bottom:1px dotted rgba(212, 175, 55, 0.25)}
+footer a:hover{color:var(--pv-gold);border-bottom-color:var(--pv-gold)}
 
+/* Responsive */
 @media(max-width:900px){
   .grid{grid-template-columns:repeat(5, 1fr)}
+  .masthead{grid-template-columns:auto 1fr;gap:18px}
+  .masthead-meta{display:none}
 }
 @media(max-width:720px){
   .grid{grid-template-columns:repeat(4, 1fr)}
-  h1{font-size:30px}
-  main{padding:22px 18px 60px}
+  h1{font-size:28px}
+  main{padding:30px 22px 60px}
+  header{padding:34px 22px 24px}
 }
 @media(max-width:480px){
-  .grid{grid-template-columns:repeat(3, 1fr); gap:5px}
-  .tile{padding:14px 5px 11px;min-height:98px;gap:8px}
+  .grid{grid-template-columns:repeat(3, 1fr); gap:6px}
+  .tile{padding:14px 5px 11px;min-height:104px;gap:9px}
   .tile-icon{width:26px;height:26px}
-  .tile-name{font-size:12.5px}
-  header{padding:22px 20px 14px}
-  h1{font-size:26px}
+  .tile-name{font-size:12px;letter-spacing:0.03em}
+  header{padding:28px 20px 20px}
+  h1{font-size:24px;letter-spacing:0.03em}
+  .mark{width:60px;height:60px}
+  .section-title{font-size:17px}
 }
 </style>
 </head>
 <body>
 
+<div class="phi-wash" aria-hidden="true"></div>
+
 <header>
-  <div class="eyebrow">Personal tool library</div>
-  <h1>Tools · <em>Elijah Purcell</em></h1>
-  <div class="tagline">Single-screen utilities. Apps live in the master app, not here.</div>
+  <div class="masthead">
+    <div class="mark">
+      <img src="/_brand/panopticon.svg" alt="Purcell Ventures">
+    </div>
+    <div class="wordmark">
+      <div class="eyebrow">Personal tool library</div>
+      <h1>Tools<span class="div">·</span><span class="name">Elijah Purcell</span></h1>
+      <div class="tagline">Single-screen utilities. Apps live in the master app, not here.</div>
+    </div>
+    <div class="masthead-meta">
+      <strong>v0.05</strong><br>
+      27 tools<br>
+      6 sections
+    </div>
+  </div>
 </header>
 
 <main>
 
 <section class="section">
   <div class="section-header">
-    <h2 class="section-title">Faith &amp; discipline</h2>
+    <span class="section-roman">I.</span>
+    <h2 class="section-title">Faith &amp; Discipline</h2>
     <span class="section-count">8 · daily practice</span>
   </div>
   <div class="grid">
@@ -211,8 +273,9 @@ footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
 
 <section class="section">
   <div class="section-header">
-    <h2 class="section-title">Productivity &amp; growth</h2>
-    <span class="section-count">9 · self-tracking</span>
+    <span class="section-roman">II.</span>
+    <h2 class="section-title">Productivity &amp; Growth</h2>
+    <span class="section-count">10 · self-tracking</span>
   </div>
   <div class="grid">
 
@@ -261,12 +324,18 @@ footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
       <span class="tile-name">Stage Fright</span>
     </a>
 
+    <a class="tile" href="/reza-prep/" target="_blank" style="opacity:0.55">
+      <span class="tile-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+      <span class="tile-name">Reza Prep</span>
+    </a>
+
   </div>
 </section>
 
 <section class="section">
   <div class="section-header">
-    <h2 class="section-title">UA prep</h2>
+    <span class="section-roman">III.</span>
+    <h2 class="section-title">UA Prep</h2>
     <span class="section-count">3 · move-in soon</span>
   </div>
   <div class="grid">
@@ -291,7 +360,8 @@ footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
 
 <section class="section">
   <div class="section-header">
-    <h2 class="section-title">Cryptography &amp; play</h2>
+    <span class="section-roman">IV.</span>
+    <h2 class="section-title">Cryptography &amp; Play</h2>
     <span class="section-count">2</span>
   </div>
   <div class="grid">
@@ -311,7 +381,8 @@ footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
 
 <section class="section">
   <div class="section-header">
-    <h2 class="section-title">Meta &amp; routing</h2>
+    <span class="section-roman">V.</span>
+    <h2 class="section-title">Meta &amp; Routing</h2>
     <span class="section-count">2</span>
   </div>
   <div class="grid">
@@ -331,7 +402,8 @@ footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
 
 <section class="section">
   <div class="section-header">
-    <h2 class="section-title">Business · lead-gen</h2>
+    <span class="section-roman">VI.</span>
+    <h2 class="section-title">Business · Lead-gen</h2>
     <span class="section-count">3 · for prospects</span>
   </div>
   <div class="grid">
@@ -357,7 +429,9 @@ footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
 </main>
 
 <footer>
-  Apps live in the master app, not here · <a href="https://elijahbot-refresh.vercel.app">Refresh</a> · <a href="https://purcellventures.co">Purcell Ventures</a>
+  Apps live in the master app <span class="div">·</span>
+  <a href="https://elijahbot-refresh.vercel.app">Refresh</a> <span class="div">·</span>
+  <a href="https://purcellventures.co">Purcell Ventures</a>
 </footer>
 
 </body>
