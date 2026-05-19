@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1a1611">
+<title>Notepad · scratch paper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#f4ede0;
+  --ink-dim:#a89c87;
+  --ink-faint:#6d6353;
+  --bg:#1a1611;
+  --bg-panel:#221d16;
+  --bg-elev:#2a241c;
+  --accent:#d4a865;
+  --accent-warm:#c97a4b;
+  --good:#7da97d;
+  --rule:#3a3328;
+  --serif:'Fraunces',Georgia,serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-weight:400;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+header{
+  padding:14px 22px;
+  border-bottom:1px solid var(--rule);
+  display:flex;align-items:center;justify-content:space-between;
+  gap:14px;flex-wrap:wrap;
+  background:var(--bg-panel);
+}
+.brand{display:flex;align-items:baseline;gap:14px;min-width:0}
+.brand-mark{
+  font-family:var(--serif);font-weight:300;font-size:22px;color:var(--ink);
+  letter-spacing:-0.02em;font-variation-settings:"opsz" 144;
+}
+.brand-mark em{font-style:italic;color:var(--accent);font-weight:400}
+.brand-sub{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);letter-spacing:0.15em;text-transform:uppercase}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{
+  font-family:var(--mono);font-size:11.5px;letter-spacing:0.05em;
+  background:transparent;border:1px solid var(--rule);color:var(--ink-dim);
+  padding:7px 14px;border-radius:14px;cursor:pointer;
+  transition:all .15s;
+}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:500}
+.btn.primary:hover{background:var(--accent-warm);color:var(--ink);border-color:var(--accent-warm)}
+.btn.danger:hover{border-color:var(--accent-warm);color:var(--accent-warm)}
+
+.wrap{flex:1;display:flex;min-height:0}
+
+.sidebar{
+  width:260px;flex-shrink:0;
+  background:var(--bg-panel);
+  border-right:1px solid var(--rule);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+.sidebar-toolbar{padding:12px 14px;border-bottom:1px solid var(--rule)}
+.sidebar-search{
+  width:100%;background:var(--bg);border:1px solid var(--rule);color:var(--ink);
+  font-family:var(--mono);font-size:12px;
+  padding:8px 12px;border-radius:6px;outline:none;
+}
+.sidebar-search:focus{border-color:var(--accent)}
+.sidebar-list{flex:1;overflow-y:auto;padding:8px 0}
+.note-tile{
+  padding:11px 16px;cursor:pointer;border-left:3px solid transparent;
+  transition:background .12s, border-color .12s;
+}
+.note-tile:hover{background:var(--bg-elev)}
+.note-tile.active{background:var(--bg-elev);border-left-color:var(--accent)}
+.note-tile-title{
+  font-family:var(--serif);font-size:14.5px;color:var(--ink);
+  line-height:1.25;font-weight:400;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.note-tile-meta{
+  font-family:var(--mono);font-size:10px;color:var(--ink-faint);
+  margin-top:3px;letter-spacing:0.04em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.note-tile.active .note-tile-title{color:var(--accent)}
+
+.editor{
+  flex:1;display:flex;flex-direction:column;min-width:0;
+  background:var(--bg);
+}
+.editor-header{padding:16px 28px 8px;border-bottom:1px dashed var(--rule)}
+.editor-title{
+  width:100%;background:transparent;border:none;color:var(--ink);
+  font-family:var(--serif);font-weight:300;font-size:28px;line-height:1.15;
+  letter-spacing:-0.02em;outline:none;
+  font-variation-settings:"opsz" 96;
+}
+.editor-title::placeholder{color:var(--ink-faint);font-style:italic}
+.editor-meta{
+  font-family:var(--mono);font-size:11px;color:var(--ink-faint);
+  margin-top:6px;letter-spacing:0.05em;
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+}
+.editor-meta .saved{color:var(--good)}
+.editor-meta .unsaved{color:var(--accent-warm)}
+
+.editor-body-wrap{flex:1;overflow-y:auto;padding:18px 28px 60px}
+.editor-body{
+  width:100%;min-height:100%;
+  background:transparent;border:none;color:var(--ink);
+  font-family:var(--serif);font-size:17px;line-height:1.65;font-weight:400;
+  outline:none;resize:none;
+  font-feature-settings:"ss01";
+  letter-spacing:-0.005em;
+}
+.editor-body::placeholder{color:var(--ink-faint);font-style:italic;font-weight:300}
+
+.empty{
+  font-family:var(--mono);font-size:12px;color:var(--ink-faint);
+  text-align:center;padding:40px 20px;letter-spacing:0.04em;line-height:1.6;
+}
+
+@media(max-width:720px){
+  .wrap{flex-direction:column}
+  .sidebar{width:100%;max-height:38vh;border-right:none;border-bottom:1px solid var(--rule)}
+  .editor-title{font-size:22px}
+  .editor-body{font-size:16px}
+  .editor-header{padding:14px 20px 6px}
+  .editor-body-wrap{padding:14px 20px 60px}
+  header{padding:11px 18px}
+  .brand-mark{font-size:18px}
+}
+
+@media print{
+  body{background:white;color:#1a1611;overflow:visible}
+  header, .sidebar{display:none}
+  .editor{background:white}
+  .editor-title{color:#1a1611}
+  .editor-body{color:#1a1611;font-size:13pt;line-height:1.6}
+  .editor-meta{color:#666}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="brand-mark">Note<em>pad</em></span>
+    <span class="brand-sub">scratch · auto-saved</span>
+  </div>
+  <div class="toolbar">
+    <button class="btn primary" onclick="newNote()">+ New</button>
+    <button class="btn" onclick="window.print()">Print</button>
+    <button class="btn danger" onclick="deleteCurrent()">Delete</button>
+    <a class="btn" href="https://elijahbot-tools-hub.vercel.app" style="text-decoration:none">Tools ↗</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <aside class="sidebar">
+    <div class="sidebar-toolbar">
+      <input type="text" class="sidebar-search" id="search" placeholder="search notes…" oninput="renderList()">
+    </div>
+    <div class="sidebar-list" id="list"></div>
+  </aside>
+
+  <main class="editor" id="editor-wrap">
+    <div class="editor-header">
+      <input type="text" class="editor-title" id="title" placeholder="Untitled" oninput="onChange()">
+      <div class="editor-meta">
+        <span id="meta-created">—</span>
+        <span id="meta-saved" class="saved">saved</span>
+      </div>
+    </div>
+    <div class="editor-body-wrap">
+      <textarea class="editor-body" id="body" placeholder="Start writing. Notes auto-save as you type.
+
+Tip: keep this open in a tab during meetings — it stores everything locally, never sends anything anywhere." oninput="onChange()"></textarea>
+    </div>
+  </main>
+</div>
+
+<script>
+const STORE_KEY = 'notepad-v0';
+
+function load(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch(e){ return {}; } }
+function save(s){ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }
+function getStore(){
+  const s = load();
+  if(!s.notes) s.notes = [];
+  return s;
+}
+function setStore(s){ save(s); }
+
+let currentId = null;
+let saveTimer = null;
+
+function uid(){ return 'N' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+function seedIfFirstTime(){
+  const s = getStore();
+  if(s.notes.length > 0) return;
+  // Seed with a Reza-call template so first-time users see the shape.
+  s.notes.push({
+    id: uid(),
+    title: 'Reza · May 19 · 1:00 PM',
+    body: "NOTES DURING CALL (keywords only, 3-5 per topic)\n———————————————————————————\n\n\n\n\nWHAT HE LIT UP ABOUT:\n\n\n\nNAMES / PAPERS / PEOPLE HE REFERENCED:\n\n\n\nDOORS HE OPENED:\n\n\n\n———————————————————————————\nAT 1:30 — write follow-up email referencing ONE specific thing.\nSend within the hour.",
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  });
+  s.notes.push({
+    id: uid(),
+    title: 'Blank note',
+    body: '',
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  });
+  setStore(s);
+}
+
+function renderList(){
+  const s = getStore();
+  const q = document.getElementById('search').value.toLowerCase().trim();
+  const list = document.getElementById('list');
+  let notes = s.notes.slice().sort((a,b)=>b.updatedAt - a.updatedAt);
+  if(q){
+    notes = notes.filter(n =>
+      (n.title || '').toLowerCase().includes(q) ||
+      (n.body || '').toLowerCase().includes(q)
+    );
+  }
+  if(notes.length === 0){
+    list.innerHTML = '<div class="empty">' + (q ? 'No matches.' : 'No notes yet. Tap + New.') + '</div>';
+    return;
+  }
+  list.innerHTML = notes.map(n => {
+    const isActive = n.id === currentId;
+    const titleStr = n.title || (n.body ? n.body.slice(0,40) : 'Untitled');
+    const updated = new Date(n.updatedAt);
+    const today = new Date();
+    let when;
+    if(updated.toDateString() === today.toDateString()){
+      when = updated.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'});
+    } else {
+      when = updated.toLocaleDateString(undefined, {month:'short', day:'numeric'});
+    }
+    const preview = (n.body || '').replace(/\s+/g,' ').slice(0,60);
+    return `<div class="note-tile ${isActive ? 'active' : ''}" onclick="selectNote('${n.id}')">
+      <div class="note-tile-title">${escapeHtml(titleStr)}</div>
+      <div class="note-tile-meta">${escapeHtml(when)} · ${escapeHtml(preview)}</div>
+    </div>`;
+  }).join('');
+}
+
+function selectNote(id){
+  saveImmediate();
+  currentId = id;
+  const s = getStore();
+  const n = s.notes.find(x => x.id === id);
+  if(!n) return;
+  document.getElementById('title').value = n.title || '';
+  document.getElementById('body').value = n.body || '';
+  document.getElementById('meta-created').textContent = 'Created ' + formatDate(n.createdAt);
+  setSaved('saved');
+  renderList();
+}
+
+function newNote(){
+  saveImmediate();
+  const s = getStore();
+  const n = {
+    id: uid(),
+    title: '',
+    body: '',
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+  s.notes.push(n);
+  setStore(s);
+  currentId = n.id;
+  document.getElementById('title').value = '';
+  document.getElementById('body').value = '';
+  document.getElementById('meta-created').textContent = 'Created just now';
+  setSaved('saved');
+  renderList();
+  document.getElementById('title').focus();
+}
+
+function deleteCurrent(){
+  if(!currentId) return;
+  const s = getStore();
+  const n = s.notes.find(x => x.id === currentId);
+  if(!n) return;
+  const label = (n.title || n.body || '').slice(0,40) || 'this note';
+  if(!confirm(`Delete "${label}"? Cannot be undone.`)) return;
+  s.notes = s.notes.filter(x => x.id !== currentId);
+  setStore(s);
+  if(s.notes.length > 0){
+    selectNote(s.notes.sort((a,b)=>b.updatedAt - a.updatedAt)[0].id);
+  } else {
+    currentId = null;
+    document.getElementById('title').value = '';
+    document.getElementById('body').value = '';
+    document.getElementById('meta-created').textContent = '—';
+    renderList();
+  }
+}
+
+function onChange(){
+  setSaved('unsaved');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveImmediate, 500);
+}
+
+function saveImmediate(){
+  if(!currentId) return;
+  const s = getStore();
+  const n = s.notes.find(x => x.id === currentId);
+  if(!n) return;
+  n.title = document.getElementById('title').value;
+  n.body = document.getElementById('body').value;
+  n.updatedAt = Date.now();
+  setStore(s);
+  setSaved('saved');
+  renderList();
+}
+
+function setSaved(state){
+  const el = document.getElementById('meta-saved');
+  if(state === 'saved'){
+    el.textContent = 'saved';
+    el.className = 'saved';
+  } else {
+    el.textContent = 'saving…';
+    el.className = 'unsaved';
+  }
+}
+
+function formatDate(ts){
+  const d = new Date(ts);
+  return d.toLocaleString(undefined, { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
+}
+
+function escapeHtml(s){
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+}
+
+// keyboard: Ctrl+S (defensive — already auto-saving)
+document.addEventListener('keydown', (e) => {
+  if((e.ctrlKey || e.metaKey) && e.key === 's'){
+    e.preventDefault();
+    saveImmediate();
+  }
+  if((e.ctrlKey || e.metaKey) && e.key === 'n'){
+    e.preventDefault();
+    newNote();
+  }
+});
+
+// save before tab close
+window.addEventListener('beforeunload', saveImmediate);
+
+// init
+seedIfFirstTime();
+const s = getStore();
+const sorted = s.notes.slice().sort((a,b)=>b.updatedAt - a.updatedAt);
+if(sorted.length > 0){
+  selectNote(sorted[0].id);
+}
+renderList();
+</script>
+
+</body>
+</html>
