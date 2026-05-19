@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1a1611">
+<title>Reza call · prep card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#f4ede0;
+  --ink-dim:#a89c87;
+  --ink-faint:#6d6353;
+  --bg:#1a1611;
+  --bg-panel:#221d16;
+  --bg-elev:#2a241c;
+  --accent:#d4a865;
+  --accent-warm:#c97a4b;
+  --good:#7da97d;
+  --rule:#3a3328;
+  --serif:'Fraunces',Georgia,serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-weight:400;-webkit-font-smoothing:antialiased;font-feature-settings:"ss01"}
+body{min-height:100vh;line-height:1.5}
+
+header{
+  padding:32px 36px 18px;
+  border-bottom:1px solid var(--rule);
+  background:linear-gradient(180deg, var(--bg-panel) 0%, var(--bg) 100%);
+}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px}
+h1{font-family:var(--serif);font-weight:300;font-size:42px;line-height:1.0;letter-spacing:-0.025em;margin:0;font-variation-settings:"opsz" 144}
+h1 em{font-style:italic;color:var(--accent);font-weight:400}
+.when{font-family:var(--mono);font-size:13px;color:var(--accent);margin-top:10px;letter-spacing:0.08em}
+
+main{max-width:780px;margin:0 auto;padding:32px 36px}
+
+section{
+  margin-bottom:32px;
+  border-left:3px solid var(--rule);
+  padding-left:20px;
+  position:relative;
+}
+section.priority{border-left-color:var(--accent-warm)}
+section.action{border-left-color:var(--accent)}
+section.warning{border-left-color:var(--ink-faint)}
+
+.section-num{
+  position:absolute;left:-3px;top:0;
+  background:var(--bg);
+  padding:0 8px 0 8px;
+  margin-left:-12px;
+  font-family:var(--mono);font-size:11px;color:var(--accent-warm);letter-spacing:0.15em;
+}
+.section-h{
+  font-family:var(--serif);font-weight:400;font-size:22px;
+  letter-spacing:-0.01em;margin:0 0 14px;
+  color:var(--ink);
+  font-variation-settings:"opsz" 96;
+}
+
+.facts{font-family:var(--serif);font-size:17px;line-height:1.7;color:var(--ink-dim);margin:0}
+.facts li{margin-bottom:10px}
+.facts strong{color:var(--ink);font-weight:500;font-style:italic}
+.facts em{font-style:italic;color:var(--accent);font-weight:400}
+
+.quote{
+  font-family:var(--serif);font-style:italic;font-weight:300;
+  font-size:19px;line-height:1.55;
+  color:var(--ink);
+  padding:16px 20px;
+  background:var(--bg-panel);
+  border-radius:8px;
+  border:1px solid var(--rule);
+  margin:8px 0 4px;
+  letter-spacing:-0.005em;
+}
+.quote .strong{font-weight:500;font-style:normal;color:var(--accent)}
+.reaim{
+  font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);
+  margin-top:8px;letter-spacing:0.04em;
+}
+.reaim strong{color:var(--accent-warm);font-weight:500}
+
+.numbered{font-family:var(--serif);font-size:16px;line-height:1.55;color:var(--ink-dim);margin:0;padding-left:0;list-style:none}
+.numbered li{
+  margin-bottom:14px;
+  padding-left:34px;
+  position:relative;
+}
+.numbered li::before{
+  content:counter(item) ".";
+  counter-increment:item;
+  position:absolute;left:0;top:1px;
+  font-family:var(--mono);font-size:13px;color:var(--accent);
+  font-weight:500;letter-spacing:0.04em;
+}
+.numbered{counter-reset:item}
+
+.dont-list{font-family:var(--mono);font-size:13px;color:var(--ink-dim);list-style:none;padding:0;margin:0;line-height:1.9}
+.dont-list li{padding-left:28px;position:relative}
+.dont-list li::before{
+  content:"";position:absolute;left:0;top:6px;
+  width:14px;height:14px;
+  border:1.5px solid var(--rule);
+  border-radius:3px;
+}
+
+.callout{
+  background:var(--bg-elev);
+  border-left:3px solid var(--accent);
+  padding:12px 18px;
+  margin:8px 0;
+  border-radius:0 6px 6px 0;
+  font-family:var(--mono);font-size:12.5px;color:var(--ink-dim);line-height:1.6;
+}
+.callout strong{color:var(--accent)}
+
+.right-after{
+  background:var(--bg-panel);
+  border:1px solid var(--accent-warm);
+  border-radius:8px;
+  padding:18px 22px;
+  margin-top:12px;
+}
+.right-after-label{font-family:var(--mono);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent-warm);margin-bottom:8px}
+.right-after-body{font-family:var(--serif);font-size:15px;color:var(--ink-dim);line-height:1.6}
+.right-after-body strong{color:var(--ink);font-weight:500}
+
+footer{
+  padding:24px 36px;
+  border-top:1px solid var(--rule);
+  text-align:center;
+  font-family:var(--mono);font-size:11px;color:var(--ink-faint);
+  letter-spacing:0.05em;
+}
+
+@media(max-width:640px){
+  header{padding:24px 22px 14px}
+  main{padding:24px 22px}
+  h1{font-size:32px}
+  .quote{font-size:16.5px;padding:14px 16px}
+  .section-h{font-size:19px}
+  .facts{font-size:15.5px}
+}
+
+@media print{
+  body{background:white;color:#1a1611}
+  header{background:white;border-bottom-color:#aaa}
+  .eyebrow{color:#888}
+  h1, .section-h{color:#1a1611}
+  h1 em, .quote .strong{color:#8b6f47}
+  .section-num{background:white;color:#8b6f47}
+  section{border-left-color:#ccc}
+  section.priority{border-left-color:#c97a4b}
+  section.action{border-left-color:#d4a865}
+  .facts, .numbered, .quote, .reaim, .dont-list{color:#1a1611}
+  .quote{background:#faf6f1;border-color:#ddd}
+  .callout, .right-after{background:#faf6f1;border-color:#c97a4b}
+  .when{color:#8b6f47}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Prep card · single-glance reference</div>
+  <h1>Reza · <em>1:00 PM today</em></h1>
+  <div class="when">30 min · Google Meet · listen more than you talk</div>
+</header>
+
+<main>
+
+<section class="priority">
+  <span class="section-num">I.</span>
+  <h2 class="section-h">The 3 facts</h2>
+  <ul class="facts">
+    <li>Cancer at 22 → <strong>naval engineering → medicine</strong></li>
+    <li>Now = <strong>Frontier Psychiatry / MedFlow / OpenHi</strong> — <em>NOT NeuroLex</em> (exited 2020)</li>
+    <li>Obsession = <strong>early dementia detection</strong> · voice biomarkers + lifestyle prevention</li>
+    <li>His frame: <em>"tech-enabled clinical systems rooted in clinical expertise"</em></li>
+  </ul>
+</section>
+
+<section class="action">
+  <span class="section-num">II.</span>
+  <h2 class="section-h">If he asks "tell me about you"</h2>
+  <div class="quote">
+    I'm 18, headed to Alabama this fall on a pre-med track — psychiatry direction, with an AI tools habit on the side I keep feeding. Clint thought we'd connect.
+  </div>
+  <div class="reaim">Then re-aim: <strong>"What's the most interesting thing on your plate right now?"</strong></div>
+</section>
+
+<section class="action">
+  <span class="section-num">III.</span>
+  <h2 class="section-h">Opener 1 — use first, after hello</h2>
+  <div class="quote">
+    I've been thinking about AI tools for mental health from the outside — building stuff for myself, friends, family. You're inside the system. What's the gap between what AI <span class="strong">CAN</span> do and what regulated clinical workflow will actually <span class="strong">ALLOW</span> it to do right now?
+  </div>
+</section>
+
+<section>
+  <span class="section-num">IV.</span>
+  <h2 class="section-h">Follow-ups · when there's a pause or he asks back</h2>
+  <ol class="numbered">
+    <li>"What's a problem in psychiatry you'd want a smart undergrad to spend a summer on — not because it's a job, but because solving it would actually move something?"</li>
+    <li>"40% of dementia is modifiable — in clinic, is the lifestyle conversation actually changing patient behavior, or is it still mostly academic?"</li>
+    <li>"What did you wish someone had told you in undergrad about preparing for the dual track — building AND practicing?"</li>
+  </ol>
+</section>
+
+<section>
+  <span class="section-num">V.</span>
+  <h2 class="section-h">If I blank — universal reset</h2>
+  <div class="quote">
+    Can you walk me through how you split your time between clinical practice and the companies right now?
+  </div>
+  <div class="reaim">Always works. Hands him the floor.</div>
+</section>
+
+<section class="priority">
+  <span class="section-num">VI.</span>
+  <h2 class="section-h">Mentor ask · last 5 minutes · verbatim</h2>
+  <div class="quote">
+    Would you be open to talking periodically — maybe once a quarter — as I think through the pre-med path?
+  </div>
+  <div class="callout"><strong>Transition line if needed:</strong> "Before we run over — one thing I wanted to ask…"</div>
+</section>
+
+<section class="warning">
+  <span class="section-num">VII.</span>
+  <h2 class="section-h">Hard don'ts</h2>
+  <ul class="dont-list">
+    <li>Don't pitch yourself unless asked</li>
+    <li>Don't lead with Christianity — let him reveal first</li>
+    <li>Don't say "NeuroLex" as current</li>
+    <li>Don't try to match his pedigree</li>
+    <li>Don't fill silence — let him think</li>
+    <li>Don't ask "will you mentor me" — "periodic" only</li>
+    <li>Don't ask "is there anything I can do for you" — performative</li>
+    <li>Don't bluff. "I haven't gone deep on that — what's the gist?"</li>
+  </ul>
+</section>
+
+<section class="action">
+  <span class="section-num">VIII.</span>
+  <h2 class="section-h">Right after the call · 1:30 PM</h2>
+  <div class="right-after">
+    <div class="right-after-label">Do not postpone</div>
+    <div class="right-after-body">
+      Write follow-up email. Reference <strong>ONE</strong> specific thing he said. Say what you're going to <strong>do</strong> with it. 4-6 sentences. Send within the hour.
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  Listen more than you talk. He's giving you 30 min because he wants to.
+</footer>
+
+</body>
+</html>
