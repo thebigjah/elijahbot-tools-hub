@@ -3,223 +3,507 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#1a1611">
-<title>Stage Fright · pre-call voice check</title>
+<meta name="theme-color" content="#070908">
+<title>Stage Fright · UV-7 Vocal Analyzer</title>
+<link rel="icon" href="/_brand/panopticon-mark.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+/*  ============================================================
+    STAGE FRIGHT · "UV-7 Vocal Analyzer"
+    -----------------------------------------------------------
+    Concept: pre-call calibration instrument. Phosphor-green
+    readouts. Oscilloscope graticule. Panel-mounted sections
+    with rivet headers and LED indicators. Reads like a bench
+    instrument you'd find in a 1980s broadcast booth.
+    ============================================================ */
+
 :root{
-  --ink:#f4ede0;
-  --ink-dim:#a89c87;
-  --ink-faint:#6d6353;
-  --bg:#1a1611;
-  --bg-panel:#221d16;
-  --bg-elev:#2a241c;
-  --accent:#d4a865;
-  --accent-warm:#c97a4b;
-  --good:#7da97d;
-  --warn:#c97a4b;
-  --bad:#b85959;
-  --rule:#3a3328;
-  --serif:'Fraunces',Georgia,serif;
-  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --bg:#070908;
+  --bg-panel:#0f1310;
+  --bg-deep:#040605;
+  --bg-elev:#161a17;
+  --ink:#c8d4cc;
+  --ink-dim:#7a8a82;
+  --ink-faint:#4a5550;
+  --phosphor:#6cf08e;
+  --phosphor-dim:#3da25a;
+  --phosphor-deep:#1a4a2a;
+  --amber:#e8b968;
+  --amber-deep:#7a5f2a;
+  --critical:#e54a28;
+  --gold:#d4af37;
+  --rule:#1d2520;
+  --rule-strong:#2a3530;
+
+  --mono:'IBM Plex Mono', ui-monospace, monospace;
+  --sans:'IBM Plex Sans', system-ui, sans-serif;
+  --brand:'Cinzel', Georgia, serif;
 }
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-weight:400;-webkit-font-smoothing:antialiased}
-body{min-height:100vh;line-height:1.5}
-header{padding:32px 24px 18px;border-bottom:1px solid var(--rule)}
-.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px}
-h1{font-family:var(--serif);font-weight:300;font-size:42px;line-height:1.02;letter-spacing:-0.025em;margin:0;font-variation-settings:"opsz" 144}
-h1 em{font-style:italic;color:var(--accent);font-weight:400}
-.tagline{font-family:var(--serif);font-size:16px;color:var(--ink-dim);margin-top:12px;max-width:540px;font-style:italic;font-weight:300}
-main{max-width:680px;margin:0 auto;padding:32px 24px}
-.section-label{display:flex;align-items:baseline;gap:12px;margin:32px 0 14px}
-.section-num{font-family:var(--mono);font-size:11px;color:var(--accent-warm);letter-spacing:0.2em}
-.section-h{font-family:var(--serif);font-weight:400;font-size:18px;letter-spacing:0.01em;color:var(--ink)}
-.section-sub{font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-left:auto}
+html,body{
+  margin:0;padding:0;
+  background:var(--bg);color:var(--ink);
+  font-family:var(--mono);font-weight:400;
+  -webkit-font-smoothing:antialiased;
+  font-size:13.5px;line-height:1.5;
+}
+body{
+  min-height:100vh;
+  /* Scope graticule background */
+  background-image:
+    /* coarse grid */
+    linear-gradient(rgba(108, 240, 142, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(108, 240, 142, 0.025) 1px, transparent 1px),
+    /* fine grid */
+    linear-gradient(rgba(108, 240, 142, 0.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(108, 240, 142, 0.012) 1px, transparent 1px);
+  background-size:80px 80px, 80px 80px, 16px 16px, 16px 16px;
+  background-position:0 0;
+  background-color:var(--bg);
+  position:relative;
+}
+/* CRT vignette */
+body::before{
+  content:"";
+  position:fixed;inset:0;pointer-events:none;z-index:1;
+  background:radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.5) 100%);
+}
+/* Scanlines */
+body::after{
+  content:"";
+  position:fixed;inset:0;pointer-events:none;z-index:2;
+  background:repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 2px,
+    rgba(108, 240, 142, 0.015) 2px,
+    rgba(108, 240, 142, 0.015) 3px
+  );
+}
 
-.record-zone{
+/* ============================================================
+   HEADER — instrument front-panel strip
+   ============================================================ */
+header{
+  position:relative;z-index:3;
+  background:linear-gradient(180deg, var(--bg-panel) 0%, var(--bg) 100%);
+  border-bottom:1px solid var(--rule-strong);
+  padding:18px 28px 16px;
+}
+.front-panel{
+  display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;
+  max-width:920px;margin:0 auto;
+}
+.mark-cell{display:flex;align-items:center;gap:14px}
+.mark{width:36px;height:36px;flex-shrink:0;opacity:0.7;filter:hue-rotate(70deg) brightness(0.9)}
+.mark img{width:100%;height:100%}
+.model-block{display:flex;flex-direction:column;gap:3px;min-width:0}
+.brand-strip{
+  font-family:var(--brand);
+  font-size:9px;letter-spacing:0.4em;text-transform:uppercase;
+  color:var(--gold);opacity:0.7;font-weight:700;
+}
+.model-name{
+  font-family:var(--sans);font-weight:600;font-size:18px;
+  color:var(--phosphor);
+  letter-spacing:0.04em;
+  text-shadow:0 0 14px rgba(108, 240, 142, 0.4);
+  line-height:1;
+}
+.model-sub{
+  font-family:var(--mono);font-size:10px;color:var(--ink-dim);
+  letter-spacing:0.18em;text-transform:uppercase;margin-top:4px;
+}
+.front-panel-power{
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--mono);font-size:10px;letter-spacing:0.15em;
+  color:var(--ink-dim);text-transform:uppercase;
+}
+.led{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--phosphor);
+  box-shadow:0 0 8px var(--phosphor), inset 0 1px 1px rgba(255,255,255,0.4);
+  animation:pulse 2s ease-in-out infinite;
+}
+.led.amber{background:var(--amber);box-shadow:0 0 8px var(--amber), inset 0 1px 1px rgba(255,255,255,0.3)}
+.led.critical{background:var(--critical);box-shadow:0 0 12px var(--critical), inset 0 1px 1px rgba(255,255,255,0.3);animation:pulse-fast 0.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+@keyframes pulse-fast{0%,100%{opacity:1}50%{opacity:0.5}}
+
+main{
+  position:relative;z-index:3;
+  max-width:920px;margin:0 auto;
+  padding:24px 28px 60px;
+}
+
+/* ============================================================
+   PANELS — bench-instrument bordered sections
+   ============================================================ */
+.panel{
   background:var(--bg-panel);
-  border:1px solid var(--rule);
-  border-radius:12px;
-  padding:32px 24px;
-  text-align:center;
+  border:1px solid var(--rule-strong);
+  margin-bottom:18px;
+  position:relative;
+}
+.panel-header{
+  display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;
+  padding:9px 16px;
+  background:var(--bg-elev);
+  border-bottom:1px solid var(--rule-strong);
+  font-family:var(--mono);font-size:10px;letter-spacing:0.2em;text-transform:uppercase;
+}
+.panel-num{
+  color:var(--phosphor-dim);font-weight:600;
+}
+.panel-label{color:var(--ink-dim);letter-spacing:0.18em;font-weight:500}
+.panel-status{color:var(--phosphor);font-weight:500}
+.panel-body{padding:18px 16px}
+
+/* ============================================================
+   ACQUISITION PANEL — record button + waveform
+   ============================================================ */
+.acq-grid{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:stretch}
+@media(max-width:600px){.acq-grid{grid-template-columns:1fr}}
+
+.rec-cell{
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  padding:8px 6px;
 }
 .rec-btn{
   display:inline-flex;align-items:center;justify-content:center;
-  width:140px;height:140px;border-radius:50%;
-  background:var(--bg-elev);
-  border:2px solid var(--accent);
-  color:var(--accent);
-  font-family:var(--mono);font-size:13px;letter-spacing:0.1em;text-transform:uppercase;
-  cursor:pointer;
-  transition:all .2s;
-  font-weight:500;
-}
-.rec-btn.recording{background:var(--bad);border-color:var(--bad);color:var(--ink);animation:pulse 1.5s infinite}
-.rec-btn:hover:not(.recording){background:var(--accent);color:var(--bg)}
-.rec-btn:disabled{opacity:.4;cursor:not-allowed}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
-.rec-status{font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin-top:18px;letter-spacing:0.05em}
-.rec-meter{
-  margin-top:18px;
-  height:6px;
-  background:var(--bg-elev);
-  border-radius:3px;
-  overflow:hidden;
-  max-width:300px;
-  margin-left:auto;margin-right:auto;
-}
-.rec-meter-fill{
-  height:100%;
-  background:linear-gradient(90deg, var(--accent), var(--accent-warm));
-  width:0%;
-  transition:width .1s;
-}
-.prompt{
-  font-family:var(--serif);font-style:italic;font-weight:300;
-  font-size:18px;color:var(--ink-dim);
-  margin-top:24px;line-height:1.6;
-  padding:0 12px;
-}
-
-.baseline-card{
-  background:var(--bg-panel);
-  border:1px solid var(--rule);
-  border-radius:8px;
-  padding:18px 22px;
-  margin-top:16px;
-  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
-}
-.baseline-info{flex:1;min-width:200px}
-.baseline-label{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:4px}
-.baseline-stats{font-family:var(--serif);font-size:15px;color:var(--ink-dim)}
-.baseline-stats strong{color:var(--accent);font-weight:500}
-.btn-sm{
-  font-family:var(--mono);font-size:11px;
-  background:transparent;border:1px solid var(--rule);
-  color:var(--ink-dim);padding:8px 14px;border-radius:14px;cursor:pointer;
+  width:110px;height:110px;border-radius:50%;
+  background:var(--bg-deep);
+  border:2px solid var(--phosphor-dim);
+  color:var(--phosphor);
+  font-family:var(--mono);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;
+  cursor:pointer;font-weight:600;
   transition:all .15s;
-  text-decoration:none;display:inline-block;
+  box-shadow:
+    inset 0 0 18px rgba(108, 240, 142, 0.08),
+    0 0 0 8px var(--bg-panel),
+    0 0 0 10px var(--rule-strong);
+  text-shadow:0 0 8px rgba(108, 240, 142, 0.5);
 }
-.btn-sm:hover{border-color:var(--accent-warm);color:var(--accent-warm)}
+.rec-btn:hover:not(.recording){background:var(--phosphor-deep);color:var(--phosphor)}
+.rec-btn.recording{
+  background:var(--critical);border-color:var(--critical);
+  color:var(--bg);font-weight:700;
+  box-shadow:
+    inset 0 0 20px rgba(229, 74, 40, 0.6),
+    0 0 0 8px var(--bg-panel),
+    0 0 0 10px var(--critical),
+    0 0 40px rgba(229, 74, 40, 0.5);
+  text-shadow:none;
+  animation:rec-pulse 1.2s ease-in-out infinite;
+}
+@keyframes rec-pulse{0%,100%{box-shadow:inset 0 0 20px rgba(229, 74, 40, 0.6),0 0 0 8px var(--bg-panel),0 0 0 10px var(--critical),0 0 40px rgba(229, 74, 40, 0.5)}50%{box-shadow:inset 0 0 20px rgba(229, 74, 40, 0.8),0 0 0 8px var(--bg-panel),0 0 0 10px var(--critical),0 0 60px rgba(229, 74, 40, 0.7)}}
+.rec-btn:disabled{opacity:0.3;cursor:not-allowed}
 
-.results{margin-top:20px;display:none}
+.rec-label{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:0.2em;
+  color:var(--ink-faint);text-transform:uppercase;
+}
+
+.scope-cell{
+  display:flex;flex-direction:column;gap:8px;
+  background:var(--bg-deep);
+  border:1px solid var(--rule);
+  padding:14px;
+  min-height:130px;
+  position:relative;
+}
+.scope-canvas{
+  width:100%;height:80px;
+  background:var(--bg-deep);
+  background-image:
+    linear-gradient(rgba(108, 240, 142, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(108, 240, 142, 0.06) 1px, transparent 1px),
+    /* center crosshair */
+    linear-gradient(rgba(108, 240, 142, 0.18) 1px, transparent 1px);
+  background-size:8% 25%, 8% 25%, 100% 50%;
+  background-position:0 0, 0 0, 0 50%;
+  display:block;
+  border:1px solid var(--rule);
+}
+.meter-row{
+  display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;
+  font-family:var(--mono);font-size:9px;letter-spacing:0.15em;
+  color:var(--ink-dim);text-transform:uppercase;
+}
+.meter{
+  height:5px;background:var(--bg-deep);
+  border:1px solid var(--rule);
+  position:relative;overflow:hidden;
+}
+.meter-fill{
+  height:100%;
+  background:linear-gradient(to right, var(--phosphor) 0%, var(--phosphor) 60%, var(--amber) 80%, var(--critical) 100%);
+  box-shadow:0 0 6px rgba(108, 240, 142, 0.4);
+  width:0%;transition:width .05s linear;
+}
+.scope-readout{
+  font-family:var(--mono);font-size:11px;color:var(--phosphor);
+  letter-spacing:0.08em;text-shadow:0 0 6px rgba(108, 240, 142, 0.4);
+}
+
+.prompt-line{
+  margin-top:12px;
+  font-family:var(--sans);font-size:13.5px;line-height:1.55;color:var(--ink-dim);
+  font-style:italic;
+  padding:10px 14px;
+  border-left:2px solid var(--phosphor-deep);
+  background:rgba(108, 240, 142, 0.025);
+}
+.prompt-line .field{color:var(--amber);font-style:normal;font-weight:500;font-family:var(--mono);font-size:12px}
+
+/* ============================================================
+   BASELINE PANEL
+   ============================================================ */
+.baseline-card{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;
+  padding:11px 16px;
+  background:rgba(232, 185, 104, 0.05);
+  border:1px solid var(--amber-deep);
+  border-left:3px solid var(--amber);
+  font-family:var(--mono);font-size:11px;color:var(--ink);
+}
+.baseline-card-label{
+  font-size:9px;letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--amber);font-weight:600;
+}
+.baseline-card-stats strong{color:var(--phosphor);font-weight:600}
+.btn-sm{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:0.15em;text-transform:uppercase;
+  background:transparent;border:1px solid var(--rule-strong);color:var(--ink-dim);
+  padding:6px 12px;cursor:pointer;
+  transition:all .12s;font-weight:500;
+}
+.btn-sm:hover{border-color:var(--phosphor);color:var(--phosphor)}
+.btn-sm.danger:hover{border-color:var(--critical);color:var(--critical)}
+
+/* ============================================================
+   RESULTS PANEL
+   ============================================================ */
+.results{display:none}
 .results.show{display:block}
-.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px}
+
+.metric-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+}
 @media(max-width:760px){.metric-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:480px){.metric-grid{grid-template-columns:1fr}}
-.metric{
-  background:var(--bg-panel);
-  border:1px solid var(--rule);
-  border-radius:8px;
-  padding:14px 16px;
-}
-.metric-name{font-family:var(--mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px}
-.metric-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-family:var(--serif)}
-.metric-value{font-size:22px;font-weight:400;color:var(--ink);font-variation-settings:"opsz" 144}
-.metric-delta{font-family:var(--mono);font-size:12px}
-.metric-delta.good{color:var(--good)}
-.metric-delta.warn{color:var(--warn)}
-.metric-delta.bad{color:var(--bad)}
-.metric-baseline{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);margin-top:6px}
 
-.diagnoses{margin-top:24px}
-.diagnosis{
-  background:var(--bg-elev);
-  border-left:3px solid var(--accent);
-  border-radius:0 6px 6px 0;
-  padding:14px 18px;
+.metric{
+  background:var(--bg-deep);
+  border:1px solid var(--rule);
+  padding:12px 14px;
+  position:relative;
+}
+.metric::before{
+  content:"";
+  position:absolute;top:0;left:0;width:3px;height:100%;
+  background:var(--phosphor-dim);
+}
+.metric-name{
+  font-family:var(--mono);font-size:9px;color:var(--ink-faint);
+  letter-spacing:0.2em;text-transform:uppercase;
   margin-bottom:10px;
 }
-.diagnosis.alert{border-left-color:var(--accent-warm)}
-.diagnosis.calm{border-left-color:var(--good)}
-.diagnosis-title{font-family:var(--serif);font-size:15px;font-weight:500;color:var(--ink);margin-bottom:6px;letter-spacing:-0.01em}
-.diagnosis-body{font-family:var(--mono);font-size:12px;color:var(--ink-dim);line-height:1.55}
+.metric-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.metric-value{
+  font-family:var(--sans);font-weight:600;font-size:26px;color:var(--phosphor);
+  letter-spacing:-0.005em;line-height:1;
+  text-shadow:0 0 12px rgba(108, 240, 142, 0.3);
+}
+.metric-delta{
+  font-family:var(--mono);font-size:11px;
+  letter-spacing:0.04em;font-weight:500;
+}
+.metric-delta.good{color:var(--phosphor)}
+.metric-delta.warn{color:var(--amber)}
+.metric-delta.bad{color:var(--critical)}
+.metric-baseline{
+  font-family:var(--mono);font-size:9px;color:var(--ink-faint);
+  margin-top:7px;letter-spacing:0.12em;text-transform:uppercase;
+}
 
-.transcript-toggle{margin-top:24px;text-align:center}
+/* Diagnoses */
+.diagnoses{margin-top:18px;display:flex;flex-direction:column;gap:8px}
+.diagnosis{
+  background:var(--bg-deep);
+  border:1px solid var(--rule);
+  border-left:3px solid var(--amber);
+  padding:12px 16px;
+  position:relative;
+}
+.diagnosis.alert{border-left-color:var(--amber)}
+.diagnosis.calm{border-left-color:var(--phosphor);background:rgba(108, 240, 142, 0.04)}
+.diagnosis::before{
+  content:"⚠ ALERT";
+  position:absolute;top:8px;right:12px;
+  font-family:var(--mono);font-size:8.5px;
+  color:var(--amber);letter-spacing:0.15em;
+  font-weight:600;
+}
+.diagnosis.calm::before{
+  content:"✓ NOMINAL";color:var(--phosphor);
+}
+.diagnosis-title{
+  font-family:var(--sans);font-weight:600;font-size:14px;
+  color:var(--ink);margin-bottom:6px;padding-right:80px;
+  line-height:1.35;
+}
+.diagnosis-body{
+  font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);
+  line-height:1.6;letter-spacing:0;
+}
+
+.transcript-toggle{margin-top:14px;text-align:center}
 .transcript{
-  margin-top:16px;
-  background:var(--bg-elev);
-  border:1px dashed var(--rule);
-  border-radius:6px;
-  padding:16px 18px;
-  font-family:var(--serif);font-style:italic;font-weight:300;
-  font-size:14px;color:var(--ink-dim);line-height:1.6;
-  display:none;
+  margin-top:12px;
+  background:var(--bg-deep);
+  border:1px dashed var(--rule-strong);
+  padding:14px 16px;
+  font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);
+  line-height:1.65;display:none;
+  letter-spacing:0;
 }
 .transcript.show{display:block}
 
-footer{padding:24px;border-top:1px solid var(--rule);text-align:center;font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-top:48px}
-footer a{color:var(--ink-dim);text-decoration:none;border-bottom:1px dotted var(--rule)}
-footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
-.unsupported{background:var(--bg-elev);border:1px solid var(--bad);border-radius:6px;padding:16px;font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin-top:24px;line-height:1.6}
-.unsupported strong{color:var(--bad)}
-@media(max-width:560px){
-  header{padding:24px 20px 14px}
-  main{padding:24px 20px}
-  h1{font-size:30px}
+.unsupported{
+  background:var(--bg-deep);
+  border:1px solid var(--critical);
+  border-left:3px solid var(--critical);
+  padding:14px 16px;margin-top:16px;
+  font-family:var(--mono);font-size:11px;color:var(--ink);line-height:1.6;
+}
+.unsupported strong{color:var(--critical);letter-spacing:0.12em}
+
+footer{
+  position:relative;z-index:3;
+  text-align:center;padding:24px 28px 36px;
+  font-family:var(--mono);font-size:10px;color:var(--ink-faint);
+  letter-spacing:0.18em;text-transform:uppercase;
+  border-top:1px solid var(--rule);
+}
+footer a{color:var(--ink-dim);text-decoration:none;border-bottom:1px dotted var(--rule-strong)}
+footer a:hover{color:var(--phosphor);border-bottom-color:var(--phosphor)}
+
+@media(max-width:600px){
+  header{padding:14px 18px 12px}
+  main{padding:18px 18px 50px}
+  .front-panel{grid-template-columns:auto 1fr}
+  .front-panel-power{display:none}
+  .model-name{font-size:16px}
+  .rec-btn{width:96px;height:96px}
+  .panel-header{padding:8px 14px}
 }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="eyebrow">Stage Fright · v0.1</div>
-  <h1>Mirror your <em>voice</em></h1>
-  <p class="tagline">Speak into the mic for 20 seconds. Stage Fright tells you how you sound vs. your calm baseline — and what to do about it.</p>
+  <div class="front-panel">
+    <div class="mark-cell">
+      <div class="mark"><img src="/_brand/panopticon-mark.svg" alt="PV"></div>
+      <div class="model-block">
+        <div class="brand-strip">Purcell Ventures Lab Series</div>
+        <div class="model-name">UV-7 Vocal Analyzer</div>
+        <div class="model-sub">Stage Fright · v0.1 · 20-sec pre-call</div>
+      </div>
+    </div>
+    <div></div>
+    <div class="front-panel-power">
+      <span>Power</span><span class="led"></span>
+      <span style="margin-left:6px">F0 Lock</span><span class="led amber" id="led-lock"></span>
+    </div>
+  </div>
 </header>
 
 <main>
 
-<div class="section-label">
-  <span class="section-num">I.</span>
-  <span class="section-h">Record 20 seconds</span>
-  <span class="section-sub" id="mode-indicator">tap to start</span>
-</div>
-
-<div class="record-zone">
-  <button class="rec-btn" id="rec-btn" onclick="toggleRecord()">Tap to record</button>
-  <div class="rec-meter"><div class="rec-meter-fill" id="meter"></div></div>
-  <div class="rec-status" id="status">Allow mic access. Speak about what you're about to do.</div>
-  <div class="prompt" id="prompt">
-    "I'm about to <span style="color:var(--accent);font-style:normal">[describe the call/meeting/talk]</span>. Here's what I want to happen. Here's what I'm worried about."
+<!-- ============================================================
+     ACQUISITION
+     ============================================================ -->
+<section class="panel">
+  <div class="panel-header">
+    <span class="panel-num">CH/01</span>
+    <span class="panel-label">Acquisition · 20-second capture window</span>
+    <span class="panel-status" id="mode-indicator">tap to start</span>
   </div>
-</div>
+  <div class="panel-body">
+    <div class="acq-grid">
 
+      <div class="rec-cell">
+        <button class="rec-btn" id="rec-btn" onclick="toggleRecord()">REC</button>
+        <span class="rec-label">click to arm</span>
+      </div>
+
+      <div class="scope-cell">
+        <canvas class="scope-canvas" id="scope" width="600" height="80"></canvas>
+        <div class="meter-row">
+          <span>LVL</span>
+          <div class="meter"><div class="meter-fill" id="meter"></div></div>
+          <span class="scope-readout" id="scope-readout">— dB</span>
+        </div>
+        <div class="prompt-line" id="prompt">
+          I'm about to <span class="field">[describe the call/meeting/talk]</span>. Here's what I want to happen. Here's what I'm worried about.
+        </div>
+      </div>
+
+    </div>
+
+    <div style="font-family:var(--mono);font-size:11px;color:var(--ink-dim);margin-top:14px;letter-spacing:0.02em" id="status">
+      Allow mic access. Speak about what you're about to do.
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     BASELINE
+     ============================================================ -->
 <div class="baseline-card" id="baseline-card" style="display:none">
-  <div class="baseline-info">
-    <div class="baseline-label">Calm baseline</div>
-    <div class="baseline-stats" id="baseline-stats">—</div>
+  <div>
+    <div class="baseline-card-label">Calm baseline · reference signal</div>
+    <div class="baseline-card-stats" id="baseline-stats">—</div>
   </div>
   <button class="btn-sm" onclick="resetBaseline()">Reset baseline</button>
 </div>
 
-<div class="section-label">
-  <span class="section-num">II.</span>
-  <span class="section-h">What I found</span>
-  <span class="section-sub" id="results-mode"></span>
-</div>
-
-<div class="results" id="results">
-  <div class="metric-grid" id="metric-grid"></div>
-  <div class="diagnoses" id="diagnoses"></div>
-  <div class="transcript-toggle">
-    <button class="btn-sm" onclick="toggleTranscript()">Show transcript</button>
+<!-- ============================================================
+     RESULTS
+     ============================================================ -->
+<section class="panel">
+  <div class="panel-header">
+    <span class="panel-num">CH/02</span>
+    <span class="panel-label">Analysis · biomarker readout</span>
+    <span class="panel-status" id="results-mode">awaiting capture</span>
   </div>
-  <div class="transcript" id="transcript"></div>
-</div>
+  <div class="panel-body">
 
-<div class="unsupported" id="unsupported" style="display:none">
-  <strong>Speech recognition unavailable.</strong><br>
-  Your browser doesn't support the SpeechRecognition API. Use Chrome (mobile or desktop) or Edge for the v0.05 demo. Audio-only metrics still work.
-</div>
+    <div class="results" id="results">
+      <div class="metric-grid" id="metric-grid"></div>
+      <div class="diagnoses" id="diagnoses"></div>
+      <div class="transcript-toggle">
+        <button class="btn-sm" onclick="toggleTranscript()">Show transcript</button>
+      </div>
+      <div class="transcript" id="transcript"></div>
+    </div>
+
+    <div id="unsupported" class="unsupported" style="display:none">
+      <strong>Speech recognition unavailable.</strong><br>
+      Your browser doesn't support the SpeechRecognition API. Use Chrome (mobile or desktop) or Edge for v0.1 transcript features. Audio-only metrics still work.
+    </div>
+  </div>
+</section>
 
 </main>
 
 <footer>
-  <a href="https://elijahbot-tools-hub.vercel.app">All tools →</a>
+  UV-7 · phosphor display · <a href="/">All tools →</a>
 </footer>
 
 <script>
@@ -249,9 +533,45 @@ let recordStart = 0;
 let recordTimer = null;
 let recordEnd = null;
 let volumeSamples = [];
-let pitchSamples = [];     // detected fundamental frequencies (Hz), null when unvoiced
-let sampleRate = 48000;    // updated when audio context created
+let pitchSamples = [];
+let sampleRate = 48000;
 let volumeFrame = null;
+
+// scope canvas
+const scopeCanvas = document.getElementById('scope');
+const scopeCtx = scopeCanvas.getContext('2d');
+function drawScope(buf){
+  const W = scopeCanvas.width = scopeCanvas.offsetWidth;
+  const H = scopeCanvas.height;
+  scopeCtx.clearRect(0, 0, W, H);
+  scopeCtx.strokeStyle = '#6cf08e';
+  scopeCtx.lineWidth = 1.5;
+  scopeCtx.shadowColor = 'rgba(108, 240, 142, 0.6)';
+  scopeCtx.shadowBlur = 3;
+  scopeCtx.beginPath();
+  const step = Math.max(1, Math.floor(buf.length / W));
+  for(let x = 0; x < W; x++){
+    const i = x * step;
+    const v = buf[i] || 0;
+    const y = H/2 + v * (H/2) * 0.9;
+    if(x === 0) scopeCtx.moveTo(x, y);
+    else scopeCtx.lineTo(x, y);
+  }
+  scopeCtx.stroke();
+}
+function clearScope(){
+  const W = scopeCanvas.width = scopeCanvas.offsetWidth;
+  const H = scopeCanvas.height;
+  scopeCtx.clearRect(0, 0, W, H);
+  scopeCtx.strokeStyle = 'rgba(108, 240, 142, 0.2)';
+  scopeCtx.lineWidth = 1;
+  scopeCtx.beginPath();
+  scopeCtx.moveTo(0, H/2);
+  scopeCtx.lineTo(W, H/2);
+  scopeCtx.stroke();
+}
+clearScope();
+window.addEventListener('resize', clearScope);
 
 // ============================================================================
 // SPEECH RECOGNITION SETUP
@@ -265,18 +585,13 @@ if(!speechSupported){
 function setupRecognition(){
   if(!speechSupported) return null;
   const r = new SpeechRec();
-  r.continuous = true;
-  r.interimResults = true;
-  r.lang = 'en-US';
+  r.continuous = true; r.interimResults = true; r.lang = 'en-US';
   let finalTranscript = '';
   r.onresult = (e)=>{
     let interim = '';
     for(let i=e.resultIndex; i<e.results.length; i++){
-      if(e.results[i].isFinal){
-        finalTranscript += e.results[i][0].transcript + ' ';
-      } else {
-        interim += e.results[i][0].transcript;
-      }
+      if(e.results[i].isFinal) finalTranscript += e.results[i][0].transcript + ' ';
+      else interim += e.results[i][0].transcript;
     }
     transcript = finalTranscript + interim;
   };
@@ -304,7 +619,7 @@ async function startRecording(){
   sampleRate = audioContext.sampleRate;
   const source = audioContext.createMediaStreamSource(micStream);
   analyser = audioContext.createAnalyser();
-  analyser.fftSize = 2048; // larger window helps autocorrelation
+  analyser.fftSize = 2048;
   source.connect(analyser);
   timeDataArray = new Float32Array(analyser.fftSize);
   volumeSamples = [];
@@ -312,9 +627,7 @@ async function startRecording(){
 
   transcript = '';
   recognition = setupRecognition();
-  if(recognition){
-    try{ recognition.start(); } catch(e){ /* may already be running */ }
-  }
+  if(recognition){ try{ recognition.start(); } catch(e){} }
 
   isRecording = true;
   recordStart = Date.now();
@@ -323,34 +636,28 @@ async function startRecording(){
   document.getElementById('status').textContent = 'Listening… speak naturally for 20 seconds.';
   document.getElementById('results').classList.remove('show');
 
-  // sample volume + pitch + meter
   let pitchCooldown = 0;
   function tick(){
     if(!isRecording) return;
     analyser.getFloatTimeDomainData(timeDataArray);
-    // RMS volume from float [-1, 1]
     let sum = 0;
-    for(let i=0; i<timeDataArray.length; i++){
-      sum += timeDataArray[i] * timeDataArray[i];
-    }
+    for(let i=0; i<timeDataArray.length; i++) sum += timeDataArray[i] * timeDataArray[i];
     const rms = Math.sqrt(sum / timeDataArray.length);
     volumeSamples.push(rms);
     document.getElementById('meter').style.width = Math.min(100, rms*350) + '%';
-    // detect pitch every ~3rd frame to save CPU
+    document.getElementById('scope-readout').textContent =
+      rms > 0.001 ? (20 * Math.log10(rms)).toFixed(1) + ' dB' : '—';
+    drawScope(timeDataArray);
     pitchCooldown = (pitchCooldown + 1) % 3;
     if(pitchCooldown === 0 && rms > 0.01){
       const hz = detectPitch(timeDataArray, sampleRate);
-      if(hz && hz > 60 && hz < 600){ // human voice range
-        pitchSamples.push(hz);
-      }
+      if(hz && hz > 60 && hz < 600) pitchSamples.push(hz);
     }
     const elapsed = (Date.now() - recordStart) / 1000;
     document.getElementById('mode-indicator').textContent = `recording · ${elapsed.toFixed(1)}s / ${RECORD_SECONDS}s`;
     volumeFrame = requestAnimationFrame(tick);
   }
   tick();
-
-  // auto-stop at 20s
   recordTimer = setTimeout(()=>{ if(isRecording) stopRecording(); }, RECORD_SECONDS * 1000);
 }
 
@@ -360,35 +667,28 @@ function stopRecording(){
   recordEnd = Date.now();
   clearTimeout(recordTimer);
   cancelAnimationFrame(volumeFrame);
-
   if(recognition){ try{ recognition.stop(); }catch(e){} }
   if(micStream){ micStream.getTracks().forEach(t=>t.stop()); }
   if(audioContext){ audioContext.close(); }
-
   document.getElementById('rec-btn').classList.remove('recording');
-  document.getElementById('rec-btn').textContent = 'Tap to record';
+  document.getElementById('rec-btn').textContent = 'REC';
   document.getElementById('meter').style.width = '0%';
-  document.getElementById('status').textContent = 'Analyzing…';
+  document.getElementById('scope-readout').textContent = 'analyzing…';
+  clearScope();
+  document.getElementById('status').textContent = 'Analyzing waveform + transcript…';
   document.getElementById('mode-indicator').textContent = 'analyzing';
-
-  // wait briefly for any final interim transcripts
   setTimeout(analyze, 800);
 }
 
 // ============================================================================
 // PITCH DETECTION — autocorrelation with parabolic interpolation
 // ============================================================================
-// Returns fundamental frequency in Hz, or null if no clear pitch.
-// Acceptable for human voice (60-600 Hz). Faster than YIN, less accurate.
 function detectPitch(buf, sr){
   const SIZE = buf.length;
-  // RMS check — bail on silence
   let rms = 0;
   for(let i=0; i<SIZE; i++) rms += buf[i]*buf[i];
   rms = Math.sqrt(rms / SIZE);
   if(rms < 0.005) return null;
-
-  // Trim leading/trailing low-amplitude samples
   const THRESH = 0.2;
   let r1 = 0, r2 = SIZE - 1;
   for(let i=0; i<SIZE/2; i++) if(Math.abs(buf[i]) < THRESH){ r1 = i; break; }
@@ -396,43 +696,26 @@ function detectPitch(buf, sr){
   const trimmed = buf.subarray(r1, r2);
   const N = trimmed.length;
   if(N < 256) return null;
-
-  // Autocorrelation
   const c = new Float32Array(N);
   for(let lag = 0; lag < N; lag++){
     let sum = 0;
-    for(let i = 0; i < N - lag; i++){
-      sum += trimmed[i] * trimmed[i + lag];
-    }
+    for(let i = 0; i < N - lag; i++) sum += trimmed[i] * trimmed[i + lag];
     c[lag] = sum;
   }
-
-  // Find first dip after lag 0 (first zero crossing of derivative going up)
   let d = 0;
   while(d < N - 1 && c[d] > c[d+1]) d++;
-
-  // Find max after that point
   let maxVal = -Infinity, maxLag = -1;
-  // Pitch range: 60-600 Hz → corresponding lags
   const minLag = Math.floor(sr / 600);
   const maxLagBound = Math.floor(sr / 60);
   for(let lag = Math.max(d, minLag); lag < Math.min(N, maxLagBound); lag++){
-    if(c[lag] > maxVal){
-      maxVal = c[lag];
-      maxLag = lag;
-    }
+    if(c[lag] > maxVal){ maxVal = c[lag]; maxLag = lag; }
   }
   if(maxLag < 0) return null;
-
-  // Parabolic interpolation for sub-sample accuracy
   let bestLag = maxLag;
   if(maxLag > 0 && maxLag < N - 1){
-    const y1 = c[maxLag - 1], y2 = c[maxLag], y3 = c[maxLag + 1];
+    const y1 = c[maxLag-1], y2 = c[maxLag], y3 = c[maxLag+1];
     const denom = y1 - 2*y2 + y3;
-    if(Math.abs(denom) > 1e-6){
-      const shift = 0.5 * (y1 - y3) / denom;
-      bestLag = maxLag + shift;
-    }
+    if(Math.abs(denom) > 1e-6) bestLag = maxLag + 0.5 * (y1 - y3) / denom;
   }
   return sr / bestLag;
 }
@@ -446,8 +729,6 @@ function analyze(){
   const words = trimmedTranscript.split(/\s+/).filter(Boolean);
   const wordCount = words.length;
   const wpm = wordCount > 0 ? (wordCount / durationSec) * 60 : 0;
-
-  // filler count (case-insensitive, word-boundary)
   const lower = ' ' + trimmedTranscript.toLowerCase() + ' ';
   let fillerCount = 0;
   FILLERS.forEach(f=>{
@@ -456,8 +737,6 @@ function analyze(){
     if(m) fillerCount += m.length;
   });
   const fillerRate = wordCount > 0 ? (fillerCount / wordCount) * 100 : 0;
-
-  // volume variance (coefficient of variation)
   let volMean = 0;
   for(const v of volumeSamples) volMean += v;
   volMean = volMean / Math.max(1, volumeSamples.length);
@@ -465,8 +744,6 @@ function analyze(){
   for(const v of volumeSamples) volVar += (v - volMean)*(v - volMean);
   volVar = Math.sqrt(volVar / Math.max(1, volumeSamples.length));
   const volCV = volMean > 0 ? (volVar / volMean) : 0;
-
-  // pitch stats — median is more robust than mean for vocal F0
   let pitchMedian = 0, pitchCV = 0, pitchCount = pitchSamples.length;
   if(pitchCount > 5){
     const sorted = [...pitchSamples].sort((a,b)=>a-b);
@@ -478,10 +755,7 @@ function analyze(){
     for(const p of pitchSamples) pVar += (p - pMean)*(p - pMean);
     pitchCV = pMean > 0 ? Math.sqrt(pVar / pitchCount) / pMean : 0;
   }
-
   const metrics = { wpm, fillerCount, fillerRate, volMean, volCV, wordCount, durationSec, pitchMedian, pitchCV, pitchCount };
-
-  // is this the baseline?
   const store = loadStore();
   if(!store.baseline){
     store.baseline = { ...metrics, savedAt: Date.now() };
@@ -489,7 +763,6 @@ function analyze(){
     renderBaselineSaved(metrics);
     return;
   }
-
   renderResults(metrics, store.baseline);
 }
 
@@ -497,16 +770,15 @@ function analyze(){
 // RENDER
 // ============================================================================
 function renderBaselineSaved(m){
-  document.getElementById('status').textContent = 'Calm baseline saved. Now record any time before a high-stakes call to compare.';
-  document.getElementById('mode-indicator').textContent = 'baseline saved';
-  document.getElementById('results-mode').textContent = 'baseline';
+  document.getElementById('status').textContent = 'Calm baseline saved. Record any time pre-call to compare.';
+  document.getElementById('mode-indicator').textContent = 'baseline locked';
+  document.getElementById('results-mode').textContent = 'baseline reference';
   document.getElementById('results').classList.add('show');
   showBaselineCard();
   document.getElementById('metric-grid').innerHTML = metricsHtml(m, null);
   document.getElementById('diagnoses').innerHTML =
-    '<div class="diagnosis calm"><div class="diagnosis-title">Your baseline is saved.</div>' +
-    '<div class="diagnosis-body">Stage Fright will compare every future recording against this. ' +
-    'Rerecord the baseline anytime if it feels off — ideally during a calm moment, not right after coffee or before bed.</div></div>';
+    '<div class="diagnosis calm"><div class="diagnosis-title">Baseline reference locked.</div>' +
+    '<div class="diagnosis-body">UV-7 will compare every future capture against this signal. Re-record the baseline whenever it feels off — ideally during a calm moment, not right after coffee or before bed.</div></div>';
   document.getElementById('transcript').textContent = transcript || '(no transcript captured)';
 }
 
@@ -516,20 +788,17 @@ function showBaselineCard(){
   document.getElementById('baseline-card').style.display = 'flex';
   const b = store.baseline;
   let pitchPart = '';
-  if(b.pitchMedian && b.pitchMedian > 0){
-    pitchPart = ' · pitch <strong>' + Math.round(b.pitchMedian) + ' Hz</strong>';
-  }
+  if(b.pitchMedian && b.pitchMedian > 0) pitchPart = ' · F0 <strong>' + Math.round(b.pitchMedian) + ' Hz</strong>';
   document.getElementById('baseline-stats').innerHTML =
     'Saved <strong>' + new Date(b.savedAt).toLocaleDateString() + '</strong> · ' +
     '<strong>' + Math.round(b.wpm) + '</strong> wpm · ' +
     '<strong>' + b.fillerCount + '</strong> fillers · ' +
-    'volume CV <strong>' + b.volCV.toFixed(2) + '</strong>' +
-    pitchPart;
+    'CV <strong>' + b.volCV.toFixed(2) + '</strong>' + pitchPart;
 }
 
 function renderResults(m, base){
-  document.getElementById('status').textContent = 'Compared to your calm baseline:';
-  document.getElementById('mode-indicator').textContent = 'compared to baseline';
+  document.getElementById('status').textContent = 'Analysis complete · diff vs. calm baseline:';
+  document.getElementById('mode-indicator').textContent = 'reading complete';
   document.getElementById('results-mode').textContent = 'vs. baseline';
   document.getElementById('results').classList.add('show');
   showBaselineCard();
@@ -540,76 +809,26 @@ function renderResults(m, base){
 
 function metricsHtml(m, base){
   const cards = [
-    {
-      name: 'Words per min',
-      value: Math.round(m.wpm),
-      baseline: base ? Math.round(base.wpm) : null,
-      delta: base ? ((m.wpm - base.wpm)/base.wpm)*100 : null,
-      unit: ' wpm',
-      flipDelta: false,
-    },
-    {
-      name: 'Pitch (median)',
-      value: m.pitchCount > 5 ? Math.round(m.pitchMedian) + ' Hz' : 'n/a',
-      baseline: base && base.pitchMedian ? Math.round(base.pitchMedian) + ' Hz' : null,
-      delta: base && base.pitchMedian && m.pitchCount > 5 ? ((m.pitchMedian - base.pitchMedian)/base.pitchMedian)*100 : null,
-      unit: '',
-      flipDelta: false,
-    },
-    {
-      name: 'Fillers',
-      value: m.fillerCount,
-      baseline: base ? base.fillerCount : null,
-      delta: base ? (m.fillerCount - base.fillerCount) : null,
-      unit: '',
-      flipDelta: true,
-      absoluteDelta: true,
-    },
-    {
-      name: 'Volume variance',
-      value: m.volCV.toFixed(2),
-      baseline: base ? base.volCV.toFixed(2) : null,
-      delta: base && base.volCV > 0 ? ((m.volCV - base.volCV)/base.volCV)*100 : null,
-      unit: '',
-      flipDelta: false,
-    },
-    {
-      name: 'Pitch variability',
-      value: m.pitchCount > 5 ? m.pitchCV.toFixed(2) : 'n/a',
-      baseline: base && base.pitchCV ? base.pitchCV.toFixed(2) : null,
-      delta: base && base.pitchCV && m.pitchCount > 5 ? ((m.pitchCV - base.pitchCV)/base.pitchCV)*100 : null,
-      unit: '',
-      flipDelta: false,
-    },
-    {
-      name: 'Filler rate',
-      value: m.fillerRate.toFixed(1) + '%',
-      baseline: base ? base.fillerRate.toFixed(1) + '%' : null,
-      delta: base ? (m.fillerRate - base.fillerRate) : null,
-      unit: 'pp',
-      flipDelta: true,
-      absoluteDelta: true,
-    },
+    { name:'Words / min', value:Math.round(m.wpm), baseline:base?Math.round(base.wpm):null, delta:base?((m.wpm-base.wpm)/base.wpm)*100:null, unit:' wpm', flipDelta:false },
+    { name:'Pitch (F0)', value:m.pitchCount>5?Math.round(m.pitchMedian)+' Hz':'n/a', baseline:base&&base.pitchMedian?Math.round(base.pitchMedian)+' Hz':null, delta:base&&base.pitchMedian&&m.pitchCount>5?((m.pitchMedian-base.pitchMedian)/base.pitchMedian)*100:null, unit:'', flipDelta:false },
+    { name:'Filler count', value:m.fillerCount, baseline:base?base.fillerCount:null, delta:base?(m.fillerCount-base.fillerCount):null, unit:'', flipDelta:true, absoluteDelta:true },
+    { name:'Volume CV', value:m.volCV.toFixed(2), baseline:base?base.volCV.toFixed(2):null, delta:base&&base.volCV>0?((m.volCV-base.volCV)/base.volCV)*100:null, unit:'', flipDelta:false },
+    { name:'Pitch CV', value:m.pitchCount>5?m.pitchCV.toFixed(2):'n/a', baseline:base&&base.pitchCV?base.pitchCV.toFixed(2):null, delta:base&&base.pitchCV&&m.pitchCount>5?((m.pitchCV-base.pitchCV)/base.pitchCV)*100:null, unit:'', flipDelta:false },
+    { name:'Filler rate', value:m.fillerRate.toFixed(1)+'%', baseline:base?base.fillerRate.toFixed(1)+'%':null, delta:base?(m.fillerRate-base.fillerRate):null, unit:'pp', flipDelta:true, absoluteDelta:true },
   ];
   return cards.map(c=>{
-    let deltaStr = '';
-    let deltaClass = '';
+    let deltaStr = '', deltaClass = '';
     if(c.delta !== null){
       const sign = c.delta >= 0 ? '+' : '';
-      if(c.absoluteDelta){
-        deltaStr = sign + c.delta.toFixed(1) + c.unit;
-      } else {
-        deltaStr = sign + c.delta.toFixed(0) + '%';
-      }
+      deltaStr = c.absoluteDelta ? sign + c.delta.toFixed(1) + c.unit : sign + c.delta.toFixed(0) + '%';
       const magnitude = Math.abs(c.delta);
       const threshold = c.absoluteDelta ? 2 : 15;
       const big = c.absoluteDelta ? 5 : 30;
       if(magnitude < threshold) deltaClass = 'good';
       else if(magnitude < big) deltaClass = 'warn';
       else deltaClass = 'bad';
-      // flip if higher is bad (fillers, filler rate)
-      if(c.flipDelta && c.delta < 0){ deltaClass = 'good'; }
-      if(c.flipDelta && c.delta >= big){ deltaClass = 'bad'; }
+      if(c.flipDelta && c.delta < 0) deltaClass = 'good';
+      if(c.flipDelta && c.delta >= big) deltaClass = 'bad';
     }
     return `<div class="metric">
       <div class="metric-name">${c.name}</div>
@@ -617,127 +836,60 @@ function metricsHtml(m, base){
         <span class="metric-value">${c.value}</span>
         ${deltaStr ? `<span class="metric-delta ${deltaClass}">${deltaStr}</span>` : ''}
       </div>
-      ${c.baseline !== null ? `<div class="metric-baseline">baseline: ${c.baseline}</div>` : ''}
+      ${c.baseline !== null ? `<div class="metric-baseline">REF · ${c.baseline}</div>` : ''}
     </div>`;
   }).join('');
 }
 
 function diagnosesHtml(m, base){
   const issues = [];
-
-  // Pitch elevated? (raised pitch is the classic anxiety tell)
   if(base && base.pitchMedian && base.pitchMedian > 0 && m.pitchCount > 5){
     const pitchDelta = ((m.pitchMedian - base.pitchMedian) / base.pitchMedian) * 100;
     if(pitchDelta > 8){
-      issues.push({
-        type: 'alert',
-        title: `Your pitch is ${pitchDelta.toFixed(1)}% higher than calm baseline.`,
-        body: `Elevated F0 is the most reliable acoustic anxiety marker. Your vocal folds are tensing. Quick reset: yawn deeply 3 times (resets larynx position) + hum 5 seconds at your lowest comfortable note before joining the call. Lowers pitch back to baseline range almost instantly.`,
-      });
+      issues.push({ type:'alert', title:`F0 elevated ${pitchDelta.toFixed(1)}% above baseline.`, body:`Elevated F0 is the most reliable acoustic anxiety marker. Your vocal folds are tensing. Reset: yawn deeply 3× (resets larynx position) + hum 5 seconds at your lowest comfortable note before joining. Lowers pitch back to baseline almost instantly.` });
     } else if(pitchDelta < -8){
-      issues.push({
-        type: 'alert',
-        title: `Your pitch is ${Math.abs(pitchDelta).toFixed(1)}% lower than calm baseline.`,
-        body: `Could be fatigue, post-meal grogginess, or you're projecting "calm" too hard (sometimes a fake-low voice). If genuinely tired: stand up. Drink cold water. Read three sentences aloud at your normal volume to wake the vocal cords. If forcing calm: stop, just be normal-you.`,
-      });
+      issues.push({ type:'alert', title:`F0 depressed ${Math.abs(pitchDelta).toFixed(1)}% below baseline.`, body:`Could be fatigue, post-meal grogginess, or projecting "calm" too hard. If genuinely tired: stand, drink cold water, read three sentences aloud at normal volume. If forcing calm: stop, just be normal-you.` });
     }
   }
-
-  // Pitch variability (monotone vs. animated)
   if(base && base.pitchCV && base.pitchCV > 0 && m.pitchCount > 5){
     const pitchCVDelta = m.pitchCV / base.pitchCV;
     if(pitchCVDelta > 1.6){
-      issues.push({
-        type: 'alert',
-        title: 'Your pitch is swinging more than usual.',
-        body: 'Wide pitch variance often signals anxiety-driven over-emphasis or strained excitement. Try a controlled "lift" only on key words instead of every other word. The listener picks up the most important word more clearly when emphasis is rationed.',
-      });
+      issues.push({ type:'alert', title:'Pitch variance elevated · over-emphasizing.', body:'Wide pitch swing signals anxiety-driven over-emphasis. Ration the "lift" — only on key words, not every other word. The listener picks up the important word more clearly when emphasis is restrained.' });
     } else if(pitchCVDelta < 0.55){
-      issues.push({
-        type: 'alert',
-        title: 'Your pitch is flatter than usual — sounding monotone.',
-        body: "Monotone pitch reads as disengaged or rehearsed. Mark 2-3 key phrases in your opening and deliberately give them a lift. Even slight pitch variation on 'this is what I wanted to ask you' makes the question land.",
-      });
+      issues.push({ type:'alert', title:'Pitch variance depressed · monotone delivery.', body:"Monotone reads as disengaged or rehearsed. Mark 2-3 key phrases in your opening and deliberately lift them. Even slight pitch variation on 'this is what I wanted to ask you' makes the question land." });
     }
   }
-
-  // WPM elevated?
   if(base && base.wpm > 0){
     const wpmDelta = ((m.wpm - base.wpm) / base.wpm) * 100;
     if(wpmDelta > 25){
-      issues.push({
-        type: 'alert',
-        title: `You're speaking ${Math.round(wpmDelta)}% faster than calm.`,
-        body: `Your nervous system is in pace-up mode. Before the call: 4-7-8 breath (in 4, hold 7, out 8) × 3 cycles. During: deliberately end every other sentence with a 1-beat pause. Slower talking literally slows your heart rate.`,
-      });
+      issues.push({ type:'alert', title:`Speaking rate ${Math.round(wpmDelta)}% above baseline.`, body:`Nervous system is in pace-up mode. Pre-call: 4-7-8 breath (in 4, hold 7, out 8) × 3 cycles. During: deliberately end every other sentence with a 1-beat pause. Slower talk slows your heart rate.` });
     } else if(wpmDelta < -20){
-      issues.push({
-        type: 'alert',
-        title: `You're speaking ${Math.abs(Math.round(wpmDelta))}% slower than calm.`,
-        body: `Could be fatigue, low energy, or pre-call dread. If it's dread: stand up. Do 10 jumping jacks. Drink water. The body has to wake before the voice will.`,
-      });
+      issues.push({ type:'alert', title:`Speaking rate ${Math.abs(Math.round(wpmDelta))}% below baseline.`, body:`Could be fatigue, low energy, or pre-call dread. If dread: stand, 10 jumping jacks, water. Body wakes before voice does.` });
     }
   }
-
-  // Filler density
   if(m.fillerRate > 8){
-    issues.push({
-      type: 'alert',
-      title: `Filler density is ${m.fillerRate.toFixed(1)}% (you'd want under 5%).`,
-      body: `Fillers are mostly a thinking-out-loud habit. Two fixes: (1) replace "um" with a deliberate silent pause — the listener fills it with respect, not anxiety. (2) Before the call, write your one-sentence answer to "what is the point of this call?" Read it twice. Fewer fillers when the spine is clear.`,
-    });
+    issues.push({ type:'alert', title:`Filler density ${m.fillerRate.toFixed(1)}% · target <5%.`, body:`Fillers are thinking-out-loud habit. Two fixes: (1) replace "um" with deliberate silent pause — listener fills it with respect, not anxiety. (2) Pre-call, write your one-sentence answer to "what is the point of this call?" Read twice. Fewer fillers when the spine is clear.` });
   } else if(m.fillerRate > 4 && base && m.fillerRate > base.fillerRate * 1.5){
-    issues.push({
-      type: 'alert',
-      title: `Filler rate is ${m.fillerRate.toFixed(1)}% — elevated vs. your baseline of ${base.fillerRate.toFixed(1)}%.`,
-      body: `You're searching mid-sentence. Likely cause: you haven't decided what to say yet. Write your two opening sentences. Say them out loud once. Then come back here.`,
-    });
+    issues.push({ type:'alert', title:`Filler rate ${m.fillerRate.toFixed(1)}% · elevated vs. baseline ${base.fillerRate.toFixed(1)}%.`, body:`You're searching mid-sentence. Likely cause: you haven't decided what to say yet. Write your two opening sentences. Say them out loud once. Then re-test.` });
   }
-
-  // Volume variance — high CV = anxious modulation, low CV = monotone
   if(base && base.volCV > 0){
     const cvDelta = m.volCV / base.volCV;
     if(cvDelta > 1.6){
-      issues.push({
-        type: 'alert',
-        title: 'Your volume is swinging more than usual.',
-        body: 'Could be nerves making you over-emphasize then trail off. Try the "newscaster level": pick a comfortable middle volume, stay within ±20% of it for the first minute of the call. Steadiness reads as competence.',
-      });
+      issues.push({ type:'alert', title:'Volume CV elevated · level instability.', body:'Volume is swinging — likely nerves making you over-emphasize then trail off. Use newscaster level: pick a middle volume, stay within ±20% of it for the first minute. Steadiness reads as competence.' });
     } else if(cvDelta < 0.5){
-      issues.push({
-        type: 'alert',
-        title: 'Your volume is flatter than usual — sounding monotone.',
-        body: "If you're going into a real conversation, monotone reads as disengaged. Quick fix: smile briefly before you speak (the voice picks it up). Or read three sentences out loud with deliberately varied pitch right before the call.",
-      });
+      issues.push({ type:'alert', title:'Volume CV depressed · flat delivery.', body:"Monotone volume reads as disengaged. Quick fix: smile briefly before you speak (the voice picks it up). Or read three sentences aloud with deliberately varied pitch right before the call." });
     }
   }
-
-  // Volume too low?
   if(m.volMean < 0.02){
-    issues.push({
-      type: 'alert',
-      title: 'Volume is quite low.',
-      body: 'Check your mic position (4-6 inches from mouth) and that the right mic is selected in browser settings. If volume is right and you still sound quiet: you might be physically tight. Roll shoulders. Open mouth wider. Project from diaphragm.',
-    });
+    issues.push({ type:'alert', title:'Signal level critically low.', body:'Check mic position (4-6 inches from mouth) and that the right mic is selected in browser settings. If volume is right but you still sound quiet: you might be physically tight. Roll shoulders. Open mouth wider. Project from diaphragm.' });
   }
-
-  // Word count check — too few words means we don't have signal
   if(m.wordCount < 15){
-    issues.push({
-      type: 'alert',
-      title: `Only ${m.wordCount} words captured — not much signal.`,
-      body: 'Either you held back, or the mic missed you, or speech recognition stalled. Try again — aim for steady speech across the full 20 seconds. The more you talk, the more accurate the analysis.',
-    });
+    issues.push({ type:'alert', title:`Only ${m.wordCount} words captured · insufficient sample.`, body:'Either you held back, mic missed you, or speech recognition stalled. Try again — aim for steady speech across the full 20 seconds. More words = better analysis.' });
   }
-
-  // If everything's normal, give a calm signal
   if(!issues.length){
-    return '<div class="diagnosis calm">' +
-      '<div class="diagnosis-title">Your voice is in calm range.</div>' +
-      '<div class="diagnosis-body">No flags compared to your baseline. Your nervous system is reading green. Go.</div>' +
-    '</div>';
+    return '<div class="diagnosis calm"><div class="diagnosis-title">Signal nominal.</div>' +
+      '<div class="diagnosis-body">All biomarkers within baseline range. Nervous system reading green. Go.</div></div>';
   }
-
   return issues.map(d => `<div class="diagnosis ${d.type}">
     <div class="diagnosis-title">${d.title}</div>
     <div class="diagnosis-body">${d.body}</div>
@@ -751,26 +903,23 @@ function toggleTranscript(){
 }
 
 function resetBaseline(){
-  if(!confirm('Reset your calm baseline? You will need to record a fresh calm sample before the next pre-call check works.')) return;
+  if(!confirm('Clear calm baseline? You will need to record a fresh calm reference before the next pre-call analysis works.')) return;
   const store = loadStore();
   delete store.baseline;
   saveStore(store);
   document.getElementById('baseline-card').style.display = 'none';
   document.getElementById('results').classList.remove('show');
-  document.getElementById('status').textContent = 'Baseline cleared. Record a calm sample to set a new one.';
+  document.getElementById('status').textContent = 'Baseline cleared. Record a calm sample to lock a new reference.';
 }
 
-// ============================================================================
 // INIT
-// ============================================================================
 const initStore = loadStore();
 if(initStore.baseline){
   showBaselineCard();
-  document.getElementById('status').textContent = 'Baseline saved. Record now to compare your current state.';
+  document.getElementById('status').textContent = 'Baseline locked. Record to compare current state.';
 } else {
-  document.getElementById('status').textContent = 'No baseline yet. Your first recording will become your calm baseline — try when you feel settled.';
+  document.getElementById('status').textContent = 'No baseline. Your first recording becomes the calm reference — try when settled.';
 }
-
 if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
   document.getElementById('rec-btn').disabled = true;
   document.getElementById('status').textContent = 'Microphone API unavailable in this browser. Use Chrome/Edge.';
