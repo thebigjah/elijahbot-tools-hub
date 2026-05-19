@@ -6,7 +6,7 @@
   Generated 2026-05-19. Color: #c2a173 brass.
 -->
 <svg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="0 0 480 480">
-  <g fill="#c2a173" opacity="0.55">
+  <g fill="#d4af37" opacity="0.85">
 <!-- 220 dots at golden angle, sqrt-r distribution, centered on 240,240 -->
     <circle cx="240.00" cy="240.00" r="1.40"/>
     <circle cx="237.74" cy="242.92" r="1.42"/>

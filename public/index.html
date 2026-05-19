@@ -29,17 +29,41 @@ body{
     radial-gradient(ellipse 70% 40% at 100% 100%, rgba(212, 175, 55, 0.03), transparent 60%);
 }
 
-/* Subtle phi pattern wash on hero, fading down */
+/* Phi pattern wash — top of page, fades down */
 .phi-wash{
   position:absolute;
-  top:0;left:0;right:0;height:420px;
+  top:0;left:0;right:0;height:520px;
   background-image:url("/_brand/phi-pattern.svg");
   background-repeat:repeat;
-  background-size:480px 480px;
-  opacity:0.06;
+  background-size:380px 380px;
+  opacity:0.22;
   pointer-events:none;
-  mask-image:linear-gradient(to bottom, black 30%, transparent 100%);
-  -webkit-mask-image:linear-gradient(to bottom, black 30%, transparent 100%);
+  mask-image:linear-gradient(to bottom, black 0%, black 40%, transparent 100%);
+  -webkit-mask-image:linear-gradient(to bottom, black 0%, black 40%, transparent 100%);
+}
+/* Phi watermark — large in corner, visible but quiet */
+.phi-watermark{
+  position:absolute;
+  top:-80px;right:-120px;
+  width:520px;height:520px;
+  background-image:url("/_brand/phi-pattern.svg");
+  background-repeat:no-repeat;
+  background-size:contain;
+  opacity:0.18;
+  pointer-events:none;
+  mix-blend-mode:screen;
+  transform:rotate(8deg);
+}
+/* Phi between sections — small accent rosette */
+.phi-divider{
+  display:flex;justify-content:center;
+  margin:18px 0;
+  height:48px;
+  background-image:url("/_brand/phi-pattern.svg");
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:120px 120px;
+  opacity:0.35;
 }
 
 /* Header — editorial masthead with panopticon mark + Cinzel wordmark */
@@ -199,6 +223,7 @@ footer a:hover{color:var(--pv-gold);border-bottom-color:var(--pv-gold)}
 <body>
 
 <div class="phi-wash" aria-hidden="true"></div>
+<div class="phi-watermark" aria-hidden="true"></div>
 
 <header>
   <div class="masthead">
