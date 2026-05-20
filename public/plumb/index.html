@@ -1,0 +1,1028 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0604">
+<title>Plumb · principled voting tool</title>
+<link rel="icon" href="/_brand/panopticon-mark.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/*  ============================================================
+    PLUMB · principled-first voting tool
+    -----------------------------------------------------------
+    "Plumb line" — a carpenter's tool for vertical alignment.
+    Your principles are the line; candidates measured against
+    it. Amos 7:7-8 imagery, but the framework is universal.
+    ============================================================ */
+
+:root{
+  --bg:#0a0604;
+  --bg-panel:#14100a;
+  --bg-elev:#1f1810;
+  --bg-deep:#050302;
+  --ink:#f4ede0;
+  --ink-dim:#a89c87;
+  --ink-faint:#6d6353;
+  --gold:#d4af37;
+  --gold-deep:#8a6d18;
+  --brass:#c2a173;
+  --red:#b8332a;
+  --green:#5d8c52;
+  --rule:#2c2519;
+  --rule-strong:#403526;
+
+  --display:'Cinzel', Georgia, serif;
+  --body:'Crimson Pro', Georgia, serif;
+  --mono:'JetBrains Mono', ui-monospace, monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-weight:400;-webkit-font-smoothing:antialiased;font-size:16px;line-height:1.5}
+body{min-height:100vh}
+
+/* ============================================================
+   HEADER — masthead w/ panopticon + plumb-line visual
+   ============================================================ */
+header{
+  position:relative;
+  padding:36px 28px 28px;
+  border-bottom:1px solid var(--rule-strong);
+  background:linear-gradient(180deg, var(--bg-panel) 0%, var(--bg) 100%);
+  overflow:hidden;
+}
+/* The actual plumb line — vertical thread + weight */
+.plumb-line{
+  position:absolute;
+  top:0;left:50%;
+  width:1px;height:100%;
+  background:linear-gradient(to bottom, transparent 0%, var(--gold) 15%, var(--gold) 80%, transparent 100%);
+  transform:translateX(-50%);
+  opacity:0.18;
+}
+.plumb-line::after{
+  content:"";
+  position:absolute;
+  bottom:14px;left:50%;
+  width:10px;height:14px;
+  background:var(--gold);
+  transform:translateX(-50%) rotate(0deg);
+  clip-path:polygon(50% 0%, 100% 35%, 50% 100%, 0% 35%);
+  opacity:0.7;
+}
+.masthead{
+  position:relative;z-index:1;
+  max-width:780px;margin:0 auto;
+  text-align:center;
+}
+.mark{
+  display:inline-block;
+  width:48px;height:48px;
+  margin-bottom:14px;opacity:0.85;
+}
+.eyebrow{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:0.32em;text-transform:uppercase;
+  color:var(--gold-deep);margin-bottom:8px;font-weight:500;
+}
+h1{
+  font-family:var(--display);font-weight:600;font-size:44px;line-height:1.0;letter-spacing:0.05em;
+  margin:0;color:var(--ink);text-transform:uppercase;
+  font-variation-settings:"opsz" 144;
+}
+h1 em{font-style:italic;color:var(--gold);font-weight:500;text-transform:none;letter-spacing:0.02em}
+.tagline{
+  font-family:var(--body);font-style:italic;font-size:16px;color:var(--ink-dim);
+  margin-top:14px;max-width:520px;margin-left:auto;margin-right:auto;line-height:1.55;
+  font-weight:400;
+}
+.epigraph{
+  font-family:var(--body);font-size:13px;font-style:italic;
+  color:var(--ink-faint);margin-top:18px;
+  border-top:1px solid var(--rule);padding-top:14px;
+  max-width:520px;margin-left:auto;margin-right:auto;
+}
+.epigraph cite{font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold-deep);font-style:normal;display:block;margin-top:4px;}
+
+/* ============================================================
+   NAV — phases
+   ============================================================ */
+nav.phases{
+  position:sticky;top:0;z-index:10;
+  background:var(--bg);
+  border-bottom:1px solid var(--rule-strong);
+  padding:0 16px;
+  display:flex;justify-content:center;
+  overflow-x:auto;
+}
+.phase-btn{
+  background:transparent;border:none;
+  font-family:var(--mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--ink-faint);
+  padding:14px 14px;cursor:pointer;
+  border-bottom:2px solid transparent;
+  white-space:nowrap;
+  transition:all .15s;
+  font-weight:500;
+}
+.phase-btn .num{color:var(--gold-deep);margin-right:6px;font-weight:600}
+.phase-btn:hover{color:var(--ink-dim)}
+.phase-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+.phase-btn.active .num{color:var(--gold)}
+
+main{max-width:780px;margin:0 auto;padding:32px 24px 80px}
+
+/* ============================================================
+   PANEL styles shared
+   ============================================================ */
+.panel-intro{
+  font-family:var(--body);font-style:italic;
+  font-size:17px;color:var(--ink-dim);line-height:1.6;
+  margin-bottom:24px;
+  padding-left:18px;border-left:2px solid var(--gold-deep);
+}
+.section-h{
+  font-family:var(--display);font-weight:500;font-size:20px;
+  letter-spacing:0.04em;color:var(--gold);text-transform:uppercase;
+  margin:24px 0 12px;
+  padding-bottom:6px;border-bottom:1px solid var(--rule);
+}
+.helper{
+  font-family:var(--mono);font-size:11px;color:var(--ink-faint);
+  margin-top:10px;letter-spacing:0.04em;line-height:1.6;
+}
+
+.panel{display:none}
+.panel.active{display:block}
+
+label{
+  display:block;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--ink-faint);margin-bottom:6px;margin-top:14px;font-weight:500;
+}
+input[type=text], select, textarea{
+  width:100%;background:var(--bg-panel);border:1px solid var(--rule-strong);
+  color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;
+  padding:11px 14px;border-radius:4px;outline:none;
+  transition:border .12s;
+}
+textarea{resize:vertical;min-height:80px}
+input:focus, select:focus, textarea:focus{border-color:var(--gold)}
+
+button.primary{
+  font-family:var(--mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;
+  background:var(--gold);color:var(--bg);border:none;
+  padding:12px 22px;border-radius:4px;cursor:pointer;font-weight:600;
+  transition:all .12s;
+}
+button.primary:hover{background:var(--brass);color:var(--ink)}
+button.primary:disabled{opacity:0.4;cursor:not-allowed}
+
+.btn-sm{
+  font-family:var(--mono);font-size:11px;letter-spacing:0.06em;
+  background:transparent;border:1px solid var(--rule-strong);color:var(--ink-dim);
+  padding:7px 12px;border-radius:14px;cursor:pointer;transition:all .12s;
+  text-decoration:none;display:inline-block;
+}
+.btn-sm:hover{border-color:var(--gold);color:var(--gold)}
+.btn-sm.danger:hover{border-color:var(--red);color:var(--red)}
+
+/* ============================================================
+   PHASE 1 — REGISTRATION CHECK (passive — link out)
+   ============================================================ */
+.action-card{
+  background:var(--bg-panel);
+  border:1px solid var(--rule-strong);
+  border-left:3px solid var(--gold-deep);
+  padding:18px 22px;margin-bottom:14px;
+  border-radius:0 4px 4px 0;
+}
+.action-card-title{
+  font-family:var(--display);font-weight:500;font-size:17px;color:var(--ink);
+  letter-spacing:0.02em;margin-bottom:8px;
+}
+.action-card-body{
+  font-family:var(--body);font-size:15px;color:var(--ink-dim);line-height:1.6;
+}
+.action-card-body a{color:var(--gold);text-decoration:none;border-bottom:1px solid var(--gold-deep)}
+.action-card-body a:hover{border-bottom-color:var(--gold)}
+
+/* ============================================================
+   PHASE 2 — PRINCIPLE LIBRARY
+   ============================================================ */
+.principle-list{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.principle-item{
+  background:var(--bg-panel);border:1px solid var(--rule);
+  padding:12px 14px;border-radius:4px;
+  display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start;
+}
+.principle-pos{
+  font-family:var(--mono);font-size:11px;font-weight:600;
+  padding:5px 10px;border-radius:12px;
+  width:62px;text-align:center;letter-spacing:0.04em;text-transform:uppercase;
+}
+.principle-pos.agree{background:rgba(93, 140, 82, 0.15);color:var(--green);border:1px solid var(--green)}
+.principle-pos.disagree{background:rgba(184, 51, 42, 0.15);color:var(--red);border:1px solid var(--red)}
+.principle-text{font-family:var(--body);font-size:15px;color:var(--ink);line-height:1.45}
+.principle-weight{
+  font-family:var(--mono);font-size:10px;color:var(--gold);
+  margin-top:6px;letter-spacing:0.06em;
+}
+.principle-actions{display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+.icon-btn{
+  background:transparent;border:none;color:var(--ink-faint);
+  cursor:pointer;font-family:var(--mono);font-size:11px;padding:2px 6px;
+}
+.icon-btn:hover{color:var(--red)}
+
+.add-principle{
+  background:var(--bg-panel);border:1px dashed var(--rule-strong);
+  padding:18px;border-radius:4px;margin-top:20px;
+}
+.weight-row{display:flex;gap:6px;margin-top:6px}
+.weight-chip{
+  font-family:var(--mono);font-size:11px;
+  padding:6px 10px;background:var(--bg);border:1px solid var(--rule);color:var(--ink-dim);
+  border-radius:14px;cursor:pointer;transition:all .12s;user-select:none;
+}
+.weight-chip:hover{border-color:var(--gold);color:var(--ink)}
+.weight-chip.active{background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:600}
+.pos-row{display:flex;gap:8px;margin-top:6px}
+.pos-chip{
+  font-family:var(--mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;
+  padding:7px 16px;background:var(--bg);border:1px solid var(--rule);color:var(--ink-dim);
+  border-radius:14px;cursor:pointer;transition:all .12s;user-select:none;
+}
+.pos-chip.agree.active{background:rgba(93, 140, 82, 0.2);color:var(--green);border-color:var(--green);font-weight:600}
+.pos-chip.disagree.active{background:rgba(184, 51, 42, 0.2);color:var(--red);border-color:var(--red);font-weight:600}
+
+/* ============================================================
+   PHASE 3 — BALLOT
+   ============================================================ */
+.race-card{
+  background:var(--bg-panel);border:1px solid var(--rule);
+  padding:16px 18px;margin-bottom:14px;border-radius:4px;
+}
+.race-header{
+  display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+  padding-bottom:8px;margin-bottom:10px;border-bottom:1px solid var(--rule);
+}
+.race-name{
+  font-family:var(--display);font-weight:500;font-size:17px;color:var(--ink);
+  letter-spacing:0.02em;
+}
+.race-jurisdiction{
+  font-family:var(--mono);font-size:10px;color:var(--ink-faint);
+  letter-spacing:0.1em;text-transform:uppercase;
+}
+.candidate-list{display:flex;flex-direction:column;gap:6px}
+.candidate-row{
+  display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;
+  padding:8px 10px;background:var(--bg);border:1px solid var(--rule);border-radius:3px;
+  font-family:var(--body);font-size:15px;
+}
+.candidate-name{color:var(--ink);line-height:1.3}
+.candidate-party{
+  font-family:var(--mono);font-size:10px;color:var(--ink-faint);
+  letter-spacing:0.06em;text-transform:uppercase;
+}
+.candidate-actions{display:flex;gap:4px}
+.candidate-actions .icon-btn{font-size:13px}
+
+/* ============================================================
+   PHASE 4 — FILTER
+   ============================================================ */
+.filter-card{
+  background:var(--bg-panel);border:1px solid var(--rule-strong);
+  padding:20px;margin-bottom:16px;border-radius:4px;
+}
+.filter-header{
+  display:flex;justify-content:space-between;align-items:baseline;
+  padding-bottom:12px;margin-bottom:14px;border-bottom:1px solid var(--rule);
+  gap:12px;flex-wrap:wrap;
+}
+.filter-candidate{
+  font-family:var(--display);font-weight:500;font-size:20px;color:var(--ink);
+  letter-spacing:0.02em;
+}
+.filter-race{
+  font-family:var(--mono);font-size:11px;color:var(--ink-faint);
+  letter-spacing:0.1em;text-transform:uppercase;
+}
+
+.research-row{
+  display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;
+}
+.research-link{
+  font-family:var(--mono);font-size:11px;color:var(--gold);
+  background:rgba(212, 175, 55, 0.08);
+  border:1px solid var(--gold-deep);
+  padding:6px 11px;border-radius:14px;
+  text-decoration:none;letter-spacing:0.04em;
+  transition:all .12s;
+}
+.research-link:hover{background:var(--gold);color:var(--bg)}
+
+.principle-check{
+  background:var(--bg);border:1px solid var(--rule);
+  padding:12px 14px;border-radius:3px;margin-bottom:8px;
+  display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;
+}
+.principle-check-text{font-family:var(--body);font-size:15px;color:var(--ink);line-height:1.4}
+.principle-check-pos{font-family:var(--mono);font-size:9px;color:var(--ink-faint);letter-spacing:0.1em;text-transform:uppercase;margin-top:3px}
+.swipe-row{display:flex;gap:5px}
+.swipe-btn{
+  font-family:var(--mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;
+  background:var(--bg-elev);border:1px solid var(--rule-strong);color:var(--ink-dim);
+  padding:7px 11px;border-radius:14px;cursor:pointer;transition:all .12s;
+  min-width:48px;text-align:center;
+}
+.swipe-btn:hover{border-color:var(--gold);color:var(--gold)}
+.swipe-btn.aligns.active{background:rgba(93,140,82,0.2);color:var(--green);border-color:var(--green);font-weight:600}
+.swipe-btn.opposes.active{background:rgba(184,51,42,0.2);color:var(--red);border-color:var(--red);font-weight:600}
+.swipe-btn.unknown.active{background:rgba(168,156,135,0.15);color:var(--ink-dim);border-color:var(--ink-dim);font-weight:600}
+
+.filter-notes textarea{
+  margin-top:14px;background:var(--bg);
+  font-family:var(--body);font-size:14px;
+}
+.filter-score{
+  display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;
+  margin-top:16px;padding:12px 14px;
+  background:var(--bg);border:1px solid var(--rule-strong);border-radius:3px;
+}
+.filter-score-label{font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:0.08em;text-transform:uppercase}
+.filter-score-val{
+  font-family:var(--display);font-weight:600;font-size:24px;color:var(--gold);
+  letter-spacing:0.02em;
+}
+.filter-score-val.high{color:var(--green)}
+.filter-score-val.low{color:var(--red)}
+
+.filter-nav{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  margin-top:18px;
+}
+.filter-progress{font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:0.08em}
+
+/* ============================================================
+   PHASE 5 — BALLOT OUTPUT
+   ============================================================ */
+.output-race{
+  background:var(--bg-panel);border:1px solid var(--rule);
+  padding:14px 18px;margin-bottom:12px;border-radius:4px;
+}
+.output-race-name{font-family:var(--display);font-weight:500;font-size:16px;color:var(--gold);letter-spacing:0.02em;text-transform:uppercase;margin-bottom:8px}
+.output-pick{
+  display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;
+  padding:9px 0;border-top:1px dashed var(--rule);
+}
+.output-pick:first-of-type{border-top:none}
+.output-pick-mark{
+  font-family:var(--display);font-weight:700;color:var(--gold);font-size:18px;
+  width:24px;text-align:center;
+}
+.output-pick-name{font-family:var(--body);font-size:16px;color:var(--ink)}
+.output-pick-score{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);letter-spacing:0.06em}
+.output-pick-best .output-pick-name{color:var(--green);font-weight:500}
+.output-pick-best .output-pick-mark{content:"✓"}
+
+.confidence-band{
+  background:var(--bg-elev);border:1px solid var(--gold-deep);
+  padding:14px 18px;margin-bottom:20px;border-radius:4px;
+  font-family:var(--mono);font-size:12px;color:var(--ink-dim);line-height:1.6;letter-spacing:0.02em;
+}
+.confidence-band strong{color:var(--gold);font-family:var(--display);font-size:14px}
+
+.export-row{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+
+/* ============================================================
+   EMPTY STATES
+   ============================================================ */
+.empty{
+  font-family:var(--body);font-style:italic;font-size:14px;color:var(--ink-faint);
+  text-align:center;padding:36px 20px;line-height:1.5;
+}
+
+/* ============================================================
+   FOOTER + RESPONSIVE
+   ============================================================ */
+footer{
+  border-top:1px solid var(--rule-strong);padding:24px;text-align:center;
+  font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:0.08em;
+}
+footer a{color:var(--ink-dim);text-decoration:none;border-bottom:1px dotted var(--rule-strong)}
+footer a:hover{color:var(--gold);border-bottom-color:var(--gold)}
+
+@media print{
+  body{background:white;color:black}
+  header, nav.phases, .panel:not(#panel-output), button, .filter-nav, .export-row{display:none !important}
+  #panel-output{display:block !important}
+  main{padding:0;max-width:100%}
+  .output-race{break-inside:avoid;border-color:#888;background:white;color:black}
+  .output-race-name, .output-pick-mark, .filter-score-val{color:#8a6d18 !important}
+  .output-pick-name{color:black !important}
+  .confidence-band{background:#faf6f1;border-color:#aaa;color:black}
+}
+
+@media(max-width:600px){
+  header{padding:30px 22px 22px}
+  h1{font-size:32px;letter-spacing:0.04em}
+  main{padding:24px 18px 60px}
+  .phase-btn{padding:11px 10px;font-size:10px}
+  .section-h{font-size:17px}
+  .race-card, .filter-card{padding:14px}
+  .principle-item{grid-template-columns:1fr;gap:8px}
+  .principle-actions{flex-direction:row}
+  .filter-candidate{font-size:17px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="plumb-line" aria-hidden="true"></div>
+  <div class="masthead">
+    <div class="mark"><img src="/_brand/panopticon-mark.svg" alt="PV" width="48" height="48"></div>
+    <div class="eyebrow">Principled voting · any election, any state</div>
+    <h1>Plumb<em>·line</em></h1>
+    <p class="tagline">Set your principles first. Walk through each candidate. Let the line do the deciding.</p>
+    <div class="epigraph">
+      "Behold, I am setting a plumb line in the midst of my people…"
+      <cite>Amos 7:8 · the universal metaphor</cite>
+    </div>
+  </div>
+</header>
+
+<nav class="phases">
+  <button class="phase-btn active" data-phase="prep" onclick="setPhase('prep')"><span class="num">I.</span>Prep</button>
+  <button class="phase-btn" data-phase="principles" onclick="setPhase('principles')"><span class="num">II.</span>Principles</button>
+  <button class="phase-btn" data-phase="ballot" onclick="setPhase('ballot')"><span class="num">III.</span>Ballot</button>
+  <button class="phase-btn" data-phase="filter" onclick="setPhase('filter')"><span class="num">IV.</span>Filter</button>
+  <button class="phase-btn" data-phase="output" onclick="setPhase('output')"><span class="num">V.</span>Marked Ballot</button>
+</nav>
+
+<main>
+
+<!-- ============================================================
+     I. PREP — registration check + sample ballot retrieval
+     ============================================================ -->
+<section class="panel active" id="panel-prep">
+  <p class="panel-intro">Before you research candidates, make sure you can actually vote. These are universal starting points — they route you to your own state's official sites.</p>
+
+  <h2 class="section-h">Are you registered?</h2>
+  <div class="action-card">
+    <div class="action-card-title">Check your registration status</div>
+    <div class="action-card-body">
+      Use <a href="https://www.vote.org/am-i-registered-to-vote/" target="_blank">vote.org</a> for a universal check, or <a href="https://www.usa.gov/voter-registration" target="_blank">usa.gov/voter-registration</a> to register if not. Most states require registration ~30 days before election day. North Dakota is the exception (no registration). California, Michigan, Minnesota, and others allow same-day registration.
+    </div>
+  </div>
+
+  <h2 class="section-h">Find your sample ballot</h2>
+  <div class="action-card">
+    <div class="action-card-title">Your state's Secretary of State</div>
+    <div class="action-card-body">
+      Search "<a id="sos-link" href="https://www.google.com/search?q=secretary+of+state+sample+ballot" target="_blank">[your state] secretary of state sample ballot</a>" or your county election office. Most states publish your specific sample ballot 2-4 weeks before election day, keyed to your address. Print it OR keep the PDF open in a tab — you'll type the races + candidates into the next step.
+    </div>
+  </div>
+
+  <h2 class="section-h">Universal research starting points</h2>
+  <div class="action-card">
+    <div class="action-card-title">Sources Plumb will deep-link to per candidate</div>
+    <div class="action-card-body">
+      <ul style="margin:6px 0 0;padding-left:20px;font-family:var(--body);font-size:14.5px;line-height:1.8">
+        <li><strong style="color:var(--ink)">Ballotpedia</strong> — best for state-legislative + federal; thinner on local</li>
+        <li><strong style="color:var(--ink)">Vote Smart</strong> — federal positions, voting records, ratings from advocacy groups</li>
+        <li><strong style="color:var(--ink)">Candidate's own site</strong> — what they want you to know</li>
+        <li><strong style="color:var(--ink)">Local news search</strong> — what's been reported, what controversies exist</li>
+        <li><strong style="color:var(--ink)">Official filings</strong> — financial disclosures, voting records</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2 class="section-h">Honest note on the "ill-informed shouldn't vote" instinct</h2>
+  <p class="panel-intro" style="margin-top:14px">
+    Don't skip voting because you can't research everything. If your principles are clear, a 30%-research vote is still a 100%-principled vote. Plumb's job: stabilize your principles so any amount of research time yields a values-aligned ballot.
+  </p>
+
+  <button class="primary" onclick="setPhase('principles')">Next · Set your principles →</button>
+</section>
+
+<!-- ============================================================
+     II. PRINCIPLE LIBRARY
+     ============================================================ -->
+<section class="panel" id="panel-principles">
+  <p class="panel-intro">
+    Write your principles before you meet the candidates. A principle is a single claim you agree or disagree with — plus how much it weighs in your decision. Stable across elections. Edit when your thinking changes; don't edit in the middle of a race.
+  </p>
+
+  <div class="helper">
+    Examples: "Government should provide a safety net for the elderly." "Religious institutions should be free of state interference." "Abortion should be legal in the first trimester." "The death penalty is wrong." Be specific. Vague principles produce vague filtering.
+  </div>
+
+  <h2 class="section-h">Your principles <span style="font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:0.06em;margin-left:8px" id="principle-count"></span></h2>
+  <div class="principle-list" id="principle-list"></div>
+
+  <div class="add-principle">
+    <label for="new-principle">Add a principle</label>
+    <textarea id="new-principle" placeholder="Write a single specific claim you have a position on."></textarea>
+
+    <label>Your position</label>
+    <div class="pos-row" id="pos-row">
+      <div class="pos-chip agree" data-pos="agree" onclick="selectPos('agree')">I agree</div>
+      <div class="pos-chip disagree" data-pos="disagree" onclick="selectPos('disagree')">I disagree</div>
+    </div>
+
+    <label>Importance · how much this weighs in your decision</label>
+    <div class="weight-row" id="weight-row">
+      <div class="weight-chip" data-w="1" onclick="selectWeight(1)">1 · minor</div>
+      <div class="weight-chip" data-w="2" onclick="selectWeight(2)">2</div>
+      <div class="weight-chip" data-w="3" onclick="selectWeight(3)">3 · mid</div>
+      <div class="weight-chip" data-w="4" onclick="selectWeight(4)">4</div>
+      <div class="weight-chip active" data-w="5" onclick="selectWeight(5)">5 · core</div>
+    </div>
+
+    <button class="primary" style="margin-top:18px" onclick="addPrinciple()">+ Add to library</button>
+  </div>
+</section>
+
+<!-- ============================================================
+     III. BALLOT BUILDER
+     ============================================================ -->
+<section class="panel" id="panel-ballot">
+  <p class="panel-intro">
+    Type your races + candidates from your sample ballot. Two minutes per race. Skip anything uncontested.
+  </p>
+
+  <div id="races-container"></div>
+
+  <div class="add-principle" style="margin-top:22px">
+    <label for="new-race-name">Add a race</label>
+    <input type="text" id="new-race-name" placeholder="e.g. U.S. Senate · Georgia 2026">
+
+    <label for="new-race-jurisdiction">Jurisdiction (optional)</label>
+    <input type="text" id="new-race-jurisdiction" placeholder="e.g. Federal · or · Cobb County School Board District 3">
+
+    <label for="new-race-candidates">Candidates · one per line · party in (parens) optional</label>
+    <textarea id="new-race-candidates" placeholder="Jane Smith (D)&#10;John Doe (R)&#10;Robin Reed (I)"></textarea>
+
+    <button class="primary" style="margin-top:18px" onclick="addRace()">+ Add race</button>
+  </div>
+
+  <button class="primary" style="margin-top:24px;background:var(--brass)" onclick="setPhase('filter')">Next · Begin filtering →</button>
+</section>
+
+<!-- ============================================================
+     IV. FILTER — per-candidate principle check
+     ============================================================ -->
+<section class="panel" id="panel-filter">
+  <p class="panel-intro">
+    For each candidate, click out to the research links, read enough to form a position on each principle, then mark each one: aligns / opposes / unknown. Notes are private.
+  </p>
+
+  <div id="filter-container">
+    <div class="empty">No candidates yet. Add a ballot in step III.</div>
+  </div>
+
+  <div class="filter-nav" id="filter-nav" style="display:none">
+    <button class="btn-sm" onclick="prevCandidate()">← Previous</button>
+    <span class="filter-progress" id="filter-progress"></span>
+    <button class="btn-sm" onclick="nextCandidate()">Next →</button>
+  </div>
+</section>
+
+<!-- ============================================================
+     V. OUTPUT — marked ballot
+     ============================================================ -->
+<section class="panel" id="panel-output">
+  <p class="panel-intro">
+    Your marked ballot. Print this OR keep on your phone — bring it to the polls. Highest-alignment candidate per race marked with ✓. Confidence shown per race so you know which picks are well-researched.
+  </p>
+
+  <div class="confidence-band" id="confidence-band"></div>
+
+  <div id="output-container"></div>
+
+  <div class="export-row">
+    <button class="btn-sm" onclick="window.print()">Print marked ballot</button>
+    <button class="btn-sm" onclick="exportJson()">Export JSON</button>
+    <button class="btn-sm danger" onclick="resetAll()">Clear everything</button>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  Plumb · v0.05 · all data local to your device · open the source <a href="/">on the tools hub</a>
+</footer>
+
+<script>
+// ============================================================================
+// STORAGE
+// ============================================================================
+const STORE_KEY = 'plumb-v0';
+function load(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch(e){ return {}; } }
+function save(s){ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }
+function getStore(){
+  const s = load();
+  if(!s.principles) s.principles = [];
+  if(!s.races) s.races = [];
+  if(!s.filters) s.filters = {}; // {candidateId: {principleId: 'aligns'|'opposes'|'unknown', notes: ''}}
+  return s;
+}
+function setStore(s){ save(s); }
+
+const state = {
+  newPos: null,
+  newWeight: 5,
+  filterCursor: null, // {raceIdx, candIdx}
+};
+
+// ============================================================================
+// PHASE NAV
+// ============================================================================
+function setPhase(p){
+  ['prep','principles','ballot','filter','output'].forEach(ph => {
+    document.getElementById('panel-'+ph).classList.toggle('active', ph===p);
+    document.querySelector(`.phase-btn[data-phase="${ph}"]`).classList.toggle('active', ph===p);
+  });
+  if(p === 'principles') renderPrinciples();
+  if(p === 'ballot') renderBallot();
+  if(p === 'filter') renderFilter();
+  if(p === 'output') renderOutput();
+  window.scrollTo(0, 0);
+}
+
+// ============================================================================
+// PRINCIPLES
+// ============================================================================
+function selectPos(pos){
+  state.newPos = pos;
+  document.querySelectorAll('.pos-chip').forEach(c => c.classList.toggle('active', c.dataset.pos === pos));
+}
+function selectWeight(w){
+  state.newWeight = w;
+  document.querySelectorAll('.weight-chip').forEach(c => c.classList.toggle('active', parseInt(c.dataset.w) === w));
+}
+
+function addPrinciple(){
+  const text = document.getElementById('new-principle').value.trim();
+  if(!text){ alert('Write the principle first.'); return; }
+  if(!state.newPos){ alert('Pick agree or disagree.'); return; }
+  const s = getStore();
+  s.principles.push({
+    id: 'P' + Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    text, pos: state.newPos, weight: state.newWeight, createdAt: Date.now(),
+  });
+  setStore(s);
+  document.getElementById('new-principle').value = '';
+  state.newPos = null;
+  document.querySelectorAll('.pos-chip').forEach(c => c.classList.remove('active'));
+  renderPrinciples();
+}
+
+function deletePrinciple(id){
+  if(!confirm('Delete this principle?')) return;
+  const s = getStore();
+  s.principles = s.principles.filter(p => p.id !== id);
+  // also clear any filter selections that referenced this principle
+  Object.values(s.filters).forEach(f => { if(f.checks) delete f.checks[id]; });
+  setStore(s);
+  renderPrinciples();
+}
+
+function renderPrinciples(){
+  const s = getStore();
+  const list = document.getElementById('principle-list');
+  document.getElementById('principle-count').textContent = s.principles.length > 0 ? `· ${s.principles.length}` : '';
+  if(s.principles.length === 0){
+    list.innerHTML = '<div class="empty">No principles yet. Add your first below.</div>';
+    return;
+  }
+  s.principles.sort((a,b)=>b.weight-a.weight || a.createdAt-b.createdAt);
+  list.innerHTML = s.principles.map(p => `
+    <div class="principle-item">
+      <span class="principle-pos ${p.pos}">${p.pos === 'agree' ? '+ Agree' : '− Oppose'}</span>
+      <div>
+        <div class="principle-text">${escapeHtml(p.text)}</div>
+        <div class="principle-weight">weight: ${p.weight} of 5</div>
+      </div>
+      <div class="principle-actions">
+        <button class="icon-btn" onclick="deletePrinciple('${p.id}')" title="Delete">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================================================
+// BALLOT
+// ============================================================================
+function addRace(){
+  const name = document.getElementById('new-race-name').value.trim();
+  const jurisdiction = document.getElementById('new-race-jurisdiction').value.trim();
+  const candidatesRaw = document.getElementById('new-race-candidates').value.trim();
+  if(!name){ alert('Race name required.'); return; }
+  if(!candidatesRaw){ alert('At least one candidate.'); return; }
+  const candidates = candidatesRaw.split('\n').map(line => line.trim()).filter(Boolean).map(line => {
+    const m = line.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+    return {
+      id: 'C' + Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+      name: m ? m[1].trim() : line,
+      party: m ? m[2].trim() : '',
+    };
+  });
+  const s = getStore();
+  s.races.push({
+    id: 'R' + Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    name, jurisdiction, candidates, createdAt: Date.now(),
+  });
+  setStore(s);
+  document.getElementById('new-race-name').value = '';
+  document.getElementById('new-race-jurisdiction').value = '';
+  document.getElementById('new-race-candidates').value = '';
+  renderBallot();
+}
+
+function deleteRace(id){
+  if(!confirm('Delete this race + all candidate research?')) return;
+  const s = getStore();
+  const race = s.races.find(r => r.id === id);
+  if(race) race.candidates.forEach(c => delete s.filters[c.id]);
+  s.races = s.races.filter(r => r.id !== id);
+  setStore(s);
+  renderBallot();
+}
+
+function deleteCandidate(raceId, candId){
+  const s = getStore();
+  const race = s.races.find(r => r.id === raceId);
+  if(!race) return;
+  race.candidates = race.candidates.filter(c => c.id !== candId);
+  delete s.filters[candId];
+  setStore(s);
+  renderBallot();
+}
+
+function renderBallot(){
+  const s = getStore();
+  const c = document.getElementById('races-container');
+  if(s.races.length === 0){
+    c.innerHTML = '<div class="empty">No races yet. Add your first below.</div>';
+    return;
+  }
+  c.innerHTML = s.races.map(race => `
+    <div class="race-card">
+      <div class="race-header">
+        <span class="race-name">${escapeHtml(race.name)}</span>
+        <span style="display:flex;gap:6px;align-items:center">
+          ${race.jurisdiction ? `<span class="race-jurisdiction">${escapeHtml(race.jurisdiction)}</span>` : ''}
+          <button class="icon-btn" onclick="deleteRace('${race.id}')" title="Delete race">✕</button>
+        </span>
+      </div>
+      <div class="candidate-list">
+        ${race.candidates.map(c => `
+          <div class="candidate-row">
+            <span class="candidate-name">${escapeHtml(c.name)}</span>
+            <span class="candidate-party">${escapeHtml(c.party || '')}</span>
+            <span class="candidate-actions">
+              <button class="icon-btn" onclick="deleteCandidate('${race.id}','${c.id}')" title="Remove">✕</button>
+            </span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================================================
+// FILTER — per-candidate principle check
+// ============================================================================
+function getAllCandidatesFlat(){
+  const s = getStore();
+  const out = [];
+  s.races.forEach((race, ri) => {
+    race.candidates.forEach((c, ci) => out.push({...c, raceId: race.id, raceName: race.name, raceIdx: ri, candIdx: ci}));
+  });
+  return out;
+}
+
+function renderFilter(){
+  const s = getStore();
+  const all = getAllCandidatesFlat();
+  const c = document.getElementById('filter-container');
+  if(all.length === 0){
+    c.innerHTML = '<div class="empty">No candidates yet. Add a ballot in step III.</div>';
+    document.getElementById('filter-nav').style.display = 'none';
+    return;
+  }
+  if(s.principles.length === 0){
+    c.innerHTML = '<div class="empty">No principles yet. Set them in step II first.</div>';
+    document.getElementById('filter-nav').style.display = 'none';
+    return;
+  }
+  if(!state.filterCursor) state.filterCursor = 0;
+  if(state.filterCursor >= all.length) state.filterCursor = 0;
+  const cand = all[state.filterCursor];
+  const filt = s.filters[cand.id] || { checks: {}, notes: '' };
+
+  const searchQ = encodeURIComponent(cand.name + ' ' + cand.raceName);
+  const ballotpediaQ = encodeURIComponent(cand.name);
+  const newsQ = encodeURIComponent(cand.name + ' ' + cand.raceName);
+
+  c.innerHTML = `
+    <div class="filter-card">
+      <div class="filter-header">
+        <div>
+          <div class="filter-candidate">${escapeHtml(cand.name)} ${cand.party ? `<span style="font-family:var(--mono);font-size:12px;color:var(--ink-faint);letter-spacing:0.08em;margin-left:6px">(${escapeHtml(cand.party)})</span>` : ''}</div>
+          <div class="filter-race">${escapeHtml(cand.raceName)}</div>
+        </div>
+      </div>
+
+      <div class="research-row">
+        <a class="research-link" href="https://ballotpedia.org/wiki/index.php?search=${ballotpediaQ}" target="_blank">Ballotpedia ↗</a>
+        <a class="research-link" href="https://justfacts.votesmart.org/search?searchText=${ballotpediaQ}" target="_blank">Vote Smart ↗</a>
+        <a class="research-link" href="https://www.google.com/search?q=${searchQ}" target="_blank">Google ↗</a>
+        <a class="research-link" href="https://news.google.com/search?q=${newsQ}" target="_blank">News ↗</a>
+        <a class="research-link" href="https://www.google.com/search?q=${searchQ}+campaign+site" target="_blank">Campaign site ↗</a>
+      </div>
+
+      <div id="checks-list">
+        ${s.principles.map(p => {
+          const v = filt.checks[p.id] || '';
+          return `
+            <div class="principle-check">
+              <div>
+                <div class="principle-check-text">${escapeHtml(p.text)}</div>
+                <div class="principle-check-pos">you ${p.pos} · weight ${p.weight}</div>
+              </div>
+              <div class="swipe-row">
+                <button class="swipe-btn aligns ${v==='aligns'?'active':''}" onclick="setCheck('${cand.id}','${p.id}','aligns')">Aligns</button>
+                <button class="swipe-btn opposes ${v==='opposes'?'active':''}" onclick="setCheck('${cand.id}','${p.id}','opposes')">Opposes</button>
+                <button class="swipe-btn unknown ${v==='unknown'?'active':''}" onclick="setCheck('${cand.id}','${p.id}','unknown')">?</button>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+
+      <div class="filter-notes">
+        <label for="filter-notes-${cand.id}">Notes (private)</label>
+        <textarea id="filter-notes-${cand.id}" placeholder="Specific quotes, votes, concerns, or strengths." oninput="setNotes('${cand.id}', this.value)">${escapeHtml(filt.notes || '')}</textarea>
+      </div>
+
+      ${renderScoreBadge(cand.id)}
+    </div>
+  `;
+
+  document.getElementById('filter-nav').style.display = 'flex';
+  document.getElementById('filter-progress').textContent =
+    `${state.filterCursor + 1} of ${all.length} · ${escapeHtml(cand.name)}`;
+}
+
+function renderScoreBadge(candId){
+  const score = computeScore(candId);
+  if(!score) return '';
+  let cls = '';
+  if(score.pct >= 70) cls = 'high';
+  else if(score.pct < 40) cls = 'low';
+  return `
+    <div class="filter-score">
+      <div>
+        <div class="filter-score-label">Alignment score</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-top:3px;letter-spacing:0.04em">
+          ${score.aligned}/${score.totalWeightedAnswered} weighted points · ${score.unknownCount} principles unresearched
+        </div>
+      </div>
+      <div class="filter-score-val ${cls}">${score.pct}%</div>
+    </div>
+  `;
+}
+
+function computeScore(candId){
+  const s = getStore();
+  const filt = s.filters[candId];
+  if(!filt || !filt.checks || s.principles.length === 0) return null;
+  let aligned = 0, totalWeightedAnswered = 0, unknownCount = 0;
+  s.principles.forEach(p => {
+    const v = filt.checks[p.id];
+    if(v === 'aligns'){ aligned += p.weight; totalWeightedAnswered += p.weight; }
+    else if(v === 'opposes'){ totalWeightedAnswered += p.weight; }
+    else if(v === 'unknown'){ unknownCount += 1; }
+  });
+  const pct = totalWeightedAnswered > 0 ? Math.round((aligned / totalWeightedAnswered) * 100) : 0;
+  return { aligned, totalWeightedAnswered, unknownCount, pct };
+}
+
+function setCheck(candId, principleId, value){
+  const s = getStore();
+  if(!s.filters[candId]) s.filters[candId] = { checks: {}, notes: '' };
+  if(s.filters[candId].checks[principleId] === value){
+    delete s.filters[candId].checks[principleId];
+  } else {
+    s.filters[candId].checks[principleId] = value;
+  }
+  setStore(s);
+  renderFilter();
+}
+
+let notesTimer = null;
+function setNotes(candId, value){
+  clearTimeout(notesTimer);
+  notesTimer = setTimeout(() => {
+    const s = getStore();
+    if(!s.filters[candId]) s.filters[candId] = { checks: {}, notes: '' };
+    s.filters[candId].notes = value;
+    setStore(s);
+  }, 400);
+}
+
+function nextCandidate(){
+  const all = getAllCandidatesFlat();
+  if(state.filterCursor < all.length - 1){ state.filterCursor++; renderFilter(); }
+  else setPhase('output');
+}
+function prevCandidate(){
+  if(state.filterCursor > 0){ state.filterCursor--; renderFilter(); }
+}
+
+// ============================================================================
+// OUTPUT
+// ============================================================================
+function renderOutput(){
+  const s = getStore();
+  const c = document.getElementById('output-container');
+  if(s.races.length === 0){
+    c.innerHTML = '<div class="empty">No races. Add a ballot in step III.</div>';
+    document.getElementById('confidence-band').innerHTML = '';
+    return;
+  }
+
+  let totalCandidates = 0, totalAnswered = 0, totalWeightedPossible = 0;
+  s.races.forEach(race => race.candidates.forEach(cand => {
+    totalCandidates++;
+    const filt = s.filters[cand.id];
+    if(filt && filt.checks){
+      const answered = Object.keys(filt.checks).filter(k => filt.checks[k] !== 'unknown').length;
+      totalAnswered += answered;
+    }
+    totalWeightedPossible += s.principles.length;
+  }));
+  const confPct = totalWeightedPossible > 0 ? Math.round((totalAnswered / totalWeightedPossible) * 100) : 0;
+  document.getElementById('confidence-band').innerHTML = `
+    <strong>Confidence: ${confPct}%</strong> of principle-checks across ${totalCandidates} candidates have been answered.
+    ${confPct >= 70 ? 'You\'re well-researched. Trust the line.' :
+      confPct >= 40 ? 'Mid-research. Principle weights still pulled you toward a pick — that\'s the point.' :
+      'Lightly researched. The principle-weighted picks below are still better than random; if you have time, fill in more principle-checks for the highest-stakes races first.'}
+  `;
+
+  c.innerHTML = s.races.map(race => {
+    const scored = race.candidates.map(cand => ({...cand, score: computeScore(cand.id)})).sort((a,b) => {
+      const ap = a.score ? a.score.pct : -1;
+      const bp = b.score ? b.score.pct : -1;
+      return bp - ap;
+    });
+    const best = scored[0];
+    return `
+      <div class="output-race">
+        <div class="output-race-name">${escapeHtml(race.name)}${race.jurisdiction ? ` · <span style="font-family:var(--mono);font-size:10px;color:var(--ink-faint);letter-spacing:0.08em;text-transform:uppercase;font-weight:normal">${escapeHtml(race.jurisdiction)}</span>` : ''}</div>
+        ${scored.map((c, i) => `
+          <div class="output-pick ${i === 0 && c.score && c.score.pct > 0 ? 'output-pick-best' : ''}">
+            <span class="output-pick-mark">${i === 0 && c.score && c.score.pct > 0 ? '✓' : ''}</span>
+            <span class="output-pick-name">${escapeHtml(c.name)}${c.party ? ` <span style="font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:0.06em">(${escapeHtml(c.party)})</span>` : ''}</span>
+            <span class="output-pick-score">${c.score ? c.score.pct + '%' : '—'}</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }).join('');
+}
+
+function exportJson(){
+  const s = getStore();
+  const blob = new Blob([JSON.stringify(s, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'plumb-ballot-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function resetAll(){
+  if(!confirm('Clear ALL data — principles, ballot, filters, notes? This cannot be undone.')) return;
+  localStorage.removeItem(STORE_KEY);
+  state.filterCursor = null;
+  setPhase('prep');
+}
+
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+}
+
+// INIT
+renderPrinciples();
+renderBallot();
+</script>
+
+</body>
+</html>
