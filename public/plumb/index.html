@@ -3,153 +3,173 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0a0604">
-<title>Plumb · principled voting tool</title>
+<meta name="theme-color" content="#f4ecd8">
+<title>Plumb</title>
 <link rel="icon" href="/_brand/panopticon-mark.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 /*  ============================================================
-    PLUMB · principled-first voting tool
-    -----------------------------------------------------------
-    "Plumb line" — a carpenter's tool for vertical alignment.
-    Your principles are the line; candidates measured against
-    it. Amos 7:7-8 imagery, but the framework is universal.
+    PLUMB · principled-first voting · light-theme civic gravity
+    "Behold, I am setting a plumb line in the midst of my people"
+    Amos 7:8 — but the framework is universal.
     ============================================================ */
 
 :root{
-  --bg:#0a0604;
-  --bg-panel:#14100a;
-  --bg-elev:#1f1810;
-  --bg-deep:#050302;
-  --ink:#f4ede0;
-  --ink-dim:#a89c87;
-  --ink-faint:#6d6353;
-  --gold:#d4af37;
-  --gold-deep:#8a6d18;
-  --brass:#c2a173;
-  --red:#b8332a;
-  --green:#5d8c52;
-  --rule:#2c2519;
-  --rule-strong:#403526;
+  --paper:#f4ecd8;
+  --paper-deep:#ebe0bf;
+  --paper-shade:#e0d3a6;
+  --ink:#1a1410;
+  --ink-soft:#3a2f24;
+  --ink-faint:#6e5f49;
+  --brass:#8a6d18;
+  --brass-bright:#c08820;
+  --plumb-line:#9a7818;
+  --sage:#4d6b3e;
+  --rust:#a83920;
+  --rule:rgba(58, 47, 36, 0.18);
+  --rule-strong:rgba(58, 47, 36, 0.32);
 
-  --display:'Cinzel', Georgia, serif;
+  --display:'Cormorant Garamond', Georgia, serif;
   --body:'Crimson Pro', Georgia, serif;
   --mono:'JetBrains Mono', ui-monospace, monospace;
 }
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-weight:400;-webkit-font-smoothing:antialiased;font-size:16px;line-height:1.5}
-body{min-height:100vh}
+html,body{
+  margin:0;padding:0;
+  background:var(--paper);color:var(--ink);
+  font-family:var(--body);font-weight:400;
+  -webkit-font-smoothing:antialiased;font-size:17px;line-height:1.55;
+}
+body{min-height:100vh;position:relative;overflow-x:hidden}
+
+/* Paper texture */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:1;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>");
+  opacity:0.07;mix-blend-mode:multiply;
+}
 
 /* ============================================================
-   HEADER — masthead w/ panopticon + plumb-line visual
+   PLUMB LINE — actual vertical brass line through whole page
    ============================================================ */
-header{
-  position:relative;
-  padding:36px 28px 28px;
-  border-bottom:1px solid var(--rule-strong);
-  background:linear-gradient(180deg, var(--bg-panel) 0%, var(--bg) 100%);
-  overflow:hidden;
-}
-/* The actual plumb line — vertical thread + weight */
-.plumb-line{
-  position:absolute;
+.plumb-thread{
+  position:fixed;
   top:0;left:50%;
   width:1px;height:100%;
-  background:linear-gradient(to bottom, transparent 0%, var(--gold) 15%, var(--gold) 80%, transparent 100%);
+  background:linear-gradient(to bottom,
+    transparent 0%,
+    var(--plumb-line) 4%,
+    var(--plumb-line) 92%,
+    transparent 100%);
   transform:translateX(-50%);
-  opacity:0.18;
+  opacity:0.35;
+  pointer-events:none;
+  z-index:2;
 }
-.plumb-line::after{
-  content:"";
-  position:absolute;
-  bottom:14px;left:50%;
-  width:10px;height:14px;
-  background:var(--gold);
-  transform:translateX(-50%) rotate(0deg);
-  clip-path:polygon(50% 0%, 100% 35%, 50% 100%, 0% 35%);
-  opacity:0.7;
+.plumb-bob{
+  position:fixed;
+  bottom:38px;left:50%;
+  width:16px;height:24px;
+  background:linear-gradient(180deg, var(--brass-bright) 0%, var(--brass) 60%, var(--ink-soft) 100%);
+  clip-path:polygon(50% 0%, 100% 25%, 80% 100%, 20% 100%, 0% 25%);
+  transform:translateX(-50%);
+  pointer-events:none;
+  z-index:2;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,0.25));
 }
-.masthead{
-  position:relative;z-index:1;
-  max-width:780px;margin:0 auto;
-  text-align:center;
-}
-.mark{
-  display:inline-block;
-  width:48px;height:48px;
-  margin-bottom:14px;opacity:0.85;
-}
-.eyebrow{
-  font-family:var(--mono);font-size:10.5px;letter-spacing:0.32em;text-transform:uppercase;
-  color:var(--gold-deep);margin-bottom:8px;font-weight:500;
-}
-h1{
-  font-family:var(--display);font-weight:600;font-size:44px;line-height:1.0;letter-spacing:0.05em;
-  margin:0;color:var(--ink);text-transform:uppercase;
-  font-variation-settings:"opsz" 144;
-}
-h1 em{font-style:italic;color:var(--gold);font-weight:500;text-transform:none;letter-spacing:0.02em}
-.tagline{
-  font-family:var(--body);font-style:italic;font-size:16px;color:var(--ink-dim);
-  margin-top:14px;max-width:520px;margin-left:auto;margin-right:auto;line-height:1.55;
-  font-weight:400;
-}
-.epigraph{
-  font-family:var(--body);font-size:13px;font-style:italic;
-  color:var(--ink-faint);margin-top:18px;
-  border-top:1px solid var(--rule);padding-top:14px;
-  max-width:520px;margin-left:auto;margin-right:auto;
-}
-.epigraph cite{font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold-deep);font-style:normal;display:block;margin-top:4px;}
 
 /* ============================================================
-   NAV — phases
+   HEADER — masthead with plumb-line metaphor
+   ============================================================ */
+header{
+  position:relative;z-index:3;
+  padding:64px 28px 36px;
+  text-align:center;
+  border-bottom:1px solid var(--rule);
+}
+.eyebrow{
+  font-family:var(--mono);font-size:10px;letter-spacing:0.4em;text-transform:uppercase;
+  color:var(--brass);margin-bottom:18px;font-weight:500;
+}
+h1{
+  font-family:var(--display);font-weight:500;font-style:italic;
+  font-size:78px;line-height:0.85;letter-spacing:-0.015em;
+  margin:0;color:var(--ink);
+  font-variation-settings:"opsz" 144;
+}
+h1 .line{
+  display:block;font-style:normal;font-weight:600;font-size:26px;
+  letter-spacing:0.42em;text-transform:uppercase;color:var(--brass);
+  margin-top:8px;
+}
+.tagline{
+  font-family:var(--body);font-style:italic;font-size:16px;
+  color:var(--ink-soft);max-width:480px;margin:22px auto 0;line-height:1.55;
+}
+.epigraph{
+  font-family:var(--display);font-style:italic;font-weight:500;
+  font-size:14.5px;color:var(--ink-faint);
+  margin:24px auto 0;max-width:480px;
+  padding-top:18px;border-top:1px solid var(--rule);
+  position:relative;
+}
+.epigraph cite{
+  display:block;font-family:var(--mono);font-style:normal;font-size:9.5px;
+  letter-spacing:0.22em;text-transform:uppercase;color:var(--brass);
+  margin-top:8px;font-weight:500;
+}
+
+/* ============================================================
+   PHASE NAV — Roman numerals, careful spacing
    ============================================================ */
 nav.phases{
-  position:sticky;top:0;z-index:10;
-  background:var(--bg);
-  border-bottom:1px solid var(--rule-strong);
+  position:sticky;top:0;z-index:5;
+  background:var(--paper);
+  border-bottom:1px solid var(--rule);
   padding:0 16px;
-  display:flex;justify-content:center;
+  display:flex;justify-content:center;gap:8px;
   overflow-x:auto;
 }
 .phase-btn{
-  background:transparent;border:none;
-  font-family:var(--mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;
+  background:transparent;border:none;cursor:pointer;
+  font-family:var(--display);font-weight:500;font-size:14px;
+  letter-spacing:0.08em;text-transform:uppercase;
   color:var(--ink-faint);
-  padding:14px 14px;cursor:pointer;
+  padding:18px 14px;
   border-bottom:2px solid transparent;
-  white-space:nowrap;
-  transition:all .15s;
-  font-weight:500;
+  white-space:nowrap;transition:all .15s;
 }
-.phase-btn .num{color:var(--gold-deep);margin-right:6px;font-weight:600}
-.phase-btn:hover{color:var(--ink-dim)}
-.phase-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
-.phase-btn.active .num{color:var(--gold)}
+.phase-btn .num{
+  color:var(--brass);margin-right:8px;font-style:italic;font-weight:600;
+}
+.phase-btn:hover{color:var(--ink-soft)}
+.phase-btn.active{color:var(--ink);border-bottom-color:var(--brass)}
+.phase-btn.active .num{color:var(--brass-bright)}
 
-main{max-width:780px;margin:0 auto;padding:32px 24px 80px}
+main{
+  position:relative;z-index:3;
+  max-width:740px;margin:0 auto;padding:40px 28px 90px;
+}
 
 /* ============================================================
-   PANEL styles shared
+   GENERAL — panels, intros
    ============================================================ */
 .panel-intro{
-  font-family:var(--body);font-style:italic;
-  font-size:17px;color:var(--ink-dim);line-height:1.6;
-  margin-bottom:24px;
-  padding-left:18px;border-left:2px solid var(--gold-deep);
+  font-family:var(--display);font-style:italic;
+  font-size:19px;color:var(--ink-soft);line-height:1.55;
+  margin-bottom:32px;padding-left:18px;border-left:2px solid var(--brass);
 }
 .section-h{
-  font-family:var(--display);font-weight:500;font-size:20px;
-  letter-spacing:0.04em;color:var(--gold);text-transform:uppercase;
-  margin:24px 0 12px;
-  padding-bottom:6px;border-bottom:1px solid var(--rule);
+  font-family:var(--display);font-weight:600;font-size:22px;
+  letter-spacing:0.04em;color:var(--ink);text-transform:uppercase;
+  margin:28px 0 14px;
+  padding-bottom:7px;border-bottom:1px solid var(--rule);
 }
 .helper{
   font-family:var(--mono);font-size:11px;color:var(--ink-faint);
-  margin-top:10px;letter-spacing:0.04em;line-height:1.6;
+  margin-top:12px;letter-spacing:0.04em;line-height:1.65;
 }
 
 .panel{display:none}
@@ -157,129 +177,144 @@ main{max-width:780px;margin:0 auto;padding:32px 24px 80px}
 
 label{
   display:block;font-family:var(--mono);font-size:10.5px;
-  letter-spacing:0.12em;text-transform:uppercase;
-  color:var(--ink-faint);margin-bottom:6px;margin-top:14px;font-weight:500;
+  letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--brass);margin-bottom:8px;margin-top:18px;font-weight:500;
 }
 input[type=text], select, textarea{
-  width:100%;background:var(--bg-panel);border:1px solid var(--rule-strong);
-  color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;
-  padding:11px 14px;border-radius:4px;outline:none;
+  width:100%;background:var(--paper-deep);border:1px solid var(--rule-strong);
+  color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;
+  padding:12px 16px;border-radius:2px;outline:none;
   transition:border .12s;
 }
-textarea{resize:vertical;min-height:80px}
-input:focus, select:focus, textarea:focus{border-color:var(--gold)}
+textarea{resize:vertical;min-height:88px;font-family:var(--display);font-style:italic}
+input:focus, select:focus, textarea:focus{border-color:var(--brass)}
 
 button.primary{
-  font-family:var(--mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;
-  background:var(--gold);color:var(--bg);border:none;
-  padding:12px 22px;border-radius:4px;cursor:pointer;font-weight:600;
+  font-family:var(--display);font-weight:600;font-size:13px;
+  letter-spacing:0.16em;text-transform:uppercase;
+  background:var(--ink);color:var(--paper);border:none;
+  padding:14px 24px;border-radius:2px;cursor:pointer;
   transition:all .12s;
 }
 button.primary:hover{background:var(--brass);color:var(--ink)}
 button.primary:disabled{opacity:0.4;cursor:not-allowed}
 
 .btn-sm{
-  font-family:var(--mono);font-size:11px;letter-spacing:0.06em;
-  background:transparent;border:1px solid var(--rule-strong);color:var(--ink-dim);
-  padding:7px 12px;border-radius:14px;cursor:pointer;transition:all .12s;
-  text-decoration:none;display:inline-block;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;
+  background:transparent;border:1px solid var(--rule-strong);color:var(--ink-soft);
+  padding:8px 14px;border-radius:2px;cursor:pointer;transition:all .12s;
+  text-decoration:none;display:inline-block;font-weight:500;
 }
-.btn-sm:hover{border-color:var(--gold);color:var(--gold)}
-.btn-sm.danger:hover{border-color:var(--red);color:var(--red)}
+.btn-sm:hover{border-color:var(--brass);color:var(--brass)}
+.btn-sm.danger:hover{border-color:var(--rust);color:var(--rust)}
 
 /* ============================================================
-   PHASE 1 — REGISTRATION CHECK (passive — link out)
+   I. PREP
    ============================================================ */
 .action-card{
-  background:var(--bg-panel);
-  border:1px solid var(--rule-strong);
-  border-left:3px solid var(--gold-deep);
-  padding:18px 22px;margin-bottom:14px;
-  border-radius:0 4px 4px 0;
+  background:var(--paper-deep);
+  border:1px solid var(--rule);border-left:3px solid var(--brass);
+  padding:18px 22px;margin-bottom:14px;border-radius:0 2px 2px 0;
 }
 .action-card-title{
-  font-family:var(--display);font-weight:500;font-size:17px;color:var(--ink);
-  letter-spacing:0.02em;margin-bottom:8px;
+  font-family:var(--display);font-weight:600;font-size:18px;
+  color:var(--ink);letter-spacing:0.01em;margin-bottom:8px;
 }
 .action-card-body{
-  font-family:var(--body);font-size:15px;color:var(--ink-dim);line-height:1.6;
+  font-family:var(--body);font-size:15.5px;color:var(--ink-soft);line-height:1.65;
 }
-.action-card-body a{color:var(--gold);text-decoration:none;border-bottom:1px solid var(--gold-deep)}
-.action-card-body a:hover{border-bottom-color:var(--gold)}
+.action-card-body a{color:var(--brass);text-decoration:none;border-bottom:1px solid var(--brass)}
+.action-card-body a:hover{color:var(--brass-bright);border-bottom-color:var(--brass-bright)}
 
 /* ============================================================
-   PHASE 2 — PRINCIPLE LIBRARY
+   II. PRINCIPLES — deposition-slip style
    ============================================================ */
-.principle-list{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.principle-list{display:flex;flex-direction:column;gap:8px;margin-top:16px}
 .principle-item{
-  background:var(--bg-panel);border:1px solid var(--rule);
-  padding:12px 14px;border-radius:4px;
-  display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start;
+  background:var(--paper-deep);
+  border:1px solid var(--rule);
+  padding:14px 16px;border-radius:2px;
+  display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:start;
+  position:relative;
 }
+/* Plumb-line indicator on left edge */
+.principle-item::before{
+  content:"";
+  position:absolute;left:-1px;top:14px;bottom:14px;width:2px;
+}
+.principle-item[data-pos="agree"]::before{background:var(--sage)}
+.principle-item[data-pos="disagree"]::before{background:var(--rust)}
+
 .principle-pos{
-  font-family:var(--mono);font-size:11px;font-weight:600;
-  padding:5px 10px;border-radius:12px;
-  width:62px;text-align:center;letter-spacing:0.04em;text-transform:uppercase;
+  font-family:var(--display);font-weight:600;font-size:12px;
+  padding:5px 10px;
+  width:78px;text-align:center;letter-spacing:0.08em;text-transform:uppercase;
+  border-radius:2px;
 }
-.principle-pos.agree{background:rgba(93, 140, 82, 0.15);color:var(--green);border:1px solid var(--green)}
-.principle-pos.disagree{background:rgba(184, 51, 42, 0.15);color:var(--red);border:1px solid var(--red)}
-.principle-text{font-family:var(--body);font-size:15px;color:var(--ink);line-height:1.45}
+.principle-pos.agree{background:rgba(77, 107, 62, 0.13);color:var(--sage);border:1px solid var(--sage)}
+.principle-pos.disagree{background:rgba(168, 57, 32, 0.13);color:var(--rust);border:1px solid var(--rust)}
+.principle-text{
+  font-family:var(--display);font-style:italic;font-weight:500;font-size:17px;
+  color:var(--ink);line-height:1.4;
+}
 .principle-weight{
-  font-family:var(--mono);font-size:10px;color:var(--gold);
-  margin-top:6px;letter-spacing:0.06em;
+  font-family:var(--mono);font-size:10px;color:var(--brass);
+  margin-top:6px;letter-spacing:0.08em;text-transform:uppercase;
 }
 .principle-actions{display:flex;flex-direction:column;gap:4px;align-items:flex-end}
 .icon-btn{
   background:transparent;border:none;color:var(--ink-faint);
-  cursor:pointer;font-family:var(--mono);font-size:11px;padding:2px 6px;
+  cursor:pointer;font-family:var(--mono);font-size:13px;padding:2px 6px;
 }
-.icon-btn:hover{color:var(--red)}
+.icon-btn:hover{color:var(--rust)}
 
 .add-principle{
-  background:var(--bg-panel);border:1px dashed var(--rule-strong);
-  padding:18px;border-radius:4px;margin-top:20px;
+  background:var(--paper-deep);border:1px dashed var(--rule-strong);
+  padding:20px;border-radius:2px;margin-top:24px;
 }
-.weight-row{display:flex;gap:6px;margin-top:6px}
+.weight-row{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
 .weight-chip{
-  font-family:var(--mono);font-size:11px;
-  padding:6px 10px;background:var(--bg);border:1px solid var(--rule);color:var(--ink-dim);
-  border-radius:14px;cursor:pointer;transition:all .12s;user-select:none;
+  font-family:var(--mono);font-size:10.5px;
+  padding:7px 11px;background:var(--paper);border:1px solid var(--rule);color:var(--ink-soft);
+  border-radius:2px;cursor:pointer;transition:all .12s;user-select:none;
+  letter-spacing:0.05em;
 }
-.weight-chip:hover{border-color:var(--gold);color:var(--ink)}
-.weight-chip.active{background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:600}
-.pos-row{display:flex;gap:8px;margin-top:6px}
+.weight-chip:hover{border-color:var(--brass);color:var(--ink)}
+.weight-chip.active{background:var(--ink);color:var(--paper);border-color:var(--ink);font-weight:600}
+.pos-row{display:flex;gap:8px;margin-top:8px}
 .pos-chip{
-  font-family:var(--mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;
-  padding:7px 16px;background:var(--bg);border:1px solid var(--rule);color:var(--ink-dim);
-  border-radius:14px;cursor:pointer;transition:all .12s;user-select:none;
+  font-family:var(--display);font-weight:500;font-size:13px;
+  letter-spacing:0.1em;text-transform:uppercase;
+  padding:9px 22px;background:var(--paper);border:1px solid var(--rule);color:var(--ink-soft);
+  border-radius:2px;cursor:pointer;transition:all .12s;user-select:none;
 }
-.pos-chip.agree.active{background:rgba(93, 140, 82, 0.2);color:var(--green);border-color:var(--green);font-weight:600}
-.pos-chip.disagree.active{background:rgba(184, 51, 42, 0.2);color:var(--red);border-color:var(--red);font-weight:600}
+.pos-chip.agree.active{background:var(--sage);color:var(--paper);border-color:var(--sage);font-weight:600}
+.pos-chip.disagree.active{background:var(--rust);color:var(--paper);border-color:var(--rust);font-weight:600}
 
 /* ============================================================
-   PHASE 3 — BALLOT
+   III. BALLOT
    ============================================================ */
 .race-card{
-  background:var(--bg-panel);border:1px solid var(--rule);
-  padding:16px 18px;margin-bottom:14px;border-radius:4px;
+  background:var(--paper-deep);border:1px solid var(--rule);
+  padding:18px 20px;margin-bottom:16px;border-radius:2px;
 }
 .race-header{
-  display:flex;justify-content:space-between;align-items:baseline;gap:12px;
-  padding-bottom:8px;margin-bottom:10px;border-bottom:1px solid var(--rule);
+  display:flex;justify-content:space-between;align-items:baseline;gap:14px;
+  padding-bottom:10px;margin-bottom:12px;border-bottom:1px solid var(--rule);
 }
 .race-name{
-  font-family:var(--display);font-weight:500;font-size:17px;color:var(--ink);
-  letter-spacing:0.02em;
+  font-family:var(--display);font-weight:600;font-size:19px;color:var(--ink);
+  letter-spacing:0.01em;
 }
 .race-jurisdiction{
   font-family:var(--mono);font-size:10px;color:var(--ink-faint);
-  letter-spacing:0.1em;text-transform:uppercase;
+  letter-spacing:0.12em;text-transform:uppercase;
 }
 .candidate-list{display:flex;flex-direction:column;gap:6px}
 .candidate-row{
   display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;
-  padding:8px 10px;background:var(--bg);border:1px solid var(--rule);border-radius:3px;
-  font-family:var(--body);font-size:15px;
+  padding:9px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:2px;
+  font-family:var(--display);font-size:16px;
 }
 .candidate-name{color:var(--ink);line-height:1.3}
 .candidate-party{
@@ -287,194 +322,223 @@ button.primary:disabled{opacity:0.4;cursor:not-allowed}
   letter-spacing:0.06em;text-transform:uppercase;
 }
 .candidate-actions{display:flex;gap:4px}
-.candidate-actions .icon-btn{font-size:13px}
 
 /* ============================================================
-   PHASE 4 — FILTER
+   IV. FILTER — deposition slip + plumb measurement
    ============================================================ */
 .filter-card{
-  background:var(--bg-panel);border:1px solid var(--rule-strong);
-  padding:20px;margin-bottom:16px;border-radius:4px;
+  background:var(--paper-deep);border:1px solid var(--rule);
+  padding:24px 24px 20px;margin-bottom:16px;border-radius:2px;
+  position:relative;
+}
+/* Deposition stamp top-right */
+.filter-card::before{
+  content:"DEPOSITION";
+  position:absolute;top:14px;right:18px;
+  font-family:var(--mono);font-size:9px;letter-spacing:0.25em;
+  color:var(--rust);opacity:0.5;font-weight:600;
+  border:1px solid var(--rust);padding:3px 7px;
+  transform:rotate(-3deg);
 }
 .filter-header{
-  display:flex;justify-content:space-between;align-items:baseline;
-  padding-bottom:12px;margin-bottom:14px;border-bottom:1px solid var(--rule);
-  gap:12px;flex-wrap:wrap;
+  padding-bottom:14px;margin-bottom:16px;border-bottom:1px solid var(--rule);
 }
 .filter-candidate{
-  font-family:var(--display);font-weight:500;font-size:20px;color:var(--ink);
-  letter-spacing:0.02em;
+  font-family:var(--display);font-weight:600;font-size:28px;color:var(--ink);
+  letter-spacing:-0.005em;line-height:1.1;
+}
+.filter-candidate .party{
+  font-family:var(--mono);font-size:13px;font-weight:400;color:var(--ink-faint);
+  letter-spacing:0.1em;margin-left:8px;
 }
 .filter-race{
-  font-family:var(--mono);font-size:11px;color:var(--ink-faint);
-  letter-spacing:0.1em;text-transform:uppercase;
+  font-family:var(--mono);font-size:10.5px;color:var(--brass);
+  letter-spacing:0.16em;text-transform:uppercase;margin-top:6px;font-weight:500;
 }
 
 .research-row{
-  display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;
+  display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;
 }
 .research-link{
-  font-family:var(--mono);font-size:11px;color:var(--gold);
-  background:rgba(212, 175, 55, 0.08);
-  border:1px solid var(--gold-deep);
-  padding:6px 11px;border-radius:14px;
-  text-decoration:none;letter-spacing:0.04em;
-  transition:all .12s;
+  font-family:var(--mono);font-size:10.5px;color:var(--brass);
+  background:transparent;
+  border:1px solid var(--brass);
+  padding:6px 11px;border-radius:2px;
+  text-decoration:none;letter-spacing:0.06em;
+  transition:all .12s;text-transform:uppercase;font-weight:500;
 }
-.research-link:hover{background:var(--gold);color:var(--bg)}
+.research-link:hover{background:var(--brass);color:var(--paper)}
 
 .principle-check{
-  background:var(--bg);border:1px solid var(--rule);
-  padding:12px 14px;border-radius:3px;margin-bottom:8px;
-  display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;
+  background:var(--paper);border:1px solid var(--rule);
+  padding:13px 16px;border-radius:2px;margin-bottom:8px;
+  display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;
 }
-.principle-check-text{font-family:var(--body);font-size:15px;color:var(--ink);line-height:1.4}
-.principle-check-pos{font-family:var(--mono);font-size:9px;color:var(--ink-faint);letter-spacing:0.1em;text-transform:uppercase;margin-top:3px}
+.principle-check-text{
+  font-family:var(--display);font-style:italic;font-size:16px;color:var(--ink);line-height:1.4;
+}
+.principle-check-pos{
+  font-family:var(--mono);font-size:9px;color:var(--brass);letter-spacing:0.14em;
+  text-transform:uppercase;margin-top:4px;font-weight:500;
+}
 .swipe-row{display:flex;gap:5px}
 .swipe-btn{
-  font-family:var(--mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;
-  background:var(--bg-elev);border:1px solid var(--rule-strong);color:var(--ink-dim);
-  padding:7px 11px;border-radius:14px;cursor:pointer;transition:all .12s;
-  min-width:48px;text-align:center;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;
+  background:transparent;border:1px solid var(--rule-strong);color:var(--ink-soft);
+  padding:8px 12px;border-radius:2px;cursor:pointer;transition:all .12s;
+  min-width:54px;text-align:center;font-weight:500;
 }
-.swipe-btn:hover{border-color:var(--gold);color:var(--gold)}
-.swipe-btn.aligns.active{background:rgba(93,140,82,0.2);color:var(--green);border-color:var(--green);font-weight:600}
-.swipe-btn.opposes.active{background:rgba(184,51,42,0.2);color:var(--red);border-color:var(--red);font-weight:600}
-.swipe-btn.unknown.active{background:rgba(168,156,135,0.15);color:var(--ink-dim);border-color:var(--ink-dim);font-weight:600}
+.swipe-btn:hover{border-color:var(--brass);color:var(--brass)}
+.swipe-btn.aligns.active{background:var(--sage);color:var(--paper);border-color:var(--sage);font-weight:600}
+.swipe-btn.opposes.active{background:var(--rust);color:var(--paper);border-color:var(--rust);font-weight:600}
+.swipe-btn.unknown.active{background:var(--ink-faint);color:var(--paper);border-color:var(--ink-faint);font-weight:600}
 
-.filter-notes textarea{
-  margin-top:14px;background:var(--bg);
-  font-family:var(--body);font-size:14px;
-}
+.filter-notes textarea{margin-top:16px;font-family:var(--body);font-size:15px;font-style:normal;background:var(--paper)}
+
+/* Plumb measurement readout */
 .filter-score{
+  margin-top:18px;padding:18px 22px;
+  background:var(--paper);border:1px solid var(--brass);
   display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;
-  margin-top:16px;padding:12px 14px;
-  background:var(--bg);border:1px solid var(--rule-strong);border-radius:3px;
+  position:relative;
 }
-.filter-score-label{font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:0.08em;text-transform:uppercase}
+.filter-score-label{
+  font-family:var(--mono);font-size:10px;color:var(--brass);
+  letter-spacing:0.2em;text-transform:uppercase;font-weight:600;
+}
+.filter-score-sub{
+  font-family:var(--mono);font-size:11px;color:var(--ink-faint);
+  margin-top:5px;letter-spacing:0.04em;
+}
 .filter-score-val{
-  font-family:var(--display);font-weight:600;font-size:24px;color:var(--gold);
-  letter-spacing:0.02em;
+  font-family:var(--display);font-weight:600;font-style:italic;font-size:42px;
+  color:var(--brass);letter-spacing:-0.02em;line-height:1;
 }
-.filter-score-val.high{color:var(--green)}
-.filter-score-val.low{color:var(--red)}
+.filter-score-val.high{color:var(--sage)}
+.filter-score-val.low{color:var(--rust)}
 
 .filter-nav{
-  display:flex;justify-content:space-between;align-items:center;gap:12px;
-  margin-top:18px;
+  display:flex;justify-content:space-between;align-items:center;gap:14px;
+  margin-top:20px;
 }
-.filter-progress{font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:0.08em}
+.filter-progress{
+  font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);
+  letter-spacing:0.1em;
+}
 
 /* ============================================================
-   PHASE 5 — BALLOT OUTPUT
+   V. OUTPUT — marked ballot
    ============================================================ */
 .output-race{
-  background:var(--bg-panel);border:1px solid var(--rule);
-  padding:14px 18px;margin-bottom:12px;border-radius:4px;
+  background:var(--paper-deep);border:1px solid var(--rule);
+  padding:16px 22px;margin-bottom:14px;border-radius:2px;
 }
-.output-race-name{font-family:var(--display);font-weight:500;font-size:16px;color:var(--gold);letter-spacing:0.02em;text-transform:uppercase;margin-bottom:8px}
+.output-race-name{
+  font-family:var(--display);font-weight:600;font-size:18px;color:var(--ink);
+  letter-spacing:0.02em;text-transform:uppercase;margin-bottom:10px;
+}
 .output-pick{
-  display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;
-  padding:9px 0;border-top:1px dashed var(--rule);
+  display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;
+  padding:10px 0;border-top:1px dashed var(--rule);
 }
 .output-pick:first-of-type{border-top:none}
 .output-pick-mark{
-  font-family:var(--display);font-weight:700;color:var(--gold);font-size:18px;
-  width:24px;text-align:center;
+  font-family:var(--display);font-weight:700;color:var(--brass);font-size:22px;
+  width:26px;text-align:center;
 }
-.output-pick-name{font-family:var(--body);font-size:16px;color:var(--ink)}
-.output-pick-score{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);letter-spacing:0.06em}
-.output-pick-best .output-pick-name{color:var(--green);font-weight:500}
-.output-pick-best .output-pick-mark{content:"✓"}
+.output-pick-name{font-family:var(--display);font-size:18px;color:var(--ink-soft)}
+.output-pick-score{font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:0.08em}
+.output-pick-best .output-pick-name{color:var(--sage);font-weight:600;font-style:italic}
 
 .confidence-band{
-  background:var(--bg-elev);border:1px solid var(--gold-deep);
-  padding:14px 18px;margin-bottom:20px;border-radius:4px;
-  font-family:var(--mono);font-size:12px;color:var(--ink-dim);line-height:1.6;letter-spacing:0.02em;
+  background:var(--paper-deep);border:1px solid var(--brass);
+  padding:16px 22px;margin-bottom:22px;
+  font-family:var(--body);font-size:14.5px;color:var(--ink-soft);
+  line-height:1.65;
 }
-.confidence-band strong{color:var(--gold);font-family:var(--display);font-size:14px}
+.confidence-band strong{color:var(--ink);font-family:var(--display);font-weight:600;font-size:17px;letter-spacing:0.02em}
 
-.export-row{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+.export-row{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
 
 /* ============================================================
-   EMPTY STATES
+   EMPTY + FOOTER
    ============================================================ */
 .empty{
-  font-family:var(--body);font-style:italic;font-size:14px;color:var(--ink-faint);
-  text-align:center;padding:36px 20px;line-height:1.5;
+  font-family:var(--display);font-style:italic;font-size:15px;color:var(--ink-faint);
+  text-align:center;padding:40px 20px;line-height:1.5;
 }
 
-/* ============================================================
-   FOOTER + RESPONSIVE
-   ============================================================ */
 footer{
-  border-top:1px solid var(--rule-strong);padding:24px;text-align:center;
-  font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:0.08em;
+  position:relative;z-index:3;
+  border-top:1px solid var(--rule);
+  padding:32px 24px 48px;text-align:center;
+  font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);
+  letter-spacing:0.1em;
 }
-footer a{color:var(--ink-dim);text-decoration:none;border-bottom:1px dotted var(--rule-strong)}
-footer a:hover{color:var(--gold);border-bottom-color:var(--gold)}
+footer .credit{
+  font-family:var(--mono);font-size:9px;letter-spacing:0.36em;
+  color:var(--brass);margin-top:14px;opacity:0.7;
+}
+footer a{color:var(--ink-soft);text-decoration:none;border-bottom:1px dotted var(--rule-strong)}
+footer a:hover{color:var(--brass);border-bottom-color:var(--brass)}
 
 @media print{
   body{background:white;color:black}
+  body::before, .plumb-thread, .plumb-bob{display:none !important}
   header, nav.phases, .panel:not(#panel-output), button, .filter-nav, .export-row{display:none !important}
   #panel-output{display:block !important}
   main{padding:0;max-width:100%}
-  .output-race{break-inside:avoid;border-color:#888;background:white;color:black}
-  .output-race-name, .output-pick-mark, .filter-score-val{color:#8a6d18 !important}
-  .output-pick-name{color:black !important}
+  .output-race{break-inside:avoid;border-color:#888;background:white}
   .confidence-band{background:#faf6f1;border-color:#aaa;color:black}
 }
 
-@media(max-width:600px){
-  header{padding:30px 22px 22px}
-  h1{font-size:32px;letter-spacing:0.04em}
-  main{padding:24px 18px 60px}
-  .phase-btn{padding:11px 10px;font-size:10px}
-  .section-h{font-size:17px}
-  .race-card, .filter-card{padding:14px}
-  .principle-item{grid-template-columns:1fr;gap:8px}
-  .principle-actions{flex-direction:row}
-  .filter-candidate{font-size:17px}
+@media(max-width:620px){
+  header{padding:48px 22px 30px}
+  h1{font-size:56px}
+  h1 .line{font-size:20px;letter-spacing:0.32em}
+  main{padding:28px 20px 70px}
+  .phase-btn{padding:14px 9px;font-size:12.5px}
+  .filter-candidate{font-size:23px}
+  .filter-card{padding:18px}
+  .filter-score-val{font-size:34px}
+  .race-card{padding:14px}
+  .plumb-bob{bottom:24px}
 }
 </style>
 </head>
 <body>
 
+<div class="plumb-thread" aria-hidden="true"></div>
+<div class="plumb-bob" aria-hidden="true"></div>
+
 <header>
-  <div class="plumb-line" aria-hidden="true"></div>
-  <div class="masthead">
-    <div class="mark"><img src="/_brand/panopticon-mark.svg" alt="PV" width="48" height="48"></div>
-    <div class="eyebrow">Principled voting · any election, any state</div>
-    <h1>Plumb<em>·line</em></h1>
-    <p class="tagline">Set your principles first. Walk through each candidate. Let the line do the deciding.</p>
-    <div class="epigraph">
-      "Behold, I am setting a plumb line in the midst of my people…"
-      <cite>Amos 7:8 · the universal metaphor</cite>
-    </div>
+  <div class="eyebrow">Principled voting · any election, anywhere</div>
+  <h1>Plumb<span class="line">— the line —</span></h1>
+  <p class="tagline">Set your principles first. Walk the ballot. Let the line do the deciding.</p>
+  <div class="epigraph">
+    "Behold, I am setting a plumb line in the midst of my people…"
+    <cite>Amos 7:8 · the universal metaphor</cite>
   </div>
 </header>
 
 <nav class="phases">
-  <button class="phase-btn active" data-phase="prep" onclick="setPhase('prep')"><span class="num">I.</span>Prep</button>
-  <button class="phase-btn" data-phase="principles" onclick="setPhase('principles')"><span class="num">II.</span>Principles</button>
-  <button class="phase-btn" data-phase="ballot" onclick="setPhase('ballot')"><span class="num">III.</span>Ballot</button>
-  <button class="phase-btn" data-phase="filter" onclick="setPhase('filter')"><span class="num">IV.</span>Filter</button>
-  <button class="phase-btn" data-phase="output" onclick="setPhase('output')"><span class="num">V.</span>Marked Ballot</button>
+  <button class="phase-btn active" data-phase="prep" onclick="setPhase('prep')"><span class="num">I</span>Prep</button>
+  <button class="phase-btn" data-phase="principles" onclick="setPhase('principles')"><span class="num">II</span>Principles</button>
+  <button class="phase-btn" data-phase="ballot" onclick="setPhase('ballot')"><span class="num">III</span>Ballot</button>
+  <button class="phase-btn" data-phase="filter" onclick="setPhase('filter')"><span class="num">IV</span>Filter</button>
+  <button class="phase-btn" data-phase="output" onclick="setPhase('output')"><span class="num">V</span>Marked</button>
 </nav>
 
 <main>
 
-<!-- ============================================================
-     I. PREP — registration check + sample ballot retrieval
-     ============================================================ -->
 <section class="panel active" id="panel-prep">
-  <p class="panel-intro">Before you research candidates, make sure you can actually vote. These are universal starting points — they route you to your own state's official sites.</p>
+  <p class="panel-intro">Before you research candidates, make sure you can vote. These are universal starting points — they route to your own state's official sites.</p>
 
   <h2 class="section-h">Are you registered?</h2>
   <div class="action-card">
     <div class="action-card-title">Check your registration status</div>
     <div class="action-card-body">
-      Use <a href="https://www.vote.org/am-i-registered-to-vote/" target="_blank">vote.org</a> for a universal check, or <a href="https://www.usa.gov/voter-registration" target="_blank">usa.gov/voter-registration</a> to register if not. Most states require registration ~30 days before election day. North Dakota is the exception (no registration). California, Michigan, Minnesota, and others allow same-day registration.
+      Use <a href="https://www.vote.org/am-i-registered-to-vote/" target="_blank">vote.org</a> for a universal check, or <a href="https://www.usa.gov/voter-registration" target="_blank">usa.gov/voter-registration</a> to register. Most states require registration ~30 days before election day; same-day registration available in California, Michigan, Minnesota, and others.
     </div>
   </div>
 
@@ -482,58 +546,54 @@ footer a:hover{color:var(--gold);border-bottom-color:var(--gold)}
   <div class="action-card">
     <div class="action-card-title">Your state's Secretary of State</div>
     <div class="action-card-body">
-      Search "<a id="sos-link" href="https://www.google.com/search?q=secretary+of+state+sample+ballot" target="_blank">[your state] secretary of state sample ballot</a>" or your county election office. Most states publish your specific sample ballot 2-4 weeks before election day, keyed to your address. Print it OR keep the PDF open in a tab — you'll type the races + candidates into the next step.
+      Search "<a href="https://www.google.com/search?q=secretary+of+state+sample+ballot" target="_blank">[your state] secretary of state sample ballot</a>" or your county election office. States publish your specific ballot 2-4 weeks before election day, keyed to your address.
     </div>
   </div>
 
-  <h2 class="section-h">Universal research starting points</h2>
+  <h2 class="section-h">Universal research sources</h2>
   <div class="action-card">
     <div class="action-card-title">Sources Plumb will deep-link to per candidate</div>
     <div class="action-card-body">
-      <ul style="margin:6px 0 0;padding-left:20px;font-family:var(--body);font-size:14.5px;line-height:1.8">
-        <li><strong style="color:var(--ink)">Ballotpedia</strong> — best for state-legislative + federal; thinner on local</li>
-        <li><strong style="color:var(--ink)">Vote Smart</strong> — federal positions, voting records, ratings from advocacy groups</li>
-        <li><strong style="color:var(--ink)">Candidate's own site</strong> — what they want you to know</li>
-        <li><strong style="color:var(--ink)">Local news search</strong> — what's been reported, what controversies exist</li>
-        <li><strong style="color:var(--ink)">Official filings</strong> — financial disclosures, voting records</li>
+      <ul style="margin:6px 0 0;padding-left:20px;line-height:1.85">
+        <li><strong>Ballotpedia</strong> — best for state-legislative + federal</li>
+        <li><strong>Vote Smart</strong> — federal positions, voting records, ratings</li>
+        <li><strong>Candidate site</strong> — what they want you to know</li>
+        <li><strong>Local news search</strong> — what's reported, what controversies exist</li>
       </ul>
     </div>
   </div>
 
-  <h2 class="section-h">Honest note on the "ill-informed shouldn't vote" instinct</h2>
+  <h2 class="section-h">A word on partial research</h2>
   <p class="panel-intro" style="margin-top:14px">
-    Don't skip voting because you can't research everything. If your principles are clear, a 30%-research vote is still a 100%-principled vote. Plumb's job: stabilize your principles so any amount of research time yields a values-aligned ballot.
+    Don't skip voting because you can't research everything. If your principles are clear, a 30%-research vote is still a 100%-principled vote. Plumb's job is to stabilize your principles so any amount of research time still produces a values-aligned ballot.
   </p>
 
-  <button class="primary" onclick="setPhase('principles')">Next · Set your principles →</button>
+  <button class="primary" onclick="setPhase('principles')">Begin · Set your principles</button>
 </section>
 
-<!-- ============================================================
-     II. PRINCIPLE LIBRARY
-     ============================================================ -->
 <section class="panel" id="panel-principles">
   <p class="panel-intro">
-    Write your principles before you meet the candidates. A principle is a single claim you agree or disagree with — plus how much it weighs in your decision. Stable across elections. Edit when your thinking changes; don't edit in the middle of a race.
+    Write your principles before you meet the candidates. A principle is a single claim you agree or disagree with, plus how much it weighs in your decision. Stable across elections. Edit when your thinking changes; don't edit mid-race.
   </p>
 
   <div class="helper">
-    Examples: "Government should provide a safety net for the elderly." "Religious institutions should be free of state interference." "Abortion should be legal in the first trimester." "The death penalty is wrong." Be specific. Vague principles produce vague filtering.
+    Examples: "Government should provide a safety net for the elderly." "Abortion should be legal in the first trimester." "The death penalty is wrong." Be specific. Vague principles produce vague filtering.
   </div>
 
-  <h2 class="section-h">Your principles <span style="font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:0.06em;margin-left:8px" id="principle-count"></span></h2>
+  <h2 class="section-h">Your principles <span style="font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:0.08em;margin-left:8px;text-transform:uppercase" id="principle-count"></span></h2>
   <div class="principle-list" id="principle-list"></div>
 
   <div class="add-principle">
     <label for="new-principle">Add a principle</label>
-    <textarea id="new-principle" placeholder="Write a single specific claim you have a position on."></textarea>
+    <textarea id="new-principle" placeholder="A single specific claim you have a position on."></textarea>
 
     <label>Your position</label>
     <div class="pos-row" id="pos-row">
-      <div class="pos-chip agree" data-pos="agree" onclick="selectPos('agree')">I agree</div>
-      <div class="pos-chip disagree" data-pos="disagree" onclick="selectPos('disagree')">I disagree</div>
+      <div class="pos-chip agree" data-pos="agree" onclick="selectPos('agree')">Agree</div>
+      <div class="pos-chip disagree" data-pos="disagree" onclick="selectPos('disagree')">Disagree</div>
     </div>
 
-    <label>Importance · how much this weighs in your decision</label>
+    <label>Weight in your decision</label>
     <div class="weight-row" id="weight-row">
       <div class="weight-chip" data-w="1" onclick="selectWeight(1)">1 · minor</div>
       <div class="weight-chip" data-w="2" onclick="selectWeight(2)">2</div>
@@ -542,42 +602,36 @@ footer a:hover{color:var(--gold);border-bottom-color:var(--gold)}
       <div class="weight-chip active" data-w="5" onclick="selectWeight(5)">5 · core</div>
     </div>
 
-    <button class="primary" style="margin-top:18px" onclick="addPrinciple()">+ Add to library</button>
+    <button class="primary" style="margin-top:20px" onclick="addPrinciple()">Enter into library</button>
   </div>
 </section>
 
-<!-- ============================================================
-     III. BALLOT BUILDER
-     ============================================================ -->
 <section class="panel" id="panel-ballot">
   <p class="panel-intro">
-    Type your races + candidates from your sample ballot. Two minutes per race. Skip anything uncontested.
+    Type your races and candidates from your sample ballot. Two minutes per race. Skip uncontested.
   </p>
 
   <div id="races-container"></div>
 
-  <div class="add-principle" style="margin-top:22px">
-    <label for="new-race-name">Add a race</label>
+  <div class="add-principle" style="margin-top:24px">
+    <label for="new-race-name">Race</label>
     <input type="text" id="new-race-name" placeholder="e.g. U.S. Senate · Georgia 2026">
 
     <label for="new-race-jurisdiction">Jurisdiction (optional)</label>
-    <input type="text" id="new-race-jurisdiction" placeholder="e.g. Federal · or · Cobb County School Board District 3">
+    <input type="text" id="new-race-jurisdiction" placeholder="Federal · State House · School Board…">
 
     <label for="new-race-candidates">Candidates · one per line · party in (parens) optional</label>
     <textarea id="new-race-candidates" placeholder="Jane Smith (D)&#10;John Doe (R)&#10;Robin Reed (I)"></textarea>
 
-    <button class="primary" style="margin-top:18px" onclick="addRace()">+ Add race</button>
+    <button class="primary" style="margin-top:20px" onclick="addRace()">Add race</button>
   </div>
 
-  <button class="primary" style="margin-top:24px;background:var(--brass)" onclick="setPhase('filter')">Next · Begin filtering →</button>
+  <button class="primary" style="margin-top:26px;background:var(--brass);color:var(--ink)" onclick="setPhase('filter')">Begin filtering →</button>
 </section>
 
-<!-- ============================================================
-     IV. FILTER — per-candidate principle check
-     ============================================================ -->
 <section class="panel" id="panel-filter">
   <p class="panel-intro">
-    For each candidate, click out to the research links, read enough to form a position on each principle, then mark each one: aligns / opposes / unknown. Notes are private.
+    For each candidate: click out, read enough to form a position on each principle, then mark aligns / opposes / unknown. Notes are private.
   </p>
 
   <div id="filter-container">
@@ -591,12 +645,9 @@ footer a:hover{color:var(--gold);border-bottom-color:var(--gold)}
   </div>
 </section>
 
-<!-- ============================================================
-     V. OUTPUT — marked ballot
-     ============================================================ -->
 <section class="panel" id="panel-output">
   <p class="panel-intro">
-    Your marked ballot. Print this OR keep on your phone — bring it to the polls. Highest-alignment candidate per race marked with ✓. Confidence shown per race so you know which picks are well-researched.
+    Your marked ballot. Highest-alignment per race marked. Confidence shown per race so you know which picks are well-researched. Print or carry on your phone.
   </p>
 
   <div class="confidence-band" id="confidence-band"></div>
@@ -604,7 +655,7 @@ footer a:hover{color:var(--gold);border-bottom-color:var(--gold)}
   <div id="output-container"></div>
 
   <div class="export-row">
-    <button class="btn-sm" onclick="window.print()">Print marked ballot</button>
+    <button class="btn-sm" onclick="window.print()">Print</button>
     <button class="btn-sm" onclick="exportJson()">Export JSON</button>
     <button class="btn-sm danger" onclick="resetAll()">Clear everything</button>
   </div>
@@ -613,13 +664,11 @@ footer a:hover{color:var(--gold);border-bottom-color:var(--gold)}
 </main>
 
 <footer>
-  Plumb · v0.05 · all data local to your device · open the source <a href="/">on the tools hub</a>
+  All data local to your device · open the source <a href="/">on the tools hub</a>
+  <div class="credit">— purcellventures.co —</div>
 </footer>
 
 <script>
-// ============================================================================
-// STORAGE
-// ============================================================================
 const STORE_KEY = 'plumb-v0';
 function load(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch(e){ return {}; } }
 function save(s){ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }
@@ -627,20 +676,12 @@ function getStore(){
   const s = load();
   if(!s.principles) s.principles = [];
   if(!s.races) s.races = [];
-  if(!s.filters) s.filters = {}; // {candidateId: {principleId: 'aligns'|'opposes'|'unknown', notes: ''}}
+  if(!s.filters) s.filters = {};
   return s;
 }
 function setStore(s){ save(s); }
+const state = { newPos: null, newWeight: 5, filterCursor: null };
 
-const state = {
-  newPos: null,
-  newWeight: 5,
-  filterCursor: null, // {raceIdx, candIdx}
-};
-
-// ============================================================================
-// PHASE NAV
-// ============================================================================
 function setPhase(p){
   ['prep','principles','ballot','filter','output'].forEach(ph => {
     document.getElementById('panel-'+ph).classList.toggle('active', ph===p);
@@ -653,9 +694,6 @@ function setPhase(p){
   window.scrollTo(0, 0);
 }
 
-// ============================================================================
-// PRINCIPLES
-// ============================================================================
 function selectPos(pos){
   state.newPos = pos;
   document.querySelectorAll('.pos-chip').forEach(c => c.classList.toggle('active', c.dataset.pos === pos));
@@ -668,7 +706,7 @@ function selectWeight(w){
 function addPrinciple(){
   const text = document.getElementById('new-principle').value.trim();
   if(!text){ alert('Write the principle first.'); return; }
-  if(!state.newPos){ alert('Pick agree or disagree.'); return; }
+  if(!state.newPos){ alert('Agree or disagree.'); return; }
   const s = getStore();
   s.principles.push({
     id: 'P' + Date.now().toString(36) + Math.random().toString(36).slice(2,6),
@@ -685,7 +723,6 @@ function deletePrinciple(id){
   if(!confirm('Delete this principle?')) return;
   const s = getStore();
   s.principles = s.principles.filter(p => p.id !== id);
-  // also clear any filter selections that referenced this principle
   Object.values(s.filters).forEach(f => { if(f.checks) delete f.checks[id]; });
   setStore(s);
   renderPrinciples();
@@ -694,18 +731,18 @@ function deletePrinciple(id){
 function renderPrinciples(){
   const s = getStore();
   const list = document.getElementById('principle-list');
-  document.getElementById('principle-count').textContent = s.principles.length > 0 ? `· ${s.principles.length}` : '';
+  document.getElementById('principle-count').textContent = s.principles.length > 0 ? `· ${s.principles.length} entered` : '';
   if(s.principles.length === 0){
-    list.innerHTML = '<div class="empty">No principles yet. Add your first below.</div>';
+    list.innerHTML = '<div class="empty">No principles yet. The plumb line needs a top to hang from. Add your first below.</div>';
     return;
   }
-  s.principles.sort((a,b)=>b.weight-a.weight || a.createdAt-b.createdAt);
+  s.principles.sort((a,b) => b.weight - a.weight || a.createdAt - b.createdAt);
   list.innerHTML = s.principles.map(p => `
-    <div class="principle-item">
-      <span class="principle-pos ${p.pos}">${p.pos === 'agree' ? '+ Agree' : '− Oppose'}</span>
+    <div class="principle-item" data-pos="${p.pos}">
+      <span class="principle-pos ${p.pos}">${p.pos === 'agree' ? 'Agree' : 'Oppose'}</span>
       <div>
         <div class="principle-text">${escapeHtml(p.text)}</div>
-        <div class="principle-weight">weight: ${p.weight} of 5</div>
+        <div class="principle-weight">weight ${p.weight} of 5</div>
       </div>
       <div class="principle-actions">
         <button class="icon-btn" onclick="deletePrinciple('${p.id}')" title="Delete">✕</button>
@@ -714,20 +751,17 @@ function renderPrinciples(){
   `).join('');
 }
 
-// ============================================================================
-// BALLOT
-// ============================================================================
 function addRace(){
   const name = document.getElementById('new-race-name').value.trim();
   const jurisdiction = document.getElementById('new-race-jurisdiction').value.trim();
   const candidatesRaw = document.getElementById('new-race-candidates').value.trim();
   if(!name){ alert('Race name required.'); return; }
   if(!candidatesRaw){ alert('At least one candidate.'); return; }
-  const candidates = candidatesRaw.split('\n').map(line => line.trim()).filter(Boolean).map(line => {
-    const m = line.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+  const candidates = candidatesRaw.split('\n').map(l => l.trim()).filter(Boolean).map(l => {
+    const m = l.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
     return {
       id: 'C' + Date.now().toString(36) + Math.random().toString(36).slice(2,6),
-      name: m ? m[1].trim() : line,
+      name: m ? m[1].trim() : l,
       party: m ? m[2].trim() : '',
     };
   });
@@ -744,7 +778,7 @@ function addRace(){
 }
 
 function deleteRace(id){
-  if(!confirm('Delete this race + all candidate research?')) return;
+  if(!confirm('Delete this race and all candidate research?')) return;
   const s = getStore();
   const race = s.races.find(r => r.id === id);
   if(race) race.candidates.forEach(c => delete s.filters[c.id]);
@@ -767,7 +801,7 @@ function renderBallot(){
   const s = getStore();
   const c = document.getElementById('races-container');
   if(s.races.length === 0){
-    c.innerHTML = '<div class="empty">No races yet. Add your first below.</div>';
+    c.innerHTML = '<div class="empty">No races yet. The plumb hangs in empty air. Add your first below.</div>';
     return;
   }
   c.innerHTML = s.races.map(race => `
@@ -776,7 +810,7 @@ function renderBallot(){
         <span class="race-name">${escapeHtml(race.name)}</span>
         <span style="display:flex;gap:6px;align-items:center">
           ${race.jurisdiction ? `<span class="race-jurisdiction">${escapeHtml(race.jurisdiction)}</span>` : ''}
-          <button class="icon-btn" onclick="deleteRace('${race.id}')" title="Delete race">✕</button>
+          <button class="icon-btn" onclick="deleteRace('${race.id}')" title="Delete">✕</button>
         </span>
       </div>
       <div class="candidate-list">
@@ -794,15 +828,11 @@ function renderBallot(){
   `).join('');
 }
 
-// ============================================================================
-// FILTER — per-candidate principle check
-// ============================================================================
 function getAllCandidatesFlat(){
   const s = getStore();
   const out = [];
-  s.races.forEach((race, ri) => {
-    race.candidates.forEach((c, ci) => out.push({...c, raceId: race.id, raceName: race.name, raceIdx: ri, candIdx: ci}));
-  });
+  s.races.forEach((race, ri) => race.candidates.forEach((c, ci) =>
+    out.push({...c, raceId: race.id, raceName: race.name, raceIdx: ri, candIdx: ci})));
   return out;
 }
 
@@ -811,12 +841,12 @@ function renderFilter(){
   const all = getAllCandidatesFlat();
   const c = document.getElementById('filter-container');
   if(all.length === 0){
-    c.innerHTML = '<div class="empty">No candidates yet. Add a ballot in step III.</div>';
+    c.innerHTML = '<div class="empty">No candidates. Add a ballot in step III.</div>';
     document.getElementById('filter-nav').style.display = 'none';
     return;
   }
   if(s.principles.length === 0){
-    c.innerHTML = '<div class="empty">No principles yet. Set them in step II first.</div>';
+    c.innerHTML = '<div class="empty">No principles. The line needs to be set first — step II.</div>';
     document.getElementById('filter-nav').style.display = 'none';
     return;
   }
@@ -824,26 +854,22 @@ function renderFilter(){
   if(state.filterCursor >= all.length) state.filterCursor = 0;
   const cand = all[state.filterCursor];
   const filt = s.filters[cand.id] || { checks: {}, notes: '' };
-
-  const searchQ = encodeURIComponent(cand.name + ' ' + cand.raceName);
-  const ballotpediaQ = encodeURIComponent(cand.name);
-  const newsQ = encodeURIComponent(cand.name + ' ' + cand.raceName);
+  const q = encodeURIComponent(cand.name);
+  const qR = encodeURIComponent(cand.name + ' ' + cand.raceName);
 
   c.innerHTML = `
     <div class="filter-card">
       <div class="filter-header">
-        <div>
-          <div class="filter-candidate">${escapeHtml(cand.name)} ${cand.party ? `<span style="font-family:var(--mono);font-size:12px;color:var(--ink-faint);letter-spacing:0.08em;margin-left:6px">(${escapeHtml(cand.party)})</span>` : ''}</div>
-          <div class="filter-race">${escapeHtml(cand.raceName)}</div>
-        </div>
+        <div class="filter-candidate">${escapeHtml(cand.name)}${cand.party ? `<span class="party">(${escapeHtml(cand.party)})</span>` : ''}</div>
+        <div class="filter-race">${escapeHtml(cand.raceName)}</div>
       </div>
 
       <div class="research-row">
-        <a class="research-link" href="https://ballotpedia.org/wiki/index.php?search=${ballotpediaQ}" target="_blank">Ballotpedia ↗</a>
-        <a class="research-link" href="https://justfacts.votesmart.org/search?searchText=${ballotpediaQ}" target="_blank">Vote Smart ↗</a>
-        <a class="research-link" href="https://www.google.com/search?q=${searchQ}" target="_blank">Google ↗</a>
-        <a class="research-link" href="https://news.google.com/search?q=${newsQ}" target="_blank">News ↗</a>
-        <a class="research-link" href="https://www.google.com/search?q=${searchQ}+campaign+site" target="_blank">Campaign site ↗</a>
+        <a class="research-link" href="https://ballotpedia.org/wiki/index.php?search=${q}" target="_blank">Ballotpedia ↗</a>
+        <a class="research-link" href="https://justfacts.votesmart.org/search?searchText=${q}" target="_blank">Vote Smart ↗</a>
+        <a class="research-link" href="https://www.google.com/search?q=${qR}" target="_blank">Google ↗</a>
+        <a class="research-link" href="https://news.google.com/search?q=${qR}" target="_blank">News ↗</a>
+        <a class="research-link" href="https://www.google.com/search?q=${qR}+campaign+site" target="_blank">Campaign ↗</a>
       </div>
 
       <div id="checks-list">
@@ -867,7 +893,7 @@ function renderFilter(){
 
       <div class="filter-notes">
         <label for="filter-notes-${cand.id}">Notes (private)</label>
-        <textarea id="filter-notes-${cand.id}" placeholder="Specific quotes, votes, concerns, or strengths." oninput="setNotes('${cand.id}', this.value)">${escapeHtml(filt.notes || '')}</textarea>
+        <textarea id="filter-notes-${cand.id}" placeholder="Quotes, votes, concerns, or strengths." oninput="setNotes('${cand.id}', this.value)">${escapeHtml(filt.notes || '')}</textarea>
       </div>
 
       ${renderScoreBadge(cand.id)}
@@ -888,10 +914,8 @@ function renderScoreBadge(candId){
   return `
     <div class="filter-score">
       <div>
-        <div class="filter-score-label">Alignment score</div>
-        <div style="font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-top:3px;letter-spacing:0.04em">
-          ${score.aligned}/${score.totalWeightedAnswered} weighted points · ${score.unknownCount} principles unresearched
-        </div>
+        <div class="filter-score-label">Plumb · alignment</div>
+        <div class="filter-score-sub">${score.aligned}/${score.totalWeightedAnswered} weighted · ${score.unknownCount} principles unresearched</div>
       </div>
       <div class="filter-score-val ${cls}">${score.pct}%</div>
     </div>
@@ -916,11 +940,8 @@ function computeScore(candId){
 function setCheck(candId, principleId, value){
   const s = getStore();
   if(!s.filters[candId]) s.filters[candId] = { checks: {}, notes: '' };
-  if(s.filters[candId].checks[principleId] === value){
-    delete s.filters[candId].checks[principleId];
-  } else {
-    s.filters[candId].checks[principleId] = value;
-  }
+  if(s.filters[candId].checks[principleId] === value) delete s.filters[candId].checks[principleId];
+  else s.filters[candId].checks[principleId] = value;
   setStore(s);
   renderFilter();
 }
@@ -945,9 +966,6 @@ function prevCandidate(){
   if(state.filterCursor > 0){ state.filterCursor--; renderFilter(); }
 }
 
-// ============================================================================
-// OUTPUT
-// ============================================================================
 function renderOutput(){
   const s = getStore();
   const c = document.getElementById('output-container');
@@ -956,7 +974,6 @@ function renderOutput(){
     document.getElementById('confidence-band').innerHTML = '';
     return;
   }
-
   let totalCandidates = 0, totalAnswered = 0, totalWeightedPossible = 0;
   s.races.forEach(race => race.candidates.forEach(cand => {
     totalCandidates++;
@@ -970,9 +987,9 @@ function renderOutput(){
   const confPct = totalWeightedPossible > 0 ? Math.round((totalAnswered / totalWeightedPossible) * 100) : 0;
   document.getElementById('confidence-band').innerHTML = `
     <strong>Confidence: ${confPct}%</strong> of principle-checks across ${totalCandidates} candidates have been answered.
-    ${confPct >= 70 ? 'You\'re well-researched. Trust the line.' :
-      confPct >= 40 ? 'Mid-research. Principle weights still pulled you toward a pick — that\'s the point.' :
-      'Lightly researched. The principle-weighted picks below are still better than random; if you have time, fill in more principle-checks for the highest-stakes races first.'}
+    ${confPct >= 70 ? ' You\'re well-researched. Trust the line.' :
+      confPct >= 40 ? ' Mid-research. Principle weights still pulled you toward picks — that\'s the point of the line.' :
+      ' Lightly researched. Principle-weighted picks below are still better than random; fill in more checks for the highest-stakes races first if you have time.'}
   `;
 
   c.innerHTML = s.races.map(race => {
@@ -981,10 +998,9 @@ function renderOutput(){
       const bp = b.score ? b.score.pct : -1;
       return bp - ap;
     });
-    const best = scored[0];
     return `
       <div class="output-race">
-        <div class="output-race-name">${escapeHtml(race.name)}${race.jurisdiction ? ` · <span style="font-family:var(--mono);font-size:10px;color:var(--ink-faint);letter-spacing:0.08em;text-transform:uppercase;font-weight:normal">${escapeHtml(race.jurisdiction)}</span>` : ''}</div>
+        <div class="output-race-name">${escapeHtml(race.name)}${race.jurisdiction ? ` · <span style="font-family:var(--mono);font-size:10px;color:var(--ink-faint);letter-spacing:0.1em;text-transform:uppercase;font-weight:400">${escapeHtml(race.jurisdiction)}</span>` : ''}</div>
         ${scored.map((c, i) => `
           <div class="output-pick ${i === 0 && c.score && c.score.pct > 0 ? 'output-pick-best' : ''}">
             <span class="output-pick-mark">${i === 0 && c.score && c.score.pct > 0 ? '✓' : ''}</span>
@@ -1009,7 +1025,7 @@ function exportJson(){
 }
 
 function resetAll(){
-  if(!confirm('Clear ALL data — principles, ballot, filters, notes? This cannot be undone.')) return;
+  if(!confirm('Clear ALL data — principles, ballot, filters, notes? Cannot be undone.')) return;
   localStorage.removeItem(STORE_KEY);
   state.filterCursor = null;
   setPhase('prep');
@@ -1019,7 +1035,6 @@ function escapeHtml(s){
   return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 }
 
-// INIT
 renderPrinciples();
 renderBallot();
 </script>
