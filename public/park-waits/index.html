@@ -83,20 +83,6 @@ header{
   padding:42px 36px 24px;
   text-align:center;
 }
-.brand-strip{
-  font-family:var(--brand);
-  font-size:9px;letter-spacing:0.45em;text-transform:uppercase;
-  color:var(--gold-deep);
-  font-weight:700;
-  margin-bottom:6px;
-}
-.brand-strip::before, .brand-strip::after{
-  content:"❋";
-  margin:0 0.8em;
-  color:var(--red);
-  font-size:11px;
-  vertical-align:1px;
-}
 h1{
   font-family:var(--display);
   font-size:62px;line-height:0.95;letter-spacing:0.005em;
@@ -324,7 +310,6 @@ footer a:hover{color:var(--red);border-bottom-color:var(--red)}
 
 <div class="poster">
   <header>
-    <div class="brand-strip">Purcell Ventures presents</div>
     <h1>The Midway<span class="small">live ride waits</span></h1>
     <p class="tagline">Step right up. Pick a park. The wheel never sleeps.</p>
     <div class="divider-row"><span class="divider-glyph">XV PARKS · LIVE FROM QUEUE-TIMES</span></div>
@@ -370,6 +355,7 @@ footer a:hover{color:var(--red);border-bottom-color:var(--red)}
 
   <footer>
     Data: <a href="https://queue-times.com" target="_blank">queue-times.com</a> · refreshes every minute · <a href="/">All tools →</a>
+    <div style="margin-top:10px;font-size:8px;letter-spacing:0.3em;color:var(--ink-soft);opacity:0.5">— purcellventures.co —</div>
   </footer>
 </div>
 

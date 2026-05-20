@@ -97,18 +97,11 @@ header{
   max-width:920px;margin:0 auto;
 }
 .mark-cell{display:flex;align-items:center;gap:14px}
-.mark{width:36px;height:36px;flex-shrink:0;opacity:0.7;filter:hue-rotate(70deg) brightness(0.9)}
-.mark img{width:100%;height:100%}
 .model-block{display:flex;flex-direction:column;gap:3px;min-width:0}
-.brand-strip{
-  font-family:var(--brand);
-  font-size:9px;letter-spacing:0.4em;text-transform:uppercase;
-  color:var(--gold);opacity:0.7;font-weight:700;
-}
 .model-name{
-  font-family:var(--sans);font-weight:600;font-size:18px;
+  font-family:var(--mono);font-weight:700;font-size:16px;
   color:var(--phosphor);
-  letter-spacing:0.04em;
+  letter-spacing:0.12em;
   text-shadow:0 0 14px rgba(108, 240, 142, 0.4);
   line-height:1;
 }
@@ -408,10 +401,8 @@ footer a:hover{color:var(--phosphor);border-bottom-color:var(--phosphor)}
 <header>
   <div class="front-panel">
     <div class="mark-cell">
-      <div class="mark"><img src="/_brand/panopticon-mark.svg" alt="PV"></div>
       <div class="model-block">
-        <div class="brand-strip">Purcell Ventures Lab Series</div>
-        <div class="model-name">UV-7 Vocal Analyzer</div>
+        <div class="model-name">UV-7 · VOCAL ANALYZER</div>
         <div class="model-sub">Stage Fright · v0.1 · 20-sec pre-call</div>
       </div>
     </div>
@@ -504,6 +495,7 @@ footer a:hover{color:var(--phosphor);border-bottom-color:var(--phosphor)}
 
 <footer>
   UV-7 · phosphor display · <a href="/">All tools →</a>
+  <div style="margin-top:10px;font-size:8px;letter-spacing:0.3em;color:var(--ink-faint);opacity:0.5">— purcellventures.co —</div>
 </footer>
 
 <script>
