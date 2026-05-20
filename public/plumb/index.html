@@ -76,9 +76,15 @@ a{color:inherit;text-decoration:none}
    MASTHEAD — broadside title block
    ============================================================ */
 header{
-  padding:64px 0 38px;
+  padding:48px 0 38px;
   position:relative;
   border-bottom:3px double var(--ink);
+  text-align:center;
+}
+.printers-mark{
+  display:block;
+  width:140px;height:140px;
+  margin:8px auto 24px;
 }
 .head-rule-top{
   border-top:1px solid var(--ink);
@@ -166,6 +172,10 @@ main{
   margin-bottom:40px;
   padding-bottom:8px;
 }
+.article-emblem{
+  display:block;width:64px;height:64px;
+  margin:0 auto 14px;
+}
 .article-head .label{
   font-family:var(--sc);font-size:12px;letter-spacing:0.32em;
   color:var(--red);margin-bottom:6px;
@@ -179,6 +189,14 @@ main{
   font-family:var(--serif);font-style:italic;
   font-size:16px;color:var(--ink-soft);
   margin-top:14px;max-width:540px;margin-left:auto;margin-right:auto;line-height:1.5;
+}
+
+/* Tail-piece: decorative end-of-article ornament */
+.tailpiece{
+  display:block;
+  width:160px;height:32px;
+  margin:36px auto 0;
+  opacity:0.7;
 }
 
 /* ============================================================
@@ -620,6 +638,49 @@ footer{
 
 <header>
   <div class="head-rule-top"><span class="ornament">A Civic Instrument · Anywhere · Any Election</span></div>
+
+  <!-- Printer's mark: plumb-bob within a laurel wreath, engraved style -->
+  <svg class="printers-mark" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <!-- Laurel wreath (left half) -->
+    <g stroke="#16110b" stroke-width="0.9" fill="none" stroke-linecap="round">
+      <path d="M 60 100 Q 30 80 30 50 Q 30 30 50 25"/>
+      <path d="M 60 100 Q 30 120 30 150 Q 30 170 50 175"/>
+      <!-- Leaves left side -->
+      <ellipse cx="36" cy="55" rx="9" ry="3.5" transform="rotate(-60 36 55)" fill="#16110b" opacity="0.55"/>
+      <ellipse cx="32" cy="75" rx="9" ry="3.5" transform="rotate(-75 32 75)" fill="#16110b" opacity="0.55"/>
+      <ellipse cx="31" cy="100" rx="9" ry="3.5" transform="rotate(-90 31 100)" fill="#16110b" opacity="0.55"/>
+      <ellipse cx="32" cy="125" rx="9" ry="3.5" transform="rotate(-105 32 125)" fill="#16110b" opacity="0.55"/>
+      <ellipse cx="36" cy="145" rx="9" ry="3.5" transform="rotate(-120 36 145)" fill="#16110b" opacity="0.55"/>
+      <ellipse cx="44" cy="38" rx="7" ry="3" transform="rotate(-40 44 38)" fill="#16110b" opacity="0.45"/>
+      <ellipse cx="44" cy="162" rx="7" ry="3" transform="rotate(-140 44 162)" fill="#16110b" opacity="0.45"/>
+      <!-- Right half mirror -->
+      <path d="M 140 100 Q 170 80 170 50 Q 170 30 150 25"/>
+      <path d="M 140 100 Q 170 120 170 150 Q 170 170 150 175"/>
+      <ellipse cx="164" cy="55" rx="9" ry="3.5" transform="rotate(60 164 55)" fill="#16110b" opacity="0.55"/>
+      <ellipse cx="168" cy="75" rx="9" ry="3.5" transform="rotate(75 168 75)" fill="#16110b" opacity="0.55"/>
+      <ellipse cx="169" cy="100" rx="9" ry="3.5" transform="rotate(90 169 100)" fill="#16110b" opacity="0.55"/>
+      <ellipse cx="168" cy="125" rx="9" ry="3.5" transform="rotate(105 168 125)" fill="#16110b" opacity="0.55"/>
+      <ellipse cx="164" cy="145" rx="9" ry="3.5" transform="rotate(120 164 145)" fill="#16110b" opacity="0.55"/>
+      <ellipse cx="156" cy="38" rx="7" ry="3" transform="rotate(40 156 38)" fill="#16110b" opacity="0.45"/>
+      <ellipse cx="156" cy="162" rx="7" ry="3" transform="rotate(140 156 162)" fill="#16110b" opacity="0.45"/>
+      <!-- Ribbon at base -->
+      <path d="M 60 175 Q 100 188 140 175" fill="none"/>
+      <path d="M 75 178 L 80 184 L 88 180"/>
+      <path d="M 125 178 L 120 184 L 112 180"/>
+    </g>
+
+    <!-- Plumb apparatus: anchor + line + faceted bob -->
+    <g>
+      <!-- Nail/anchor at top -->
+      <circle cx="100" cy="45" r="3.5" fill="#16110b"/>
+      <!-- Plumb line -->
+      <line x1="100" y1="45" x2="100" y2="128" stroke="#7a1818" stroke-width="1.5"/>
+      <!-- Faceted plumb bob -->
+      <polygon points="100,128 110,138 106,160 94,160 90,138" fill="#7a1818" stroke="#16110b" stroke-width="0.8"/>
+      <line x1="100" y1="128" x2="100" y2="160" stroke="#16110b" stroke-width="0.4" opacity="0.5"/>
+    </g>
+  </svg>
+
   <h1>Plumb</h1>
   <p class="subtitle">A plumb-line for principled voting. Set the line first. Walk the ballot. Let the line do the deciding.</p>
   <div class="head-dedication">
@@ -641,6 +702,21 @@ footer{
 <!-- ARTICLE I — PREPARATION -->
 <section class="panel active" id="panel-prep">
   <div class="article-head">
+    <!-- Emblem: open book / preparation -->
+    <svg class="article-emblem" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <g stroke="#16110b" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M 8 18 L 32 22 L 32 54 L 8 50 Z"/>
+        <path d="M 56 18 L 32 22 L 32 54 L 56 50 Z"/>
+        <path d="M 32 22 L 32 54" stroke-width="0.8"/>
+        <line x1="14" y1="30" x2="28" y2="32"/>
+        <line x1="14" y1="36" x2="28" y2="38"/>
+        <line x1="14" y1="42" x2="28" y2="44"/>
+        <line x1="36" y1="32" x2="50" y2="30"/>
+        <line x1="36" y1="38" x2="50" y2="36"/>
+        <line x1="36" y1="44" x2="50" y2="42"/>
+        <circle cx="32" cy="14" r="3" fill="#7a1818" stroke="#7a1818"/>
+      </g>
+    </svg>
     <div class="label">Article I</div>
     <h2>Preparation</h2>
     <p class="precis">Before researching the candidates, confirm your right to vote and obtain a sample ballot. These are universal starting points; they route you to your state's official sites.</p>
@@ -682,11 +758,37 @@ footer{
   <div style="text-align:center;margin-top:48px">
     <button class="primary" onclick="setPhase('principles')">Proceed to Article II</button>
   </div>
+
+  <svg class="tailpiece" viewBox="0 0 160 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <g stroke="#16110b" stroke-width="0.8" fill="none">
+      <line x1="0" y1="16" x2="55" y2="16"/>
+      <line x1="105" y1="16" x2="160" y2="16"/>
+      <circle cx="80" cy="16" r="4" fill="#7a1818" stroke="#7a1818"/>
+      <circle cx="68" cy="16" r="2" fill="#16110b"/>
+      <circle cx="92" cy="16" r="2" fill="#16110b"/>
+      <path d="M 60 16 Q 65 8 80 16 Q 95 24 100 16" stroke-width="0.7" opacity="0.6"/>
+    </g>
+  </svg>
 </section>
 
 <!-- ARTICLE II — PRINCIPLES -->
 <section class="panel" id="panel-principles">
   <div class="article-head">
+    <!-- Emblem: scales / balance for principles -->
+    <svg class="article-emblem" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <g stroke="#16110b" stroke-width="1.2" fill="none" stroke-linecap="round">
+        <line x1="32" y1="8" x2="32" y2="50"/>
+        <line x1="14" y1="20" x2="50" y2="20"/>
+        <line x1="14" y1="20" x2="8" y2="36"/>
+        <line x1="14" y1="20" x2="20" y2="36"/>
+        <line x1="50" y1="20" x2="44" y2="36"/>
+        <line x1="50" y1="20" x2="56" y2="36"/>
+        <path d="M 5 36 Q 14 42 23 36" stroke-width="1.4"/>
+        <path d="M 41 36 Q 50 42 59 36" stroke-width="1.4"/>
+        <line x1="22" y1="50" x2="42" y2="50" stroke-width="1.6"/>
+        <circle cx="32" cy="8" r="2.5" fill="#7a1818" stroke="#7a1818"/>
+      </g>
+    </svg>
     <div class="label">Article II</div>
     <h2>Of Principles</h2>
     <p class="precis">Declare your principles before meeting the candidates. A principle is a single claim you affirm or oppose, with a measured weight. Stable across elections. Edit when your thinking shifts; do not edit mid-race.</p>
@@ -721,11 +823,35 @@ footer{
       <button class="primary" onclick="addPrinciple()">Enter into the record</button>
     </div>
   </div>
+
+  <svg class="tailpiece" viewBox="0 0 160 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <g stroke="#16110b" stroke-width="0.8" fill="none">
+      <path d="M 5 16 Q 30 4 55 16 Q 80 28 80 16 Q 80 4 105 16 Q 130 28 155 16"/>
+      <circle cx="80" cy="16" r="2" fill="#7a1818" stroke="#7a1818"/>
+    </g>
+  </svg>
 </section>
 
 <!-- ARTICLE III — BALLOT -->
 <section class="panel" id="panel-ballot">
   <div class="article-head">
+    <!-- Emblem: ballot box -->
+    <svg class="article-emblem" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <g stroke="#16110b" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="10" y="22" width="44" height="32"/>
+        <line x1="22" y1="22" x2="42" y2="22" stroke-width="2.4"/>
+        <rect x="22" y="18" width="20" height="4" rx="0.5"/>
+        <line x1="14" y1="30" x2="14" y2="50" stroke-width="0.6" opacity="0.5"/>
+        <line x1="18" y1="30" x2="18" y2="50" stroke-width="0.6" opacity="0.5"/>
+        <line x1="46" y1="30" x2="46" y2="50" stroke-width="0.6" opacity="0.5"/>
+        <line x1="50" y1="30" x2="50" y2="50" stroke-width="0.6" opacity="0.5"/>
+        <!-- Folded paper sliding in -->
+        <path d="M 28 12 L 36 12 L 36 22 L 28 22 Z" fill="#f0e6cf"/>
+        <line x1="30" y1="15" x2="34" y2="15" stroke-width="0.6"/>
+        <line x1="30" y1="18" x2="34" y2="18" stroke-width="0.6"/>
+        <circle cx="32" cy="7" r="1.5" fill="#7a1818" stroke="#7a1818"/>
+      </g>
+    </svg>
     <div class="label">Article III</div>
     <h2>The Ballot</h2>
     <p class="precis">Enter your races and the candidates contesting each, drawn from your sample ballot. Skip uncontested races. Two minutes per race.</p>
@@ -752,11 +878,36 @@ footer{
   <div style="text-align:center;margin-top:48px">
     <button class="primary" onclick="setPhase('filter')">Proceed to Article IV</button>
   </div>
+
+  <svg class="tailpiece" viewBox="0 0 160 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <g stroke="#16110b" stroke-width="0.8" fill="none">
+      <line x1="0" y1="16" x2="60" y2="16"/>
+      <line x1="100" y1="16" x2="160" y2="16"/>
+      <path d="M 65 10 L 80 16 L 65 22 Z" fill="#16110b"/>
+      <path d="M 95 10 L 80 16 L 95 22 Z" fill="#7a1818" stroke="#7a1818"/>
+    </g>
+  </svg>
 </section>
 
 <!-- ARTICLE IV — FILTER -->
 <section class="panel" id="panel-filter">
   <div class="article-head">
+    <!-- Emblem: magnifying glass over ledger -->
+    <svg class="article-emblem" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <g stroke="#16110b" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Ledger -->
+        <rect x="14" y="14" width="32" height="42"/>
+        <line x1="20" y1="22" x2="40" y2="22" stroke-width="0.6"/>
+        <line x1="20" y1="28" x2="40" y2="28" stroke-width="0.6"/>
+        <line x1="20" y1="34" x2="40" y2="34" stroke-width="0.6"/>
+        <line x1="20" y1="40" x2="40" y2="40" stroke-width="0.6"/>
+        <line x1="20" y1="46" x2="32" y2="46" stroke-width="0.6"/>
+        <!-- Magnifying glass -->
+        <circle cx="44" cy="36" r="11" stroke-width="1.6" fill="#f0e6cf" fill-opacity="0.9"/>
+        <line x1="52" y1="44" x2="60" y2="52" stroke-width="2.2"/>
+        <circle cx="44" cy="36" r="3" fill="#7a1818" stroke="#7a1818"/>
+      </g>
+    </svg>
     <div class="label">Article IV</div>
     <h2>The Filter</h2>
     <p class="precis">For each candidate: consult the public record, then mark each principle as aligned, opposed, or unknown. The line will measure the result.</p>
@@ -771,11 +922,37 @@ footer{
     <span class="filter-progress" id="filter-progress"></span>
     <button class="btn-sm" onclick="nextCandidate()">Next candidate →</button>
   </div>
+
+  <svg class="tailpiece" viewBox="0 0 160 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <g stroke="#16110b" stroke-width="0.8" fill="none">
+      <line x1="10" y1="16" x2="55" y2="16"/>
+      <line x1="105" y1="16" x2="150" y2="16"/>
+      <path d="M 65 8 Q 80 22 95 8" stroke-width="1"/>
+      <path d="M 65 24 Q 80 10 95 24" stroke-width="1"/>
+      <circle cx="80" cy="16" r="2.5" fill="#7a1818" stroke="#7a1818"/>
+    </g>
+  </svg>
 </section>
 
 <!-- ARTICLE V — RECORD -->
 <section class="panel" id="panel-output">
   <div class="article-head">
+    <!-- Emblem: wax-seal / signature -->
+    <svg class="article-emblem" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <g stroke="#16110b" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Document -->
+        <path d="M 12 12 L 44 12 L 52 20 L 52 56 L 12 56 Z"/>
+        <path d="M 44 12 L 44 20 L 52 20"/>
+        <line x1="18" y1="28" x2="46" y2="28" stroke-width="0.6"/>
+        <line x1="18" y1="34" x2="46" y2="34" stroke-width="0.6"/>
+        <line x1="18" y1="40" x2="38" y2="40" stroke-width="0.6"/>
+        <!-- Wax seal -->
+        <circle cx="42" cy="50" r="7" fill="#7a1818" stroke="#7a1818"/>
+        <path d="M 40 47 L 44 53 M 44 47 L 40 53" stroke="#f0e6cf" stroke-width="0.8"/>
+        <!-- Ribbon -->
+        <path d="M 35 50 L 30 60 M 38 50 L 35 60" stroke="#7a1818" stroke-width="1"/>
+      </g>
+    </svg>
     <div class="label">Article V</div>
     <h2>The Marked Ballot</h2>
     <p class="precis">The line is laid; the candidates measured against it. Highest-aligned candidate per race is marked. Bring this with you to vote.</p>
@@ -790,6 +967,15 @@ footer{
     <button class="btn-sm" onclick="exportJson()">Export to file</button>
     <button class="btn-sm danger" onclick="resetAll()">Strike all entries</button>
   </div>
+
+  <svg class="tailpiece" viewBox="0 0 160 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <g stroke="#16110b" stroke-width="0.8" fill="none">
+      <line x1="0" y1="16" x2="70" y2="16"/>
+      <line x1="90" y1="16" x2="160" y2="16"/>
+      <path d="M 73 16 Q 80 10 87 16 Q 80 22 73 16 Z" fill="#7a1818" stroke="#7a1818"/>
+      <line x1="80" y1="8" x2="80" y2="24" stroke-width="0.6"/>
+    </g>
+  </svg>
 </section>
 
 </main>
