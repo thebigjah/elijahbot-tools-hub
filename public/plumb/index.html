@@ -48,109 +48,182 @@ body{min-height:100vh;position:relative;overflow-x:hidden}
 body::before{
   content:"";position:fixed;inset:0;pointer-events:none;z-index:1;
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>");
-  opacity:0.07;mix-blend-mode:multiply;
+  opacity:0.08;mix-blend-mode:multiply;
 }
 
 /* ============================================================
-   PLUMB LINE — actual vertical brass line through whole page
+   LAYOUT — asymmetric architectural grid
+   left margin: ruler ticks + Roman numerals + plumb thread
+   right body: content. Line lives at the column boundary.
    ============================================================ */
-.plumb-thread{
-  position:fixed;
-  top:0;left:50%;
-  width:1px;height:100%;
-  background:linear-gradient(to bottom,
-    transparent 0%,
-    var(--plumb-line) 4%,
-    var(--plumb-line) 92%,
-    transparent 100%);
-  transform:translateX(-50%);
-  opacity:0.35;
+:root{
+  --margin-w: 120px;
+}
+
+.architectural{
+  display:grid;
+  grid-template-columns: var(--margin-w) 1fr;
+  max-width:1080px;margin:0 auto;
+  min-height:100vh;
+  position:relative;z-index:3;
+}
+.margin-rail{
+  position:relative;
+  border-right:1px solid var(--rule);
+  background:transparent;
+}
+/* Ruler ticks down the rail */
+.margin-rail::before{
+  content:"";
+  position:absolute;
+  top:0;right:-1px;bottom:0;width:14px;
+  background-image:
+    linear-gradient(to bottom, var(--rule) 0, var(--rule) 1px, transparent 1px, transparent 24px),
+    linear-gradient(to bottom, var(--rule-strong) 0, var(--rule-strong) 1px, transparent 1px, transparent 120px);
+  background-size:14px 24px, 14px 120px;
+  background-position:right 0;
+  opacity:0.55;
   pointer-events:none;
+}
+/* Brass plumb thread riding the margin/body boundary */
+.plumb-thread{
+  position:absolute;
+  top:0;right:0;
+  width:2px;height:100%;
+  background:linear-gradient(to bottom,
+    var(--brass-bright) 0%,
+    var(--plumb-line) 6%,
+    var(--plumb-line) 94%,
+    transparent 100%);
+  opacity:0.55;
+  z-index:1;
+}
+.plumb-anchor{
+  position:absolute;top:-8px;right:-7px;
+  width:14px;height:14px;
+  background:var(--ink);
+  border-radius:50%;
+  box-shadow:0 1px 2px rgba(0,0,0,0.3);
   z-index:2;
 }
 .plumb-bob{
-  position:fixed;
-  bottom:38px;left:50%;
+  position:absolute;bottom:32px;right:-8px;
   width:16px;height:24px;
-  background:linear-gradient(180deg, var(--brass-bright) 0%, var(--brass) 60%, var(--ink-soft) 100%);
-  clip-path:polygon(50% 0%, 100% 25%, 80% 100%, 20% 100%, 0% 25%);
-  transform:translateX(-50%);
-  pointer-events:none;
+  background:linear-gradient(180deg, var(--brass-bright) 0%, var(--brass) 55%, var(--ink-soft) 100%);
+  clip-path:polygon(50% 0%, 100% 22%, 78% 100%, 22% 100%, 0% 22%);
   z-index:2;
-  filter:drop-shadow(0 2px 4px rgba(0,0,0,0.25));
+  filter:drop-shadow(0 3px 5px rgba(0,0,0,0.3));
+}
+
+/* Roman numeral marker — looms in the margin */
+.roman-marker{
+  position:sticky;
+  top:24px;
+  font-family:var(--display);
+  font-weight:500;font-style:italic;
+  font-size:140px;line-height:0.85;letter-spacing:-0.04em;
+  color:var(--brass);
+  opacity:0.18;
+  text-align:right;
+  padding:24px 22px 0 0;
+  pointer-events:none;
+  user-select:none;
+}
+
+/* Body column */
+.body-col{
+  padding:0 36px 0 44px;
+  position:relative;
+  min-width:0;
 }
 
 /* ============================================================
-   HEADER — masthead with plumb-line metaphor
+   HEADER — left-aligned editorial spread
    ============================================================ */
 header{
-  position:relative;z-index:3;
-  padding:64px 28px 36px;
-  text-align:center;
-  border-bottom:1px solid var(--rule);
+  padding:56px 0 36px;
+  position:relative;
 }
 .eyebrow{
   font-family:var(--mono);font-size:10px;letter-spacing:0.4em;text-transform:uppercase;
-  color:var(--brass);margin-bottom:18px;font-weight:500;
+  color:var(--brass);margin-bottom:14px;font-weight:500;
 }
 h1{
   font-family:var(--display);font-weight:500;font-style:italic;
-  font-size:78px;line-height:0.85;letter-spacing:-0.015em;
+  font-size:140px;line-height:0.82;letter-spacing:-0.03em;
   margin:0;color:var(--ink);
   font-variation-settings:"opsz" 144;
+  /* The headline pokes into the margin */
+  margin-left:-52px;
 }
 h1 .line{
-  display:block;font-style:normal;font-weight:600;font-size:26px;
-  letter-spacing:0.42em;text-transform:uppercase;color:var(--brass);
-  margin-top:8px;
+  display:block;
+  font-family:var(--display);font-style:normal;font-weight:600;
+  font-size:14px;letter-spacing:0.62em;text-transform:uppercase;
+  color:var(--brass);
+  margin-top:24px;margin-left:6px;
 }
 .tagline{
-  font-family:var(--body);font-style:italic;font-size:16px;
-  color:var(--ink-soft);max-width:480px;margin:22px auto 0;line-height:1.55;
+  font-family:var(--body);font-style:italic;font-weight:400;font-size:21px;
+  color:var(--ink-soft);max-width:580px;margin:28px 0 0;line-height:1.45;
 }
+
+/* Amos epigraph — pulled to the right side, architectural */
 .epigraph{
-  font-family:var(--display);font-style:italic;font-weight:500;
-  font-size:14.5px;color:var(--ink-faint);
-  margin:24px auto 0;max-width:480px;
-  padding-top:18px;border-top:1px solid var(--rule);
+  margin-top:46px;
+  padding:22px 26px 22px 28px;
+  border-top:1px solid var(--ink);
+  border-bottom:1px solid var(--ink);
+  background:transparent;
   position:relative;
+  max-width:620px;
+}
+.epigraph-body{
+  font-family:var(--display);font-style:italic;font-weight:500;
+  font-size:22px;color:var(--ink);line-height:1.4;
 }
 .epigraph cite{
-  display:block;font-family:var(--mono);font-style:normal;font-size:9.5px;
-  letter-spacing:0.22em;text-transform:uppercase;color:var(--brass);
-  margin-top:8px;font-weight:500;
+  display:block;
+  font-family:var(--mono);font-style:normal;font-size:9.5px;
+  letter-spacing:0.32em;text-transform:uppercase;color:var(--brass);
+  margin-top:14px;font-weight:600;
 }
 
 /* ============================================================
-   PHASE NAV — Roman numerals, careful spacing
+   PHASE NAV — sticky, left-aligned, Roman numerals
    ============================================================ */
 nav.phases{
   position:sticky;top:0;z-index:5;
   background:var(--paper);
-  border-bottom:1px solid var(--rule);
-  padding:0 16px;
-  display:flex;justify-content:center;gap:8px;
+  border-top:1px solid var(--ink);
+  border-bottom:1px solid var(--ink);
+  display:flex;gap:0;
   overflow-x:auto;
 }
 .phase-btn{
   background:transparent;border:none;cursor:pointer;
-  font-family:var(--display);font-weight:500;font-size:14px;
-  letter-spacing:0.08em;text-transform:uppercase;
+  font-family:var(--display);font-weight:500;font-size:13.5px;
+  letter-spacing:0.18em;text-transform:uppercase;
   color:var(--ink-faint);
-  padding:18px 14px;
-  border-bottom:2px solid transparent;
+  padding:18px 22px;
+  border-right:1px solid var(--rule);
   white-space:nowrap;transition:all .15s;
+  position:relative;
 }
 .phase-btn .num{
-  color:var(--brass);margin-right:8px;font-style:italic;font-weight:600;
+  color:var(--brass);margin-right:10px;font-style:italic;font-weight:600;font-size:15px;
 }
-.phase-btn:hover{color:var(--ink-soft)}
-.phase-btn.active{color:var(--ink);border-bottom-color:var(--brass)}
+.phase-btn:hover{color:var(--ink-soft);background:rgba(138, 109, 24, 0.05)}
+.phase-btn.active{color:var(--ink);background:var(--paper-shade)}
 .phase-btn.active .num{color:var(--brass-bright)}
+.phase-btn.active::after{
+  content:"";
+  position:absolute;left:0;right:0;bottom:-1px;height:3px;
+  background:var(--brass);
+}
 
 main{
-  position:relative;z-index:3;
-  max-width:740px;margin:0 auto;padding:40px 28px 90px;
+  padding:48px 0 90px;
 }
 
 /* ============================================================
@@ -158,14 +231,29 @@ main{
    ============================================================ */
 .panel-intro{
   font-family:var(--display);font-style:italic;
-  font-size:19px;color:var(--ink-soft);line-height:1.55;
-  margin-bottom:32px;padding-left:18px;border-left:2px solid var(--brass);
+  font-size:22px;color:var(--ink-soft);line-height:1.5;
+  margin-bottom:36px;
 }
+/* Massive drop cap on the intro */
+.panel-intro::first-letter{
+  font-family:var(--display);font-weight:600;font-style:italic;
+  font-size:88px;line-height:0.85;float:left;
+  color:var(--brass);
+  margin:6px 14px -8px 0;padding:0;
+}
+
 .section-h{
-  font-family:var(--display);font-weight:600;font-size:22px;
-  letter-spacing:0.04em;color:var(--ink);text-transform:uppercase;
-  margin:28px 0 14px;
-  padding-bottom:7px;border-bottom:1px solid var(--rule);
+  font-family:var(--display);font-weight:600;font-size:14px;
+  letter-spacing:0.32em;color:var(--brass);text-transform:uppercase;
+  margin:36px 0 14px;
+  padding-bottom:8px;border-bottom:1px solid var(--ink);
+  display:flex;align-items:baseline;gap:14px;
+}
+.section-h::before{
+  content:attr(data-num);
+  font-family:var(--display);font-style:italic;font-weight:500;
+  font-size:24px;color:var(--ink);letter-spacing:-0.02em;
+  text-transform:none;
 }
 .helper{
   font-family:var(--mono);font-size:11px;color:var(--ink-faint);
@@ -484,39 +572,62 @@ footer a:hover{color:var(--brass);border-bottom-color:var(--brass)}
 
 @media print{
   body{background:white;color:black}
-  body::before, .plumb-thread, .plumb-bob{display:none !important}
+  body::before, .margin-rail, .plumb-bob{display:none !important}
   header, nav.phases, .panel:not(#panel-output), button, .filter-nav, .export-row{display:none !important}
   #panel-output{display:block !important}
-  main{padding:0;max-width:100%}
+  .architectural{grid-template-columns:1fr;max-width:100%;margin:0}
+  .body-col{padding:0}
+  main{padding:0}
   .output-race{break-inside:avoid;border-color:#888;background:white}
   .confidence-band{background:#faf6f1;border-color:#aaa;color:black}
 }
 
-@media(max-width:620px){
-  header{padding:48px 22px 30px}
-  h1{font-size:56px}
-  h1 .line{font-size:20px;letter-spacing:0.32em}
-  main{padding:28px 20px 70px}
-  .phase-btn{padding:14px 9px;font-size:12.5px}
-  .filter-candidate{font-size:23px}
+@media(max-width:760px){
+  :root{--margin-w: 56px}
+  .roman-marker{font-size:64px;padding:14px 10px 0 0}
+  .body-col{padding:0 22px 0 28px}
+  header{padding:36px 0 24px}
+  h1{font-size:88px;margin-left:-28px}
+  h1 .line{font-size:11px;letter-spacing:0.5em;margin-top:14px}
+  .tagline{font-size:17px}
+  .epigraph-body{font-size:17px}
+  .panel-intro{font-size:18px}
+  .panel-intro::first-letter{font-size:64px}
+  main{padding:32px 0 70px}
+  .phase-btn{padding:14px 12px;font-size:11.5px;letter-spacing:0.14em}
+  .phase-btn .num{font-size:12px;margin-right:7px}
+  .filter-candidate{font-size:22px}
   .filter-card{padding:18px}
   .filter-score-val{font-size:34px}
   .race-card{padding:14px}
-  .plumb-bob{bottom:24px}
+  .plumb-bob{bottom:24px;width:14px;height:20px}
+}
+@media(max-width:480px){
+  :root{--margin-w: 40px}
+  .roman-marker{font-size:48px;padding:10px 8px 0 0}
+  .body-col{padding:0 18px 0 20px}
+  h1{font-size:64px;margin-left:-20px}
 }
 </style>
 </head>
 <body>
 
-<div class="plumb-thread" aria-hidden="true"></div>
-<div class="plumb-bob" aria-hidden="true"></div>
+<div class="architectural">
+  <div class="margin-rail" id="margin-rail">
+    <div class="plumb-anchor" aria-hidden="true"></div>
+    <div class="plumb-thread" aria-hidden="true"></div>
+    <div class="plumb-bob" aria-hidden="true"></div>
+    <div class="roman-marker" id="roman-marker">I</div>
+  </div>
+
+  <div class="body-col">
 
 <header>
   <div class="eyebrow">Principled voting · any election, anywhere</div>
-  <h1>Plumb<span class="line">— the line —</span></h1>
+  <h1>Plumb<span class="line">— the line is set —</span></h1>
   <p class="tagline">Set your principles first. Walk the ballot. Let the line do the deciding.</p>
   <div class="epigraph">
-    "Behold, I am setting a plumb line in the midst of my people…"
+    <div class="epigraph-body">"Behold, I am setting a plumb line in the midst of my people…"</div>
     <cite>Amos 7:8 · the universal metaphor</cite>
   </div>
 </header>
@@ -534,7 +645,7 @@ footer a:hover{color:var(--brass);border-bottom-color:var(--brass)}
 <section class="panel active" id="panel-prep">
   <p class="panel-intro">Before you research candidates, make sure you can vote. These are universal starting points — they route to your own state's official sites.</p>
 
-  <h2 class="section-h">Are you registered?</h2>
+  <h2 class="section-h" data-num="i">Are you registered?</h2>
   <div class="action-card">
     <div class="action-card-title">Check your registration status</div>
     <div class="action-card-body">
@@ -542,7 +653,7 @@ footer a:hover{color:var(--brass);border-bottom-color:var(--brass)}
     </div>
   </div>
 
-  <h2 class="section-h">Find your sample ballot</h2>
+  <h2 class="section-h" data-num="ii">Find your sample ballot</h2>
   <div class="action-card">
     <div class="action-card-title">Your state's Secretary of State</div>
     <div class="action-card-body">
@@ -550,7 +661,7 @@ footer a:hover{color:var(--brass);border-bottom-color:var(--brass)}
     </div>
   </div>
 
-  <h2 class="section-h">Universal research sources</h2>
+  <h2 class="section-h" data-num="iii">Universal research sources</h2>
   <div class="action-card">
     <div class="action-card-title">Sources Plumb will deep-link to per candidate</div>
     <div class="action-card-body">
@@ -563,7 +674,7 @@ footer a:hover{color:var(--brass);border-bottom-color:var(--brass)}
     </div>
   </div>
 
-  <h2 class="section-h">A word on partial research</h2>
+  <h2 class="section-h" data-num="iv">A word on partial research</h2>
   <p class="panel-intro" style="margin-top:14px">
     Don't skip voting because you can't research everything. If your principles are clear, a 30%-research vote is still a 100%-principled vote. Plumb's job is to stabilize your principles so any amount of research time still produces a values-aligned ballot.
   </p>
@@ -580,7 +691,7 @@ footer a:hover{color:var(--brass);border-bottom-color:var(--brass)}
     Examples: "Government should provide a safety net for the elderly." "Abortion should be legal in the first trimester." "The death penalty is wrong." Be specific. Vague principles produce vague filtering.
   </div>
 
-  <h2 class="section-h">Your principles <span style="font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:0.08em;margin-left:8px;text-transform:uppercase" id="principle-count"></span></h2>
+  <h2 class="section-h" data-num="i">Your principles <span style="font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);letter-spacing:0.12em;margin-left:auto;text-transform:uppercase" id="principle-count"></span></h2>
   <div class="principle-list" id="principle-list"></div>
 
   <div class="add-principle">
@@ -668,6 +779,10 @@ footer a:hover{color:var(--brass);border-bottom-color:var(--brass)}
   <div class="credit">— purcellventures.co —</div>
 </footer>
 
+  </div>
+</div>
+
+
 <script>
 const STORE_KEY = 'plumb-v0';
 function load(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch(e){ return {}; } }
@@ -682,11 +797,14 @@ function getStore(){
 function setStore(s){ save(s); }
 const state = { newPos: null, newWeight: 5, filterCursor: null };
 
+const ROMAN_MAP = { prep:'I', principles:'II', ballot:'III', filter:'IV', output:'V' };
 function setPhase(p){
   ['prep','principles','ballot','filter','output'].forEach(ph => {
     document.getElementById('panel-'+ph).classList.toggle('active', ph===p);
     document.querySelector(`.phase-btn[data-phase="${ph}"]`).classList.toggle('active', ph===p);
   });
+  const rm = document.getElementById('roman-marker');
+  if(rm) rm.textContent = ROMAN_MAP[p] || 'I';
   if(p === 'principles') renderPrinciples();
   if(p === 'ballot') renderBallot();
   if(p === 'filter') renderFilter();
