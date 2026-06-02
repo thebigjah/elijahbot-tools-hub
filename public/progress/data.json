@@ -1,14 +1,28 @@
 {
-  "updated": "2026-05-19T00:05:00Z",
-  "updated_human": "2026-05-18 evening workshop — 8 ships in ~3h: Longitude + Stage Fright (v0.1) + Park Waits + Personal OS + Magic Closet + Smart Calendar + PickIt WIP+punchlist",
+  "updated": "2026-06-02T19:00:00Z",
+  "updated_human": "2026-06-02 audit — added Folio (Phase A+B shipped), Returns Void (NASB pass), Hesed (monetization spec drafted), PV Social (live ops console), Grans Supplements. Plus voxel-reference card. Plus fixed JSON syntax bug that was breaking this page.",
   "sections": [
+    {
+      "title": "Shipped this past week",
+      "blurb": "Built since the last progress update on 2026-05-18.",
+      "projects": [
+        { "name": "Folio (Goodreads competitor)", "progress": 85, "live": true, "note": "Phase A + B shipped 2026-06-01/02 to https://folio-now.vercel.app. Next.js 16 + Tailwind 4 + Supabase. Phase A: magic-link auth, profiles, list CRUD with drag-reorder, book search via Open Library + Google Books, auto-generated OG share cards via Satori, Bodoni italic display. Phase B: follow, trending materialized view, likes (tribe-signal not rating), flat comments, reading status, reading sessions, Bookshop affiliate (verified pending), homepage auth routing, /feed (page-load no realtime). 22 commits, 9 tests passing, daily trending refresh cron. Phase C deferred: book pages with reviews, AI list-builder, year-in-review wrapped, push notifications." },
+        { "name": "Returns Void (prayer ledger)", "progress": 90, "live": true, "note": "Live at https://returns-void.vercel.app. Daily prayer ledger rooted in Isaiah 55:11. Editorial redesign shipped 2026-06-01: rubricated initials, sepia marginalia, fleuron dividers, folio numbering, drop caps, leaf cards with ribbon margin. NASB translation pass complete across all 15 canonical verses + Lord's Prayer + Aaronic Blessing + Magnificat + /about Isaiah passage. Audio recordings now save with person-name in filename (mom-2026-06-01.webm). Open work: voice notes UX polish, year-in-prayer view enhancements." },
+        { "name": "Hesed (caregiver supplement ledger)", "progress": 80, "live": true, "note": "Live at https://hesed-zeta.vercel.app. Generalized SaaS evolution of the Kiki/Gran pilot. Multi-tenant + multi-patient + magic-link auth + AI chatbot + estate-ledger aesthetic. Hebrew /ˈhɛ.sɛd/ = faithful love between equals. Mobile wordmark bug fixed (was breaking on phone — letters wrapping to own lines). Monetization spec drafted 2026-06-02 at docs/superpowers/specs/2026-06-02-hesed-monetization-design.md: multi-channel affiliate (iHerb + Amazon + Vitacost) with delivered-price comparison, per-serving normalization, daily cached prices, active email + push delivery on critical bottles, /admin click-tracking dashboard. Ready for implementation." },
+        { "name": "PV Social (IG ops console)", "progress": 80, "live": true, "note": "Live at https://pv-social.vercel.app. Internal ops console for @purcellventures + @elijahbot Instagram. Scheduler + AI composer + reply review with sentinel filter + kill switch + audit log + privacy blocklist. Daily briefing cron locked (was firing 20× — fixed with x-vercel-cron header gate). NASB swap on the 15 morning-brief verses. Vault Review (Tinder-swipe content review) + Voxel Studio + Note-to-ElijahBot phone capture all shipped. Meta Graph API publish endpoint still stubbed pending FB Dev setup." },
+        { "name": "Grans Supplements (Kiki pilot)", "progress": 95, "live": true, "note": "Live at https://grans-supplements.vercel.app. Kiki's PILOT version of Hesed for Gran (Robert) — 25 numbered bottles, dose checklists, reorder alerts, Supabase synced, AI chatbot. Intentionally kept untouched as the reference implementation while Hesed evolves the SaaS." },
+        { "name": "Voxel modeling reference card", "progress": 100, "live": true, "note": "Live at /voxel-reference/. Palette swatches with locked hex codes from face-reference.md, turnaround templates (front/side/3-q) as SVG overlays on 48×64 grid, anchor coordinates table for every feature, recognition keys, emotional variants list, workflow. Print-friendly. Sits beside MagicaVoxel during modeling. Linked from Voxel Studio's .vox export button." },
+        { "name": "Workshop skill (autonomous mode)", "progress": 100, "live": true, "note": "Bottled at ~/.claude/skills/workshop/SKILL.md. Invokable as /workshop. Encodes autonomy rules: no chat-question gates, fill the entire timeframe, stop while ahead in late phase, productive > decorative, the opening 'what will be DIFFERENT in his life when he opens his phone' question, the 4-tier self-direction framework." }
+      ]
+    },
     {
       "title": "Personal AI & accountability",
       "blurb": "The systems that compound on themselves.",
       "projects": [
-        { "name": "elijahbot-tools-hub", "progress": 100, "live": true, "note": "Live at https://elijahbot-tools-hub.vercel.app. PWA-installable. Editorial redesign, /go/ affiliate redirects, /progress/ tool added today." },
+        { "name": "elijahbot-tools-hub", "progress": 100, "live": true, "note": "Live at https://elijahbot-tools-hub.vercel.app. PWA-installable. Editorial redesign, /go/ affiliate redirects, /progress/ self-audit page (this one), /voxel-reference/ modeling sheet." },
         { "name": "Refresh (elijahbot-refresh)", "progress": 90, "live": true, "note": "Live in production. Editorial redesign shipped. v0.2 features (cal/tasks wiring, push notifications) pending." },
         { "name": "elibot-overlay", "progress": 70, "note": "Lockout system works. Codeword leaked. Idle-timeout daemon not built." },
+        { "name": "elijahbot-app (native master)", "progress": 90, "note": "Expo project complete with OTA updates. Tile list now includes Folio + Returns Void + Hesed (added 2026-06-01). Needs `eas-cli init` + first build (~15 min) to ship updated APK to testers." },
         { "name": "Personal OS (state-router)", "progress": 40, "note": "v0.05 built 2026-05-18 at ~/personal-os/index.html. Routes 27 tools based on time + state + intention. NOT yet deployed pending Elijah's go-ahead." },
         { "name": "persona-ai", "progress": 25, "note": "Original flagship. Stalled since late 2025. 'Where do you want to pick up?'" }
       ]
@@ -19,7 +33,8 @@
       "projects": [
         { "name": "youtube-pipeline", "progress": 97, "note": "v0.6: hook grader, scheduler resilience, channel dashboard. 6 channels scaffolded. Code-complete. Gated only on YouTube OAuth + Amazon Associates." },
         { "name": "wallet-tracker", "progress": 95, "note": "v0.4: backtest framework, parameter sweep, Solana via Helius, token risk scoring, multi-channel alerts, charts dashboard. Gated only on .env keys." },
-        { "name": "elijahbot-app (native master)", "progress": 90, "note": "Expo project complete with OTA updates. Needs `eas-cli init` + first build (15 min)." }
+        { "name": "Folio Bookshop affiliate (verified pending)", "progress": 50, "live": true, "note": "Bookshop.org affiliate ID 'folio' registered + buy buttons live on every list/book in Folio. Verification requested 2026-06-02; Bookshop confirms within 24-48h. Once verified, commissions flow on every Folio book purchase." },
+        { "name": "Hesed monetization (multi-channel affiliate)", "progress": 25, "note": "Spec drafted 2026-06-02 with iHerb + Amazon + Vitacost auto-detection, delivered-price comparison, active email + push delivery, /admin click tracking. Implementation plan + build pending — likely one workshop block. Requires iHerb + Amazon + Vitacost affiliate sign-ups." }
       ]
     },
     {
@@ -37,34 +52,34 @@
     },
     {
       "title": "Apps (each will be its own product someday)",
-      "blurb": "The six apps that live in the master app, not the website.",
+      "blurb": "The apps that live in the master app, not the website.",
       "projects": [
-        { "name": "Echo (legacy stories)", "progress": 90, "live": true, "note": "Web shipped with AUDIO RECORDING per question (Web Audio + MediaRecorder + IndexedDB blob storage) + chapter timing + markdown/archive export. Genuinely deep — built for Kiki interview." },
+        { "name": "Echo (legacy stories)", "progress": 90, "live": true, "note": "Web shipped with AUDIO RECORDING per question (Web Audio + MediaRecorder + IndexedDB blob storage) + chapter timing + markdown/archive export. Genuinely deep — built for Kiki interview. NASB pass on 9 chapter scriptures applied 2026-06-01." },
         { "name": "Steal My Hangout", "progress": 90, "live": true, "note": "Atlanta-seeded + roll-dice + map view + I-did-this journal + share-via-hash + 'did this with' tagging." },
-        { "name": "Momentum (one intention/day)", "progress": 90, "live": true, "note": "Daily intention + scripture rotation + categories + 365-day heatmap + evening nudge + share-via-hash." },
+        { "name": "Momentum (one intention/day)", "progress": 90, "live": true, "note": "Daily intention + scripture rotation + categories + 365-day heatmap + evening nudge + share-via-hash. NASB pass on 14 scripture rotation applied 2026-06-01." },
         { "name": "Rival (self-competition)", "progress": 90, "live": true, "note": "Metric tracker + goal lines + sparklines + heatmap per metric + CSV export + archive when seasons change." },
         { "name": "Era (historical year sim)", "progress": 85, "live": true, "note": "12 hand-curated years 1955-2020 + headlines/charts/films/tech/culture/quote per year + year picker + share-via-hash." },
         { "name": "Prayer Walk (mobile, native)", "progress": 75, "note": "Expo native app with GPS heatmap. APK installable. Pending Play Store + App Store submission." },
         { "name": "Longitude (slow letters)", "progress": 30, "live": true, "note": "v0.05 shipped 2026-05-18 to /longitude/. URL-encoded sealed payloads, no server. Roadmap: random-stranger delivery pool (needs backend) for v0.1." },
-        { "name": "Stage Fright (voice mirror)", "progress": 55, "live": true, "note": "v0.1 shipped 2026-05-18 to /stage-fright/. 20-sec record + WPM/filler/volume + AUTOCORRELATION PITCH DETECTION vs. calm baseline. Diagnoses: F0 elevation = vocal-fold tension (yawn+hum prescription), pitch CV swings, monotone, fast/slow talking, filler density. Built for Reza call use tomorrow. Roadmap: offline PWA + native iOS." },
+        { "name": "Stage Fright (voice mirror)", "progress": 55, "live": true, "note": "v0.1 shipped 2026-05-18 to /stage-fright/. 20-sec record + WPM/filler/volume + autocorrelation pitch detection vs. calm baseline. Built for the Reza call (since done 5/20). Roadmap: offline PWA + native iOS." },
         { "name": "Park Waits (queue times)", "progress": 30, "live": true, "note": "v0.05 shipped 2026-05-18 to /park-waits/. Live data from queue-times.com for 15 parks incl. Six Flags Over Georgia. Sort, filter, summary cards, 60s auto-refresh." },
-        { "name": "Magic Closet", "progress": 35, "live": true, "note": "v0.05 shipped 2026-05-18 to /magic-closet/. Wardrobe catalog with IndexedDB photo storage (Blob, no cloud). Tags: type/color/seasons/formality. Outfit picker weighted by recency (60d cap), weather→season mapping. Replaces Apr Expo scaffold. Roadmap: AI BYOK outfit critique." },
-        { "name": "Smart Calendar", "progress": 40, "live": true, "note": "v0.05 shipped 2026-05-18 to /smart-calendar/. Rich per-event context (bio/prep/topics/watch-for) — 4 fields where Google Calendar gives one. .ics paste-in parser, datetime-local input, edit/delete. Seeded with the Reza call as a worked example. Roadmap: AI BYOK auto-context, two-way Google sync, ntfy reminders." }
+        { "name": "Magic Closet", "progress": 35, "live": true, "note": "v0.05 shipped 2026-05-18 to /magic-closet/. Wardrobe catalog with IndexedDB photo storage (Blob, no cloud). Tags: type/color/seasons/formality. Outfit picker weighted by recency (60d cap), weather→season mapping. Roadmap: AI BYOK outfit critique." },
+        { "name": "Smart Calendar", "progress": 40, "live": true, "note": "v0.05 shipped 2026-05-18 to /smart-calendar/. Rich per-event context (bio/prep/topics/watch-for) — 4 fields where Google Calendar gives one. .ics paste-in parser, datetime-local input, edit/delete. Roadmap: AI BYOK auto-context, two-way Google sync, ntfy reminders." },
         { "name": "PickIt (Play Store)", "progress": 70, "note": "App code complete on app-v1-wip-2026-05-18 branch (preserved 2026-05-18). Blockers before submission: $25 Console fee, service account JSON, RLS verification, AAB build, internal test track. See ~/pickit/SHIP-PUNCHLIST.md." }
       ]
     },
     {
       "title": "Faith & discipline tools",
-      "blurb": "Built for one specific kind of life.",
+      "blurb": "Built for one specific kind of life. NASB throughout (devotional translation per Elijah's 2026-06-01 preference).",
       "projects": [
-        { "name": "Verse Vault", "progress": 90, "live": true, "note": "SM-2 spaced repetition (already built — interval days, ease factor, next-due scheduling). 5-level hide + 10 seeded verses." },
-        { "name": "Prayer Journal (ACTS)", "progress": 85, "live": true, "note": "Daily entries + answered log + 365-day search + JSON export/import. Wants encrypted cloud backup (v0.3)." },
+        { "name": "Verse Vault", "progress": 90, "live": true, "note": "SM-2 spaced repetition (already built — interval days, ease factor, next-due scheduling). 5-level hide + 10 seeded verses. NASB pass on all 10 presets applied 2026-06-01." },
+        { "name": "Prayer Journal (ACTS)", "progress": 85, "live": true, "note": "Daily entries + answered log + 365-day search + JSON export/import. NASB pass on 20 prayer verses applied 2026-06-01. Wants encrypted cloud backup (v0.3)." },
         { "name": "Examen (Ignatian)", "progress": 92, "live": true, "note": "v0.2 — added Stats tab with total kept + streak + 30-day heatmap + avg depth + gratitude word cloud. Plus five-movement + history search + auto-save + JSON export/import." },
-        { "name": "Counter (apologetics)", "progress": 90, "live": true, "note": "18 topics (not 12), each with steel-manned objection + 4 expert paraphrases + scripture refs. Local response storage. v0.3+ would add per-user-weak-topic spaced repetition." },
+        { "name": "Counter (apologetics)", "progress": 90, "live": true, "note": "18 topics (not 12), each with steel-manned objection + 4 expert paraphrases + scripture refs. Local response storage. v0.3+ would add per-user-weak-topic spaced repetition. (Apologetics tool — Elijah's NRSVUE preference will apply to future scripture additions.)" },
         { "name": "Worship Set", "progress": 80, "live": true, "note": "Setlist planner + key flow + BPM viz + library save + markdown export. Wants band collaboration (v0.2)." },
         { "name": "Sermon Notes", "progress": 90, "live": true, "note": "Sunday capture + church/preacher autocomplete + history search + book-extraction stats + JSON+Markdown export." },
-        { "name": "Solomon (daily wisdom)", "progress": 92, "live": true, "note": "v0.2 — added Stats tab: favorites count, reflections count, total words written, % of corpus touched, tradition-breakdown bar chart, most-recent reflection display. Plus 50+ quotes / 4 traditions / favorites / reflection per quote / search." },
-        { "name": "Calvinism Test (TULIP)", "progress": 80, "live": true, "note": "Self-assessment 5 points + scripture from both sides + tier-based reading recs." }
+        { "name": "Solomon (daily wisdom)", "progress": 92, "live": true, "note": "v0.2 — added Stats tab: favorites count, reflections count, total words written, % of corpus touched, tradition-breakdown bar chart, most-recent reflection display. NASB pass on 13 Proverbs entries applied 2026-06-01." },
+        { "name": "Calvinism Test (TULIP)", "progress": 80, "live": true, "note": "Self-assessment 5 points + scripture from both sides + tier-based reading recs. (Apologetics tool — NRSVUE for future scripture.)" }
       ]
     },
     {
@@ -75,7 +90,7 @@
         { "name": "Brag Doc", "progress": 85, "live": true, "note": "Wins log + dark-day shuffler + 5 entry types (shipped/kind-word/award/skill/metric) + resume export with type/date filter." },
         { "name": "Friendship Map", "progress": 92, "live": true, "note": "v0.2 — added Map view: SVG concentric tier rings, dots sized by contact-recency, opacity by overdue-ratio, click-to-filter. Plus 4-tier CRM + surface + per-person history." },
         { "name": "Future Self", "progress": 85, "live": true, "note": "Sealed letters with countdown + date-locked release + quick-pick release buttons (UA move-in / +30d / +1yr) + sealed/ready/opened states." },
-        { "name": "Reading Log", "progress": 85, "live": true, "note": "Personal Goodreads — reading/finished/wishlist + 5-star ratings + stats by author and month + CSV/JSON export." },
+        { "name": "Reading Log (personal)", "progress": 85, "live": true, "note": "Single-file HTML personal Goodreads — reading/finished/wishlist + 5-star ratings + stats by author and month + CSV/JSON export. Evolved into Folio (the social/Goodreads-killer version) — see Shipped this past week." },
         { "name": "Weekly Skill", "progress": 85, "live": true, "note": "42 curated skills + ISO-week auto-rotation + Hannah-friendly filter + custom skill add + mastered-list share." },
         { "name": "Wisdom Prep", "progress": 80, "live": true, "note": "5-min mentor prep tool. Outputs opener + 7 customized questions + closing move + post-call template." }
       ]
@@ -86,7 +101,7 @@
       "projects": [
         { "name": "Milestone (countdowns)", "progress": 80, "live": true, "note": "v0.1. Pre-seeded with 20 real upcoming dates." },
         { "name": "Dorm Pack", "progress": 80, "live": true, "note": "v0.1. 130+ UA-specific items." },
-        { "name": "Day Sheet", "progress": 80, "live": true, "note": "v0.1. Printable daily planner with rotating scripture." }
+        { "name": "Day Sheet", "progress": 80, "live": true, "note": "v0.1. Printable daily planner with rotating scripture (NASB)." }
       ]
     },
     {
@@ -125,7 +140,7 @@
       "projects": [
         { "name": "pickit", "progress": 90, "live": true, "note": "Already on Play Store." },
         { "name": "hannah-tricks", "progress": 75, "live": true, "note": "Hannah's first app. PWA shipped." },
-        { "name": "magic-closet", "progress": 10, "note": "Expo scaffold, never developed past init." }
+        { "name": "magic-closet (Expo scaffold)", "progress": 10, "note": "Expo native scaffold, never developed past init. Superseded by the /magic-closet/ web version in Apps section." }
       ]
     },
     {
