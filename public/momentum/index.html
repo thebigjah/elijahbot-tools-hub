@@ -409,21 +409,22 @@ const CATEGORIES = [
 ];
 const CAT_MAP = Object.fromEntries(CATEGORIES.map(c => [c.id, c]));
 
+// Translation: NASB (per Elijah's preference for devotional contexts).
 const SCRIPTURES = [
-  { text: "Let your 'yes' be 'yes,' and your 'no,' 'no.'", ref: "Matthew 5:37" },
-  { text: "Whatever you do, work at it with all your heart, as working for the Lord.", ref: "Colossians 3:23" },
-  { text: "The plans of the diligent lead to profit as surely as haste leads to poverty.", ref: "Proverbs 21:5" },
-  { text: "Commit to the Lord whatever you do, and he will establish your plans.", ref: "Proverbs 16:3" },
-  { text: "Whoever can be trusted with very little can also be trusted with much.", ref: "Luke 16:10" },
-  { text: "Be still, and know that I am God.", ref: "Psalm 46:10" },
-  { text: "He who began a good work in you will carry it on to completion.", ref: "Philippians 1:6" },
-  { text: "Do not despise these small beginnings, for the Lord rejoices to see the work begin.", ref: "Zechariah 4:10" },
-  { text: "Let us not grow weary of doing good, for in due season we will reap, if we do not give up.", ref: "Galatians 6:9" },
-  { text: "Trust in the Lord with all your heart, and do not lean on your own understanding.", ref: "Proverbs 3:5" },
-  { text: "Run in such a way as to get the prize.", ref: "1 Corinthians 9:24" },
-  { text: "His mercies are new every morning; great is your faithfulness.", ref: "Lamentations 3:23" },
-  { text: "I have fought the good fight, I have finished the race, I have kept the faith.", ref: "2 Timothy 4:7" },
-  { text: "We are God's handiwork, created in Christ Jesus to do good works.", ref: "Ephesians 2:10" },
+  { text: "But make sure your statement is, 'Yes, yes' or 'No, no'.", ref: "Matthew 5:37 (NASB)" },
+  { text: "Whatever you do, do your work heartily, as for the Lord and not for people.", ref: "Colossians 3:23 (NASB)" },
+  { text: "The plans of the diligent certainly lead to advantage, But everyone who is in a hurry certainly comes to poverty.", ref: "Proverbs 21:5 (NASB)" },
+  { text: "Commit your works to the LORD, And your plans will be established.", ref: "Proverbs 16:3 (NASB)" },
+  { text: "The one who is faithful in a very little thing is also faithful in much.", ref: "Luke 16:10 (NASB)" },
+  { text: "Stop striving and know that I am God.", ref: "Psalm 46:10 (NASB)" },
+  { text: "He who began a good work among you will complete it by the day of Christ Jesus.", ref: "Philippians 1:6 (NASB)" },
+  { text: "For who has shown contempt for the day of small things?", ref: "Zechariah 4:10 (NASB)" },
+  { text: "Let's not become discouraged in doing good, for in due time we will reap, if we do not become weary.", ref: "Galatians 6:9 (NASB)" },
+  { text: "Trust in the LORD with all your heart and do not lean on your own understanding.", ref: "Proverbs 3:5 (NASB)" },
+  { text: "Run in such a way that you may win.", ref: "1 Corinthians 9:24 (NASB)" },
+  { text: "They are new every morning; Great is Your faithfulness.", ref: "Lamentations 3:23 (NASB)" },
+  { text: "I have fought the good fight, I have finished the course, I have kept the faith.", ref: "2 Timothy 4:7 (NASB)" },
+  { text: "For we are His workmanship, created in Christ Jesus for good works.", ref: "Ephesians 2:10 (NASB)" },
 ];
 const todayKey = () => {
   const d = new Date();

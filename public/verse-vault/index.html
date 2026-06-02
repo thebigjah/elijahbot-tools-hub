@@ -345,17 +345,18 @@
 
 const KEY = 'versevault.v1';
 
+// Translation: NASB (devotional/memorization context per Elijah's preference).
 const PRESETS = [
-  { ref: 'Romans 8:28', text: 'And we know that in all things God works for the good of those who love him, who have been called according to his purpose.', tag: 'comfort' },
-  { ref: 'Matthew 5:10', text: 'Blessed are those who are persecuted because of righteousness, for theirs is the kingdom of heaven.', tag: 'identity' },
-  { ref: 'Romans 1:16', text: 'For I am not ashamed of the gospel, because it is the power of God that brings salvation to everyone who believes.', tag: 'identity' },
-  { ref: 'Proverbs 3:5-6', text: 'Trust in the Lord with all your heart and lean not on your own understanding; in all your ways submit to him, and he will make your paths straight.', tag: 'trust' },
-  { ref: 'Psalm 139:13', text: 'For you created my inmost being; you knit me together in my mother\'s womb.', tag: 'identity' },
-  { ref: 'Philippians 4:6-7', text: 'Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God. And the peace of God, which transcends all understanding, will guard your hearts and your minds in Christ Jesus.', tag: 'anxiety' },
-  { ref: 'Joshua 1:9', text: 'Have I not commanded you? Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go.', tag: 'courage' },
-  { ref: 'James 1:2-3', text: 'Consider it pure joy, my brothers and sisters, whenever you face trials of many kinds, because you know that the testing of your faith produces perseverance.', tag: 'suffering' },
-  { ref: 'Proverbs 25:2', text: 'It is the glory of God to conceal a thing: but the honour of kings is to search out a matter.', tag: 'wisdom' },
-  { ref: '2 Timothy 1:7', text: 'For the Spirit God gave us does not make us timid, but gives us power, love and self-discipline.', tag: 'courage' },
+  { ref: 'Romans 8:28 (NASB)', text: 'And we know that God causes all things to work together for good to those who love God, to those who are called according to His purpose.', tag: 'comfort' },
+  { ref: 'Matthew 5:10 (NASB)', text: 'Blessed are those who have been persecuted for the sake of righteousness, for theirs is the kingdom of heaven.', tag: 'identity' },
+  { ref: 'Romans 1:16 (NASB)', text: 'For I am not ashamed of the gospel, for it is the power of God for salvation to everyone who believes, to the Jew first and also to the Greek.', tag: 'identity' },
+  { ref: 'Proverbs 3:5-6 (NASB)', text: 'Trust in the LORD with all your heart and do not lean on your own understanding. In all your ways acknowledge Him, and He will make your paths straight.', tag: 'trust' },
+  { ref: 'Psalm 139:13 (NASB)', text: 'For You created my innermost parts; You wove me in my mother\'s womb.', tag: 'identity' },
+  { ref: 'Philippians 4:6-7 (NASB)', text: 'Do not be anxious about anything, but in everything by prayer and pleading with thanksgiving let your requests be made known to God. And the peace of God, which surpasses all comprehension, will guard your hearts and minds in Christ Jesus.', tag: 'anxiety' },
+  { ref: 'Joshua 1:9 (NASB)', text: 'Have I not commanded you? Be strong and courageous! Do not be terrified nor dismayed, for the LORD your God is with you wherever you go.', tag: 'courage' },
+  { ref: 'James 1:2-3 (NASB)', text: 'Consider it all joy, my brothers and sisters, when you encounter various trials, knowing that the testing of your faith produces endurance.', tag: 'suffering' },
+  { ref: 'Proverbs 25:2 (NASB)', text: 'It is the glory of God to conceal a matter, But the glory of kings is to search out a matter.', tag: 'wisdom' },
+  { ref: '2 Timothy 1:7 (NASB)', text: 'For God has not given us a spirit of timidity, but of power and love and discipline.', tag: 'courage' },
 ];
 
 let state = load();
