@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Voxel Reference — @elijahbot character spec</title>
+<meta name="description" content="Modeling reference sheet for the @elijahbot voxel character. Palette, anchor coordinates, turnaround templates. Built for use alongside MagicaVoxel." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0a0604;
+    --paper: #f4eddf;
+    --ink: #1a2332;
+    --brass: #a8804b;
+    --brass-light: #c2a173;
+    --rule: rgba(244, 237, 223, 0.18);
+    --muted: rgba(244, 237, 223, 0.55);
+    --display: "Fraunces", Georgia, serif;
+    --mono: "JetBrains Mono", monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--paper);
+    font-family: var(--display);
+    line-height: 1.55;
+    min-height: 100vh;
+    padding: 2.5rem 1.5rem 5rem;
+  }
+  .container { max-width: 960px; margin: 0 auto; }
+
+  header { text-align: center; margin-bottom: 3rem; border-bottom: 1px solid var(--rule); padding-bottom: 2rem; }
+  .eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.4em; color: var(--brass); text-transform: uppercase; margin-bottom: 1rem; }
+  h1 { font-family: var(--display); font-style: italic; font-weight: 300; font-size: clamp(40px, 7vw, 72px); line-height: 1; }
+  .subtitle { font-style: italic; color: var(--muted); margin-top: 0.75rem; font-size: 1.1rem; }
+
+  h2 { font-family: var(--display); font-weight: 400; font-size: clamp(24px, 3vw, 32px); margin: 3rem 0 1rem; border-bottom: 1px solid var(--rule); padding-bottom: 0.5rem; }
+  h2 .roman { font-family: var(--display); font-style: italic; font-size: 0.6em; color: var(--brass); margin-right: 0.6em; letter-spacing: 0.2em; }
+  h3 { font-family: var(--display); font-weight: 400; font-size: 1.2rem; margin: 1.5rem 0 0.5rem; color: var(--brass-light); }
+  p { margin-bottom: 1rem; }
+  ul { list-style: none; margin: 0.5rem 0 1rem; }
+  ul li { padding-left: 1.2em; position: relative; margin-bottom: 0.3rem; }
+  ul li::before { content: "·"; position: absolute; left: 0; color: var(--brass); font-weight: bold; }
+
+  /* Palette grid */
+  .palette { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
+  .swatch { background: var(--paper); color: var(--ink); padding: 0.75rem 0.9rem; border-radius: 2px; }
+  .swatch-color { width: 100%; height: 56px; border-radius: 2px; margin-bottom: 0.5rem; border: 1px solid rgba(0, 0, 0, 0.1); }
+  .swatch-hex { font-family: var(--mono); font-size: 12px; font-weight: 500; }
+  .swatch-label { font-size: 11px; color: rgba(26, 35, 50, 0.7); font-style: italic; margin-top: 2px; }
+
+  /* Grid templates */
+  .turnaround { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin: 1.5rem 0; }
+  .view { background: var(--paper); padding: 1rem; border-radius: 2px; }
+  .view-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--brass); margin-bottom: 0.5rem; }
+  .view-grid {
+    aspect-ratio: 48 / 64;
+    background-image:
+      linear-gradient(to right, rgba(26, 35, 50, 0.12) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(26, 35, 50, 0.12) 1px, transparent 1px);
+    background-size: calc(100% / 48) calc(100% / 64);
+    border: 1px solid rgba(26, 35, 50, 0.4);
+    position: relative;
+  }
+  .view-grid svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .view-note { font-style: italic; color: rgba(26, 35, 50, 0.65); font-size: 12px; margin-top: 0.5rem; line-height: 1.4; }
+
+  /* Coords table */
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-family: var(--mono); font-size: 13px; }
+  th, td { padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid var(--rule); }
+  th { color: var(--brass); font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; font-size: 10px; }
+  td.coord { color: var(--brass-light); }
+
+  .callout { background: rgba(168, 128, 75, 0.10); border-left: 3px solid var(--brass); padding: 1rem 1.25rem; margin: 1.5rem 0; font-style: italic; color: var(--paper); }
+
+  footer { text-align: center; margin-top: 5rem; padding-top: 2rem; border-top: 1px solid var(--rule); color: var(--muted); font-size: 12px; font-family: var(--mono); letter-spacing: 0.2em; text-transform: uppercase; }
+  footer a { color: var(--brass); text-decoration: none; }
+  footer a:hover { color: var(--brass-light); }
+
+  @media (max-width: 600px) {
+    body { padding: 1.5rem 1rem 3rem; }
+    .turnaround { grid-template-columns: 1fr; }
+  }
+
+  @media print {
+    body { background: white; color: black; }
+    .swatch { border: 1px solid #ccc; }
+    .view-grid { border-color: #888; }
+    footer { border-color: #888; }
+    .callout { background: #f5f0e0; color: black; }
+    .eyebrow, h2 .roman, .view-label, th { color: #8a6638; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="eyebrow">Modeling Reference</div>
+    <h1>@elijahbot voxel character</h1>
+    <p class="subtitle">Palette, anchor coordinates, turnaround templates. Built to sit beside MagicaVoxel.</p>
+  </header>
+
+  <h2><span class="roman">I.</span>Palette</h2>
+  <p>Locked hex codes pulled from face-reference.md. Use these exact values in MagicaVoxel's palette — don't eyeball.</p>
+
+  <h3>Skin</h3>
+  <div class="palette">
+    <div class="swatch"><div class="swatch-color" style="background:#E8C8A8"></div><div class="swatch-hex">#E8C8A8</div><div class="swatch-label">base warm light</div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#C49E80"></div><div class="swatch-hex">#C49E80</div><div class="swatch-label">cheekbone shadow</div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#F4DCC4"></div><div class="swatch-hex">#F4DCC4</div><div class="swatch-label">nose highlight</div></div>
+  </div>
+
+  <h3>Hair (multi-tonal — critical for likeness)</h3>
+  <div class="palette">
+    <div class="swatch"><div class="swatch-color" style="background:#C9A876"></div><div class="swatch-hex">#C9A876</div><div class="swatch-label">sun-bleached top</div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#8E6840"></div><div class="swatch-hex">#8E6840</div><div class="swatch-label">midtone brown</div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#5A4028"></div><div class="swatch-hex">#5A4028</div><div class="swatch-label">dark base / shadow</div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#B58060"></div><div class="swatch-hex">#B58060</div><div class="swatch-label">ginger flecks</div></div>
+  </div>
+
+  <h3>Eyes</h3>
+  <div class="palette">
+    <div class="swatch"><div class="swatch-color" style="background:#9BB5C2"></div><div class="swatch-hex">#9BB5C2</div><div class="swatch-label">blue-grey iris (NOT brown)</div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#3A2418"></div><div class="swatch-hex">#3A2418</div><div class="swatch-label">lid / lash</div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#6E5236"></div><div class="swatch-hex">#6E5236</div><div class="swatch-label">eyebrow</div></div>
+  </div>
+
+  <h3>Facial hair (strawberry / peach — DISTINCT from head hair)</h3>
+  <div class="palette">
+    <div class="swatch"><div class="swatch-color" style="background:#B58265"></div><div class="swatch-hex">#B58265</div><div class="swatch-label">beard warm</div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#8C5E45"></div><div class="swatch-hex">#8C5E45</div><div class="swatch-label">beard deeper</div></div>
+  </div>
+
+  <h3>Lips</h3>
+  <div class="palette">
+    <div class="swatch"><div class="swatch-color" style="background:#C58880"></div><div class="swatch-hex">#C58880</div><div class="swatch-label">neutral pink</div></div>
+  </div>
+
+  <h3>Brass chest plate</h3>
+  <div class="palette">
+    <div class="swatch"><div class="swatch-color" style="background:#A8804B"></div><div class="swatch-hex">#A8804B</div><div class="swatch-label">brass base</div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#C2A173"></div><div class="swatch-hex">#C2A173</div><div class="swatch-label">brass highlight</div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#3A2A1A"></div><div class="swatch-hex">#3A2A1A</div><div class="swatch-label">brass collar shadow</div></div>
+  </div>
+
+  <h2><span class="roman">II.</span>Turnaround templates</h2>
+  <p>48 × 64 voxel grid. Center column at x=24. Head sits y=4 to y=28. Brass plate y=40 down. Use these as overlay references while modeling.</p>
+
+  <div class="turnaround">
+
+    <div class="view">
+      <div class="view-label">Front view</div>
+      <div class="view-grid">
+        <svg viewBox="0 0 48 64" preserveAspectRatio="none">
+          <!-- skull skeleton -->
+          <ellipse cx="24" cy="14" rx="9" ry="11" fill="none" stroke="#1a2332" stroke-width="0.3" stroke-dasharray="0.5 0.5" />
+          <!-- jaw line -->
+          <path d="M 16 22 Q 24 28 32 22" fill="none" stroke="#1a2332" stroke-width="0.3" stroke-dasharray="0.5 0.5" />
+          <!-- eye anchors -->
+          <circle cx="20" cy="15" r="0.8" fill="#9BB5C2" />
+          <circle cx="28" cy="15" r="0.8" fill="#9BB5C2" />
+          <!-- brow line -->
+          <line x1="17" y1="13" x2="22" y2="13" stroke="#6E5236" stroke-width="0.5" />
+          <line x1="26" y1="13" x2="31" y2="13" stroke="#6E5236" stroke-width="0.5" />
+          <!-- nose anchor -->
+          <line x1="24" y1="15" x2="24" y2="19" stroke="#1a2332" stroke-width="0.3" />
+          <!-- mouth -->
+          <line x1="22" y1="20" x2="26" y2="20" stroke="#C58880" stroke-width="0.5" />
+          <!-- neck -->
+          <line x1="20" y1="28" x2="20" y2="33" stroke="#1a2332" stroke-width="0.3" stroke-dasharray="0.5 0.5" />
+          <line x1="28" y1="28" x2="28" y2="33" stroke="#1a2332" stroke-width="0.3" stroke-dasharray="0.5 0.5" />
+          <!-- shoulders -->
+          <line x1="6" y1="36" x2="42" y2="36" stroke="#1a2332" stroke-width="0.3" stroke-dasharray="0.5 0.5" />
+          <!-- chest plate -->
+          <rect x="6" y="40" width="36" height="22" fill="#A8804B" opacity="0.3" />
+          <line x1="6" y1="40" x2="42" y2="40" stroke="#3A2A1A" stroke-width="0.4" />
+          <!-- centerline -->
+          <line x1="24" y1="0" x2="24" y2="64" stroke="#A8804B" stroke-width="0.2" stroke-dasharray="0.3 0.6" opacity="0.5" />
+        </svg>
+      </div>
+      <p class="view-note">Skull ellipsoid centered at (24, 14), rx=9, ry=11. Eyes at y=15, ±4 from center.</p>
+    </div>
+
+    <div class="view">
+      <div class="view-label">Side view (looking right)</div>
+      <div class="view-grid">
+        <svg viewBox="0 0 48 64" preserveAspectRatio="none">
+          <!-- skull profile -->
+          <ellipse cx="24" cy="14" rx="11" ry="11" fill="none" stroke="#1a2332" stroke-width="0.3" stroke-dasharray="0.5 0.5" />
+          <!-- jaw -->
+          <path d="M 16 22 Q 22 28 28 22" fill="none" stroke="#1a2332" stroke-width="0.3" stroke-dasharray="0.5 0.5" />
+          <!-- ear anchor -->
+          <ellipse cx="22" cy="15" rx="1.2" ry="2" fill="#C49E80" />
+          <!-- nose protrusion -->
+          <path d="M 32 15 L 35 17 L 34 19 L 32 19" fill="none" stroke="#1a2332" stroke-width="0.4" />
+          <!-- neck -->
+          <line x1="20" y1="28" x2="20" y2="33" stroke="#1a2332" stroke-width="0.3" stroke-dasharray="0.5 0.5" />
+          <line x1="28" y1="28" x2="28" y2="33" stroke="#1a2332" stroke-width="0.3" stroke-dasharray="0.5 0.5" />
+          <!-- shoulder -->
+          <line x1="14" y1="36" x2="34" y2="36" stroke="#1a2332" stroke-width="0.3" stroke-dasharray="0.5 0.5" />
+          <!-- chest plate profile -->
+          <rect x="14" y="40" width="20" height="22" fill="#A8804B" opacity="0.3" />
+          <line x1="14" y1="40" x2="34" y2="40" stroke="#3A2A1A" stroke-width="0.4" />
+        </svg>
+      </div>
+      <p class="view-note">Profile: ear at (22, 15), depth 20 voxels. Nose protrudes 3 voxels at y=15-19.</p>
+    </div>
+
+    <div class="view">
+      <div class="view-label">Three-quarter view</div>
+      <div class="view-grid">
+        <svg viewBox="0 0 48 64" preserveAspectRatio="none">
+          <!-- skull -->
+          <ellipse cx="22" cy="14" rx="10" ry="11" fill="none" stroke="#1a2332" stroke-width="0.3" stroke-dasharray="0.5 0.5" />
+          <!-- visible far eye -->
+          <circle cx="26" cy="15" r="0.6" fill="#9BB5C2" />
+          <!-- visible near eye (larger by perspective) -->
+          <circle cx="18" cy="15" r="0.9" fill="#9BB5C2" />
+          <!-- brow -->
+          <line x1="15" y1="13" x2="20" y2="13" stroke="#6E5236" stroke-width="0.5" />
+          <line x1="24" y1="13" x2="28" y2="13" stroke="#6E5236" stroke-width="0.5" />
+          <!-- nose at 3/4 angle -->
+          <path d="M 22 16 L 25 17 L 24 19" fill="none" stroke="#1a2332" stroke-width="0.4" />
+          <!-- mouth -->
+          <line x1="20" y1="20" x2="25" y2="20" stroke="#C58880" stroke-width="0.5" />
+          <!-- neck + shoulders + plate -->
+          <line x1="18" y1="28" x2="18" y2="33" stroke="#1a2332" stroke-width="0.3" stroke-dasharray="0.5 0.5" />
+          <line x1="28" y1="28" x2="28" y2="33" stroke="#1a2332" stroke-width="0.3" stroke-dasharray="0.5 0.5" />
+          <line x1="6" y1="36" x2="40" y2="36" stroke="#1a2332" stroke-width="0.3" stroke-dasharray="0.5 0.5" />
+          <rect x="8" y="40" width="32" height="22" fill="#A8804B" opacity="0.3" />
+          <line x1="8" y1="40" x2="40" y2="40" stroke="#3A2A1A" stroke-width="0.4" />
+        </svg>
+      </div>
+      <p class="view-note">Best angle for IG/profile use. Show one full eye + a slimmer far eye. Brass plate visible.</p>
+    </div>
+
+  </div>
+
+  <h2><span class="roman">III.</span>Anchor coordinates</h2>
+  <p>Voxel-level positions for every feature on the 48 × 64 × 24 grid. <code style="font-family:var(--mono);background:rgba(168,128,75,0.15);padding:1px 4px;border-radius:2px;">x</code> = horizontal (0–47, center=24), <code style="font-family:var(--mono);background:rgba(168,128,75,0.15);padding:1px 4px;border-radius:2px;">y</code> = vertical-down (0–63), <code style="font-family:var(--mono);background:rgba(168,128,75,0.15);padding:1px 4px;border-radius:2px;">z</code> = front-back (0–23, front=23).</p>
+
+  <table>
+    <thead>
+      <tr><th>Feature</th><th>x range</th><th>y range</th><th>z (front-back)</th><th>Color</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Skull (back/top)</td><td class="coord">14–33</td><td class="coord">4–22</td><td class="coord">2–22</td><td><span class="swatch-hex" style="color:#5A4028">#5A4028 hair</span></td></tr>
+      <tr><td>Crown hair (top puff)</td><td class="coord">17–30</td><td class="coord">2–6</td><td class="coord">4–20</td><td><span class="swatch-hex" style="color:#C9A876">#C9A876 highlight</span></td></tr>
+      <tr><td>Bangs (front fringe)</td><td class="coord">17–30</td><td class="coord">10–13</td><td class="coord">22–23</td><td><span class="swatch-hex" style="color:#8E6840">#8E6840 mid</span></td></tr>
+      <tr><td>Side hair drape (l)</td><td class="coord">12–16</td><td class="coord">14–30</td><td class="coord">6–18</td><td><span class="swatch-hex" style="color:#8E6840">#8E6840 mid</span></td></tr>
+      <tr><td>Side hair drape (r)</td><td class="coord">31–35</td><td class="coord">14–30</td><td class="coord">6–18</td><td><span class="swatch-hex" style="color:#8E6840">#8E6840 mid</span></td></tr>
+      <tr><td>Skin (face front)</td><td class="coord">17–30</td><td class="coord">12–24</td><td class="coord">22–23</td><td><span class="swatch-hex" style="color:#E8C8A8">#E8C8A8 base</span></td></tr>
+      <tr><td>Left eyebrow</td><td class="coord">17–21</td><td class="coord">14</td><td class="coord">23</td><td><span class="swatch-hex" style="color:#6E5236">#6E5236</span></td></tr>
+      <tr><td>Right eyebrow</td><td class="coord">26–30</td><td class="coord">14</td><td class="coord">23</td><td><span class="swatch-hex" style="color:#6E5236">#6E5236</span></td></tr>
+      <tr><td>Left eye (2×1)</td><td class="coord">19–20</td><td class="coord">15</td><td class="coord">23</td><td><span class="swatch-hex" style="color:#9BB5C2">#9BB5C2 iris</span></td></tr>
+      <tr><td>Right eye (2×1)</td><td class="coord">27–28</td><td class="coord">15</td><td class="coord">23</td><td><span class="swatch-hex" style="color:#9BB5C2">#9BB5C2 iris</span></td></tr>
+      <tr><td>Nose bridge</td><td class="coord">24</td><td class="coord">15–17</td><td class="coord">24 (1 fwd)</td><td><span class="swatch-hex" style="color:#F4DCC4">#F4DCC4 hl</span></td></tr>
+      <tr><td>Nose tip</td><td class="coord">24</td><td class="coord">18</td><td class="coord">25 (2 fwd)</td><td><span class="swatch-hex" style="color:#E8C8A8">#E8C8A8</span></td></tr>
+      <tr><td>Mouth / lips</td><td class="coord">21–27</td><td class="coord">20</td><td class="coord">23</td><td><span class="swatch-hex" style="color:#C58880">#C58880</span></td></tr>
+      <tr><td>Mustache (~70% fill)</td><td class="coord">21–27</td><td class="coord">19</td><td class="coord">23</td><td><span class="swatch-hex" style="color:#B58265">#B58265 warm</span></td></tr>
+      <tr><td>Jaw beard (~55% fill)</td><td class="coord">17–30</td><td class="coord">22–25</td><td class="coord">22–23</td><td><span class="swatch-hex" style="color:#B58265">#B58265 warm</span></td></tr>
+      <tr><td>Chin beard (~75% fill)</td><td class="coord">21–27</td><td class="coord">24–27</td><td class="coord">22–23</td><td><span class="swatch-hex" style="color:#8C5E45">#8C5E45 deep</span></td></tr>
+      <tr><td>Neck cylinder</td><td class="coord">19–28</td><td class="coord">28–33</td><td class="coord">8–16</td><td><span class="swatch-hex" style="color:#E8C8A8">#E8C8A8</span></td></tr>
+      <tr><td>Shoulders (tapered)</td><td class="coord">5–42</td><td class="coord">34–39</td><td class="coord">6–18</td><td><span class="swatch-hex" style="color:#E8C8A8">#E8C8A8</span></td></tr>
+      <tr><td>Brass plate top (collar shadow)</td><td class="coord">8–39</td><td class="coord">37</td><td class="coord">7–17</td><td><span class="swatch-hex" style="color:#3A2A1A">#3A2A1A</span></td></tr>
+      <tr><td>Brass plate body</td><td class="coord">5–42</td><td class="coord">38–55</td><td class="coord">7–17</td><td><span class="swatch-hex" style="color:#A8804B">#A8804B</span></td></tr>
+      <tr><td>Brass highlight band</td><td class="coord">5–42</td><td class="coord">39–41</td><td class="coord">7–17</td><td><span class="swatch-hex" style="color:#C2A173">#C2A173</span></td></tr>
+    </tbody>
+  </table>
+
+  <h2><span class="roman">IV.</span>The recognition keys</h2>
+  <p>If you skip everything else, get THESE right and the character will read as Elijah:</p>
+  <ul>
+    <li><strong>Multi-tonal hair</strong> — use all four hair hex codes, not just one. The sun-bleached top + ginger flecks are what differentiate from generic warm-blonde characters.</li>
+    <li><strong>Blue-grey eyes</strong> — #9BB5C2, NOT brown. Default voxel character defaults to dark/warm — you'll have to override.</li>
+    <li><strong>Lighter facial hair than head hair</strong> — strawberry/peach for beard, deeper brown for head. Distinct palettes.</li>
+    <li><strong>Shoulder-length hair drape</strong> — not buzzed, not short. It should fall past the head bottom on the sides and back.</li>
+    <li><strong>Brass chest plate</strong> — sets the bot identity. Don't dress him in clothes; go straight to plate.</li>
+  </ul>
+
+  <div class="callout">
+    Procedural geometry can't fake likeness. This sheet exists because the in-browser
+    Voxel Studio I built reads as "generic shapes that add up," not as a person. The
+    only path to a recognizable @elijahbot character is a human (you) at the keys in
+    MagicaVoxel using these anchors as a guide. The .vox export from
+    pv-social.vercel.app/voxel-studio gives you a starting bust skeleton you can refine
+    against this reference.
+  </div>
+
+  <h2><span class="roman">V.</span>Ten emotional variants to build</h2>
+  <p>Once the base model is locked, clone it ten times and change ONE thing per variant. Keep everything else identical so they read as the same character across states.</p>
+
+  <ul>
+    <li><strong>Neutral</strong> — default expression. Eyebrows flat, lips neutral.</li>
+    <li><strong>Smiling</strong> — lip row shifts up at corners (x=22, x=26 move up 1 voxel).</li>
+    <li><strong>Concerned</strong> — eyebrows angle down toward nose bridge.</li>
+    <li><strong>Surprised</strong> — eyebrows lift 1 voxel; mouth opens (replace with darker void).</li>
+    <li><strong>Sleeping</strong> — eye voxels become skin tone (eyes closed); slight head tilt.</li>
+    <li><strong>Studying</strong> — eyebrows furrow inward; small glasses overlay (2-voxel rims).</li>
+    <li><strong>Praying</strong> — eyes closed, slight upward gaze (head tilt 1 voxel up).</li>
+    <li><strong>Thinking</strong> — one eyebrow lifted 1 voxel.</li>
+    <li><strong>Disappointed</strong> — mouth corners down 1 voxel; brows flat.</li>
+    <li><strong>Laughing</strong> — eyes squint (single voxel each); mouth wide open.</li>
+  </ul>
+
+  <h2><span class="roman">VI.</span>Workflow</h2>
+  <ul>
+    <li>Open <a href="https://pv-social.vercel.app/voxel-studio" style="color:var(--brass-light)">Voxel Studio</a> → click <strong>.vox</strong> → download the bust skeleton.</li>
+    <li>Open MagicaVoxel → import the .vox → it lands as the procedural bust.</li>
+    <li>Print this reference sheet (browser → print) and place beside the monitor.</li>
+    <li>Refine eyes / facial hair / hair multi-tone using the anchor table.</li>
+    <li>Save base as <code style="font-family:var(--mono)">elijahbot_neutral.vox</code>.</li>
+    <li>Clone and modify per variant table. Save each as <code style="font-family:var(--mono)">elijahbot_&lt;state&gt;.vox</code>.</li>
+    <li>Export PNGs (front + side + 3/4 for each variant) for IG content.</li>
+  </ul>
+
+  <footer>
+    <a href="/">← Back to tools hub</a>
+  </footer>
+
+</div>
+</body>
+</html>
