@@ -1,7 +1,8 @@
 {
-  "updated": "2026-06-02T23:30:00Z",
-  "updated_human": "2026-06-02 audit (late) — Hesed Monetization v1 shipped + deployed today (24 tasks, 121 tests). PV portfolio updated to 12 projects. Honesty pass on this page: fixed PickIt status contradiction (it is NOT on the Play Store yet, was lying), updated Hesed monetization from 'spec drafted' to 'code shipped, activation pending', updated top blurb. See PERCENT_MEANS below.",
-  "PERCENT_MEANS": "Percentages track CODE COMPLETENESS, not revenue or user count. 90% live + 'gated on env keys' means the build is done but nothing has actually earned/been used by strangers. Read the note field, not the bar, to judge real readiness.",
+  "updated": "2026-06-02T23:45:00Z",
+  "updated_human": "2026-06-02 honesty pass (second sweep). Brutal audit per Elijah's note: 'I'm worried it feels inflated' + 'many don't have the depth or completeness they could have or should have to live up to the standard we want to set' + 'pickit is not live, that's bad info'. Changes: PickIt dropped 70→40% with explicit NOT LIVE marker (was misleading at 70%). PERCENT_MEANS + TIER_KEY rewritten to make the personal-tool vs production-app distinction unmissable. Hesed Monetization v1 shipped today (24 tasks, 121 tests, deployed). $0 earned across all 'passive income' entries — added to notes.",
+  "PERCENT_MEANS": "% tracks CODE COMPLETENESS only. NOT revenue. NOT user count. NOT polish for strangers. A '90% live' single-file HTML tool means *the code works for the personal use Elijah built it for*. It does NOT mean it's polished, marketed, distributed, or used by anyone other than him. Read the note + tier, not the bar.",
+  "TIER_KEY": "Production app = real auth, DB, multi-user, public URL (Hesed, Folio, Returns Void, PV Social, Refresh, purcellventures.co). Personal tool = single-file HTML, localStorage, v0.1-v0.5, built in 1-3 hrs in a workshop block, used by Elijah (and sometimes Hannah). They're real — they work — but Elijah's standard for 'shipped product' is the first tier, not the second. The Apps + Faith + Productivity + UA + Cryptography sections are mostly tier 2.",
   "sections": [
     {
       "title": "Shipped this past week",
@@ -66,7 +67,7 @@
         { "name": "Park Waits (queue times)", "progress": 30, "live": true, "note": "v0.05 shipped 2026-05-18 to /park-waits/. Live data from queue-times.com for 15 parks incl. Six Flags Over Georgia. Sort, filter, summary cards, 60s auto-refresh." },
         { "name": "Magic Closet", "progress": 35, "live": true, "note": "v0.05 shipped 2026-05-18 to /magic-closet/. Wardrobe catalog with IndexedDB photo storage (Blob, no cloud). Tags: type/color/seasons/formality. Outfit picker weighted by recency (60d cap), weather→season mapping. Roadmap: AI BYOK outfit critique." },
         { "name": "Smart Calendar", "progress": 40, "live": true, "note": "v0.05 shipped 2026-05-18 to /smart-calendar/. Rich per-event context (bio/prep/topics/watch-for) — 4 fields where Google Calendar gives one. .ics paste-in parser, datetime-local input, edit/delete. Roadmap: AI BYOK auto-context, two-way Google sync, ntfy reminders." },
-        { "name": "PickIt (Play Store)", "progress": 70, "note": "App code complete on app-v1-wip-2026-05-18 branch (preserved 2026-05-18). Blockers before submission: $25 Console fee, service account JSON, RLS verification, AAB build, internal test track. See ~/pickit/SHIP-PUNCHLIST.md." }
+        { "name": "PickIt — NOT LIVE, NOT ON PLAY STORE", "progress": 40, "note": "Code on a local branch (app-v1-wip-2026-05-18), no GitHub remote, no AAB build, no Play Console account, no store listing, zero testers. The '70%' I claimed before was generous-to-misleading. Real product-readiness is closer to 40%: app code works locally, but every product-launch step (signing, store assets, distribution, testers) is at zero. Blockers in ~/pickit/SHIP-PUNCHLIST.md." }
       ]
     },
     {
@@ -139,7 +140,7 @@
       "title": "Apps in flight",
       "blurb": "Mobile-first, in motion.",
       "projects": [
-        { "name": "pickit (NOT on Play Store yet — was lying)", "progress": 70, "note": "Same as the PickIt entry in Apps section above. Was lying in this section. App code complete on app-v1-wip-2026-05-18 branch (LOCAL only, no GitHub remote). Blockers: $25 Google Play Console fee, service account JSON, Supabase RLS verification, EAS production AAB build, internal test track, store screenshots. See ~/pickit/SHIP-PUNCHLIST.md." },
+        { "name": "PickIt — DUPLICATE of Apps section entry above (NOT LIVE)", "progress": 40, "note": "Same project — was listed twice with conflicting status. This entry is the same as the PickIt entry in the Apps section. Not live, not on Play Store, not pushed to GitHub. See above for details." },
         { "name": "hannah-tricks", "progress": 75, "live": true, "note": "Hannah's first app. PWA shipped." },
         { "name": "magic-closet (Expo scaffold)", "progress": 10, "note": "Expo native scaffold, never developed past init. Superseded by the /magic-closet/ web version in Apps section." }
       ]
