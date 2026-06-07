@@ -3,7 +3,6 @@ const CACHE_NAME = 'elijahbot-tools-v1';
 const SHELL = [
   '/',
   '/manifest.json',
-  '/lock.js',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
 ];
