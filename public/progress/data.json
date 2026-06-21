@@ -71,12 +71,14 @@
           "name": "Refresh (elijahbot-refresh)",
           "progress": 90,
           "live": true,
-          "note": "Live in production. Editorial redesign shipped. v0.2 features (cal/tasks wiring, push notifications) pending."
+          "note": "Live in production. Editorial redesign shipped. v0.2 features (cal/tasks wiring, push notifications) pending.",
+          "vision": "Real readers subscribing + returning — a publication with an audience."
         },
         {
           "name": "elibot-overlay",
           "progress": 70,
-          "note": "Lockout system works. Codeword leaked. Idle-timeout daemon not built."
+          "note": "Lockout system works. Codeword leaked. Idle-timeout daemon not built.",
+          "vision": "Elijah relies on it daily for focus/accountability — it actually changes his behavior."
         },
         {
           "name": "elijahbot-app (native master)",
@@ -146,13 +148,15 @@
           "name": "AI Readiness Test (lead-gen)",
           "progress": 90,
           "live": true,
-          "note": "Live at /ai-readiness-test/. Built into the consulting funnel."
+          "note": "Live at /ai-readiness-test/. Built into the consulting funnel.",
+          "vision": "Generating real consulting leads that convert to paid work."
         },
         {
           "name": "AI Cost Calculator (lead-gen)",
           "progress": 90,
           "live": true,
-          "note": "Live at /ai-cost-calculator/. Pairs with readiness test."
+          "note": "Live at /ai-cost-calculator/. Pairs with readiness test.",
+          "vision": "Generating real consulting leads that convert to paid work."
         },
         {
           "name": "AI Will (lead-gen)",
@@ -182,36 +186,42 @@
           "name": "Echo (legacy stories)",
           "progress": 90,
           "live": true,
-          "note": "Web shipped with AUDIO RECORDING per question (Web Audio + MediaRecorder + IndexedDB blob storage) + chapter timing + markdown/archive export. Genuinely deep — built for Kiki interview. NASB pass on 9 chapter scriptures applied 2026-06-01."
+          "note": "Web shipped with AUDIO RECORDING per question (Web Audio + MediaRecorder + IndexedDB blob storage) + chapter timing + markdown/archive export. Genuinely deep — built for Kiki interview. NASB pass on 9 chapter scriptures applied 2026-06-01.",
+          "vision": "Real families using it to record + preserve a loved one's stories — actual legacy capture, published."
         },
         {
           "name": "Steal My Hangout",
           "progress": 90,
           "live": true,
-          "note": "Atlanta-seeded + roll-dice + map view + I-did-this journal + share-via-hash + 'did this with' tagging."
+          "note": "Atlanta-seeded + roll-dice + map view + I-did-this journal + share-via-hash + 'did this with' tagging.",
+          "vision": "Real people using it to plan real hangouts — an audience beyond Elijah."
         },
         {
           "name": "Momentum (one intention/day)",
           "progress": 90,
           "live": true,
-          "note": "Daily intention + scripture rotation + categories + 365-day heatmap + evening nudge + share-via-hash. NASB pass on 14 scripture rotation applied 2026-06-01."
+          "note": "Daily intention + scripture rotation + categories + 365-day heatmap + evening nudge + share-via-hash. NASB pass on 14 scripture rotation applied 2026-06-01.",
+          "vision": "A daily habit Elijah keeps — one intention every day, a real streak."
         },
         {
           "name": "Rival (self-competition)",
           "progress": 90,
           "live": true,
-          "note": "Metric tracker + goal lines + sparklines + heatmap per metric + CSV export + archive when seasons change."
+          "note": "Metric tracker + goal lines + sparklines + heatmap per metric + CSV export + archive when seasons change.",
+          "vision": "Elijah and others using it to actually beat their past selves on real metrics, sustained."
         },
         {
           "name": "Era (historical year sim)",
           "progress": 85,
           "live": true,
-          "note": "12 hand-curated years 1955-2020 + headlines/charts/films/tech/culture/quote per year + year picker + share-via-hash."
+          "note": "12 hand-curated years 1955-2020 + headlines/charts/films/tech/culture/quote per year + year picker + share-via-hash.",
+          "vision": "On the store, people exploring + sharing it — real downloads."
         },
         {
           "name": "Prayer Walk (mobile, native)",
           "progress": 75,
-          "note": "Expo native app with GPS heatmap. APK installable. Pending Play Store + App Store submission."
+          "note": "Expo native app with GPS heatmap. APK installable. Pending Play Store + App Store submission.",
+          "vision": "Published on the Play Store, people praying through their neighborhoods with it."
         },
         {
           "name": "Longitude (slow letters)",
@@ -246,7 +256,8 @@
         {
           "name": "PickIt — NOT LIVE, NOT ON PLAY STORE",
           "progress": 40,
-          "note": "Code on a local branch (app-v1-wip-2026-05-18), no GitHub remote, no AAB build, no Play Console account, no store listing, zero testers. The '70%' I claimed before was generous-to-misleading. Real product-readiness is closer to 40%: app code works locally, but every product-launch step (signing, store assets, distribution, testers) is at zero. Blockers in ~/pickit/SHIP-PUNCHLIST.md."
+          "note": "Code on a local branch (app-v1-wip-2026-05-18), no GitHub remote, no AAB build, no Play Console account, no store listing, zero testers. The '70%' I claimed before was generous-to-misleading. Real product-readiness is closer to 40%: app code works locally, but every product-launch step (signing, store assets, distribution, testers) is at zero. Blockers in ~/pickit/SHIP-PUNCHLIST.md.",
+          "vision": "On the Play Store, groups actually using it to decide — real downloads."
         }
       ]
     },
@@ -258,25 +269,29 @@
           "name": "Verse Vault",
           "progress": 90,
           "live": true,
-          "note": "SM-2 spaced repetition (already built — interval days, ease factor, next-due scheduling). 5-level hide + 10 seeded verses. NASB pass on all 10 presets applied 2026-06-01."
+          "note": "SM-2 spaced repetition (already built — interval days, ease factor, next-due scheduling). 5-level hide + 10 seeded verses. NASB pass on all 10 presets applied 2026-06-01.",
+          "vision": "Elijah actually memorizing scripture through it on a sustained spaced-repetition streak."
         },
         {
           "name": "Prayer Journal (ACTS)",
           "progress": 85,
           "live": true,
-          "note": "Daily entries + answered log + 365-day search + JSON export/import. NASB pass on 20 prayer verses applied 2026-06-01. Wants encrypted cloud backup (v0.3)."
+          "note": "Daily entries + answered log + 365-day search + JSON export/import. NASB pass on 20 prayer verses applied 2026-06-01. Wants encrypted cloud backup (v0.3).",
+          "vision": "A sustained daily prayer habit — the answered-prayer log filling up over time."
         },
         {
           "name": "Examen (Ignatian)",
           "progress": 92,
           "live": true,
-          "note": "v0.2 — added Stats tab with total kept + streak + 30-day heatmap + avg depth + gratitude word cloud. Plus five-movement + history search + auto-save + JSON export/import."
+          "note": "v0.2 — added Stats tab with total kept + streak + 30-day heatmap + avg depth + gratitude word cloud. Plus five-movement + history search + auto-save + JSON export/import.",
+          "vision": "A sustained nightly examen habit Elijah keeps."
         },
         {
           "name": "Counter (apologetics)",
           "progress": 90,
           "live": true,
-          "note": "18 topics (not 12), each with steel-manned objection + 4 expert paraphrases + scripture refs. Local response storage. v0.3+ would add per-user-weak-topic spaced repetition. (Apologetics tool — Elijah's NRSVUE preference will apply to future scripture additions.)"
+          "note": "18 topics (not 12), each with steel-manned objection + 4 expert paraphrases + scripture refs. Local response storage. v0.3+ would add per-user-weak-topic spaced repetition. (Apologetics tool — Elijah's NRSVUE preference will apply to future scripture additions.)",
+          "vision": "Used in real conversations to engage objections — genuinely sharpening his apologetics."
         },
         {
           "name": "Worship Set",
@@ -288,13 +303,15 @@
           "name": "Sermon Notes",
           "progress": 90,
           "live": true,
-          "note": "Sunday capture + church/preacher autocomplete + history search + book-extraction stats + JSON+Markdown export."
+          "note": "Sunday capture + church/preacher autocomplete + history search + book-extraction stats + JSON+Markdown export.",
+          "vision": "Used every Sunday — a real, growing archive of sermon notes."
         },
         {
           "name": "Solomon (daily wisdom)",
           "progress": 92,
           "live": true,
-          "note": "v0.2 — added Stats tab: favorites count, reflections count, total words written, % of corpus touched, tradition-breakdown bar chart, most-recent reflection display. NASB pass on 13 Proverbs entries applied 2026-06-01."
+          "note": "v0.2 — added Stats tab: favorites count, reflections count, total words written, % of corpus touched, tradition-breakdown bar chart, most-recent reflection display. NASB pass on 13 Proverbs entries applied 2026-06-01.",
+          "vision": "A daily wisdom habit Elijah keeps — reflections accumulating."
         },
         {
           "name": "Calvinism Test (TULIP)",
@@ -384,7 +401,8 @@
           "name": "Cipher Lab",
           "progress": 80,
           "live": true,
-          "note": "v0.1. 6 classical ciphers + chained puzzle-hunt builder."
+          "note": "v0.1. 6 classical ciphers + chained puzzle-hunt builder.",
+          "vision": "People actually playing the puzzle hunts — real engagement."
         },
         {
           "name": "Project Prowess",
@@ -400,7 +418,8 @@
         {
           "name": "pulse-game",
           "progress": 90,
-          "note": "v1.6.0. Spotify-integrated rhythm game. AAB built. Not yet on Play Store."
+          "note": "v1.6.0. Spotify-integrated rhythm game. AAB built. Not yet on Play Store.",
+          "vision": "On the Play Store, people playing it with their Spotify — real installs."
         },
         {
           "name": "coldmaid",
@@ -463,13 +482,15 @@
           "name": "PickIt — DUPLICATE of Apps section entry above (NOT LIVE)",
           "progress": 40,
           "note": "Same project — was listed twice with conflicting status. This entry is the same as the PickIt entry in the Apps section. Not live, not on Play Store, not pushed to GitHub. See above for details.",
-          "status": "archived"
+          "status": "archived",
+          "vision": "On the Play Store, groups actually using it to decide — real downloads."
         },
         {
           "name": "hannah-tricks",
           "progress": 75,
           "live": true,
-          "note": "Hannah's first app. PWA shipped."
+          "note": "Hannah's first app. PWA shipped.",
+          "vision": "Hannah uses and loves it — her app, actually used."
         },
         {
           "name": "magic-closet (Expo scaffold)",
