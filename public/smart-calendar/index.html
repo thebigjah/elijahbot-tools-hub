@@ -129,19 +129,19 @@ footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
 
 <section class="panel" id="panel-add">
   <label class="lbl" for="ev-name">Event name</label>
-  <input type="text" id="ev-name" placeholder="e.g. Call with Reza">
+  <input type="text" id="ev-name" placeholder="e.g. Call with a mentor">
 
   <label class="lbl" for="ev-when">When</label>
   <input type="datetime-local" id="ev-when">
 
   <label class="lbl" for="ev-where">Where (optional)</label>
-  <input type="text" id="ev-where" placeholder="Google Meet / Acworth coffee shop / Cleveland TN">
+  <input type="text" id="ev-where" placeholder="Google Meet / a coffee shop / campus">
 
   <label class="lbl">Kind</label>
   <div class="tag-row" id="kind-row"></div>
 
   <label class="lbl" for="ev-bio">Who is this person / what is this event</label>
-  <textarea id="ev-bio" placeholder="Reza Hosseini Ghomi MD — neuropsychiatrist + biomedical engineer. 15 years ahead of where you want to be."></textarea>
+  <textarea id="ev-bio" placeholder="Who they are and why the meeting matters."></textarea>
 
   <label class="lbl" for="ev-prep">Prep / what to do beforehand</label>
   <textarea id="ev-prep" placeholder="Reread cheat sheet at 12:45. Pick 2 openers. Don't pitch yourself. Don't reference NeuroLex as current."></textarea>
@@ -158,7 +158,7 @@ footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
 <section class="panel" id="panel-import">
   <p style="font-family:var(--serif);font-size:15px;color:var(--ink-dim);line-height:1.55">Paste an .ics block (the part between BEGIN:VEVENT and END:VEVENT). I'll parse it into a Smart Calendar event you can add context to.</p>
   <div class="import-area">
-    <textarea id="ics-input" style="min-height:200px;font-family:var(--mono);font-size:12.5px" placeholder="BEGIN:VEVENT&#10;UID:r4vrkjcih5ismd9t9vfn0dl1do&#10;DTSTART:20260519T170000Z&#10;DTEND:20260519T173000Z&#10;SUMMARY:Call with Reza&#10;...&#10;END:VEVENT"></textarea>
+    <textarea id="ics-input" style="min-height:200px;font-family:var(--mono);font-size:12.5px" placeholder="BEGIN:VEVENT&#10;SUMMARY:Coffee with a mentor&#10;DTSTART:20261105T150000Z&#10;END:VEVENT"></textarea>
   </div>
   <button class="primary" onclick="parseIcs()">Parse + add</button>
   <p id="ics-result" style="margin-top:14px;font-family:var(--mono);font-size:12px;color:var(--ink-dim)"></p>
@@ -438,20 +438,22 @@ function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 }
 
-// Seed first-time user with the Reza event so they see how context works.
+// Seed a first-time user with one sample event so they see how context works.
 function seedIfEmpty(){
   const store = getStore();
   if(store.events.length === 0 && !store.seededOnce){
+    const d = new Date(Date.now() + 3*86400000);
+    const when = d.toISOString().slice(0,10) + 'T15:00';
     store.events.push({
-      id: 'E_seed_reza',
-      name: 'Call with Reza Hosseini Ghomi',
-      when: '2026-05-19T13:00',
-      where: 'Google Meet',
+      id: 'E_seed_sample',
+      name: 'Sample: coffee with a mentor',
+      when,
+      where: 'A coffee shop near campus',
       kind: 'call',
-      bio: "Neuropsychiatrist + biomedical engineer. Survived Hodgkin's at 22, pivoted from naval engineering to medicine. Four health-tech companies (NeuroLex exited 2020 → Sonde, Frontier Psychiatry ~$12M ARR, MedFlow, OpenHi). Treats patients across MT/ID/AK/WY. Currently obsessed with early dementia detection via voice biomarkers + lifestyle prevention.",
-      prep: "12:45 reread the morning-of cheat sheet at ~/.claude/elijahbot/drafts/reza-call-ammo-2026-05-19.md. Use Stage Fright at 12:30 to baseline your voice. Camera + Shure mic + water + tabs closed.",
-      topics: "1) 40% of dementia is preventable — is the lifestyle conversation actually changing patient behavior or is it academic? 2) Gap between AI capability and what regulated clinical workflow allows? Mentor ask (last 5 min): \"Would you be open to talking periodically — maybe once a quarter — as I think through the pre-med path?\"",
-      watch: "DON'T pitch yourself. DON'T lead with Christianity (faith status unknown). DON'T reference NeuroLex as current — it exited 5 years ago. DON'T match his pedigree — you can't. DON'T fill silence — let him think.",
+      bio: "Who they are: their field, what they have built, and why you asked for the meeting.",
+      prep: "Reread your notes 15 minutes before. Bring two questions you cannot answer with a search.",
+      topics: "1) What they wish they had known at your stage. 2) One decision you are weighing right now.",
+      watch: "Let them talk. Do not fill silence. Close by asking whether you can follow up.",
       createdAt: Date.now(),
     });
     store.seededOnce = true;
