@@ -185,11 +185,16 @@ footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
 
 <section class="panel" id="panel-pick">
   <div class="outfit-zone">
-    <p class="outfit-prompt">Tell me the weather and the occasion. I'll pull a top + bottom + (optional) outer layer + shoes that fit, weighted toward things you haven't worn recently.</p>
+    <p class="outfit-prompt">Tell me the weather and the occasion. I'll pull a top and bottom (or a dress), shoes, an outer layer when it's cold or wet, and an accessory if you have one, favoring things you haven't worn recently.</p>
 
-    <label class="lbl">Weather</label>
+    <label class="lbl">Temperature</label>
     <div class="outfit-controls">
       <div class="tag-row" id="pick-weather"></div>
+    </div>
+
+    <label class="lbl">Rain</label>
+    <div class="outfit-controls">
+      <div class="tag-row" id="pick-rain"></div>
     </div>
 
     <label class="lbl">Occasion</label>
@@ -262,6 +267,10 @@ const FORMAL = [
   { id:'business', label:'Business' },
   { id:'formal', label:'Formal' },
 ];
+const RAIN_TODAY = [
+  { id:'dry', label:'Dry' },
+  { id:'rain', label:'Raining' },
+];
 const RAIN_OK = [
   { id:'yes', label:'Yes' },
   { id:'no', label:'No' },
@@ -271,7 +280,6 @@ const WEATHER = [
   { id:'cool', label:'Cool (50-65°)' },
   { id:'warm', label:'Warm (65-80°)' },
   { id:'hot', label:'Hot (>80°)' },
-  { id:'rain', label:'Rainy' },
 ];
 
 // ============================================================================
@@ -346,7 +354,7 @@ async function dbDelete(storeName, key){
 // ============================================================================
 const state = {
   selected: { type:null, color:null, seasons:[], formal:null, rainOk:null },
-  pick: { weather:'cool', formal:'casual' },
+  pick: { weather:'cool', formal:'casual', rain:'dry' },
   uploadBlob: null,
   uploadDataUrl: null,
 };
@@ -405,6 +413,7 @@ function renderAddTab(){
 
 function renderPickTab(){
   renderTagRow('pick-weather', WEATHER, 'weather', false, 'pick');
+  renderTagRow('pick-rain', RAIN_TODAY, 'rain', false, 'pick');
   renderTagRow('pick-formal', FORMAL, 'formal', false, 'pick');
 }
 
@@ -556,7 +565,6 @@ const SEASON_BY_WEATHER = {
   cool: ['fall', 'spring'],
   warm: ['spring', 'summer'],
   hot: ['summer'],
-  rain: ['fall', 'spring'],
 };
 
 async function pickOutfit(){
@@ -582,7 +590,7 @@ async function pickOutfit(){
   };
 
   // On rainy days, shoes and outer layers marked rain-ready win whenever any exist.
-  const rainy = state.pick.weather === 'rain';
+  const rainy = state.pick.rain === 'rain';
   const pickByType = (type) => {
     let candidates = items.filter(it => it.type === type && matchesContext(it));
     if(rainy && (type === 'shoes' || type === 'outer') && candidates.some(it => it.rainOk)){
@@ -600,19 +608,13 @@ async function pickOutfit(){
 
   const wantDress = items.some(it => it.type === 'dress' && matchesContext(it)) && Math.random() < 0.2;
   let outfit;
+  // Cold, cool and wet days get an outer layer, whether the base is a dress or a top and bottom.
+  const wantsOuter = state.pick.weather === 'cold' || state.pick.weather === 'cool' || rainy;
+  const outer = wantsOuter ? pickByType('outer') : null;
   if(wantDress){
-    const dress = pickByType('dress');
-    const shoes = pickByType('shoes');
-    outfit = { dress, shoes, accessory: pickByType('accessory') };
+    outfit = { dress: pickByType('dress'), outer, shoes: pickByType('shoes'), accessory: pickByType('accessory') };
   } else {
-    const top = pickByType('top');
-    const bottom = pickByType('bottom');
-    const shoes = pickByType('shoes');
-    let outer = null;
-    if(state.pick.weather === 'cold' || state.pick.weather === 'cool' || state.pick.weather === 'rain'){
-      outer = pickByType('outer');
-    }
-    outfit = { top, bottom, outer, shoes, accessory: pickByType('accessory') };
+    outfit = { top: pickByType('top'), bottom: pickByType('bottom'), outer, shoes: pickByType('shoes'), accessory: pickByType('accessory') };
   }
 
   // Say what is missing instead of showing half an outfit with no explanation.
@@ -625,7 +627,7 @@ async function pickOutfit(){
   }
   if(rainy){
     const dry = ['shoes','outer'].filter(role => outfit[role] && !outfit[role].rainOk);
-    if(dry.length) notes.push('None of your ' + dry.join(' or ') + ' are marked as holding up in rain.');
+    if(dry.length) notes.push('No ' + dry.join(' or ') + ' marked as holding up in rain fit this temperature and occasion.');
   }
   const note = document.getElementById('outfit-note');
   note.textContent = notes.join(' ');
@@ -660,7 +662,9 @@ async function renderOutfit(outfit){
 }
 
 async function logOutfit(){
-  if(!state.currentOutfit) return;
+  // One log per picked outfit, so a double tap does not count twice.
+  if(!state.currentOutfit || state.currentOutfit.logged) return;
+  state.currentOutfit.logged = true;
   for(const role of ['outer','top','dress','bottom','shoes','accessory']){
     const it = state.currentOutfit[role];
     if(it) await markWorn(it.id);

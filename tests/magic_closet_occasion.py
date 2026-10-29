@@ -39,7 +39,8 @@ with sync_playwright() as p:
                                                ['r5','watch','accessory',false]])
         await dbPut('items', { ...base, id, name, type, rainOk });
     }""")
-    pg.locator("#pick-weather .tag-chip", has_text="Rainy").click()
+    pg.locator("#pick-weather .tag-chip", has_text="Cool").click()
+    pg.locator("#pick-rain .tag-chip", has_text="Raining").click()
     pg.locator("#pick-formal .tag-chip", has_text="Casual").first.click()
     seen = set()
     for _ in range(15):
@@ -49,10 +50,35 @@ with sync_playwright() as p:
     assert "suede loafers" not in seen and "wool coat" not in seen, seen
     assert "watch" in seen, seen
 
+    # A dress on a cold day still gets a coat, and rain does not drop the temperature's clothes.
+    pg.evaluate("""async () => {
+      const base = { color:'black', formal:'smart-casual', addedAt:Date.now(), lastWorn:null, wornCount:0 };
+      await dbPut('items', { ...base, id:'d1', name:'wool dress', type:'dress', seasons:['winter'] });
+      await dbPut('items', { ...base, id:'d2', name:'parka', type:'outer', seasons:['winter'], rainOk:false });
+      await dbPut('items', { ...base, id:'d3', name:'winter boots', type:'shoes', seasons:['winter'], rainOk:true });
+    }""")
+    pg.locator("#pick-weather .tag-chip", has_text="Cold").click()
+    pg.locator("#pick-formal .tag-chip", has_text="Smart-casual").click()
+    dress_seen = False
+    for _ in range(60):
+        pg.evaluate("pickOutfit()"); pg.wait_for_timeout(60)
+        grid = pg.inner_text("#outfit-grid")
+        if "wool dress" in grid:
+            dress_seen = True
+            assert "parka" in grid, grid
+    assert dress_seen, "the dress never came up in 60 cold picks"
+
+    # Logging twice for the same outfit counts once.
+    pg.evaluate("pickOutfit()"); pg.wait_for_timeout(100)
+    pg.evaluate("Promise.all([logOutfit(), logOutfit()])"); pg.wait_for_timeout(300)
+    counts = pg.evaluate("dbGetAll('items').then(xs => xs.filter(x => x.wornCount).map(x => x.wornCount))")
+    assert counts and max(counts) == 1, counts
+
     # A closet with no bottoms for the occasion says so.
+    pg.locator("#pick-rain .tag-chip", has_text="Dry").click()
     pg.locator("#pick-formal .tag-chip", has_text="Business").click()
     pg.evaluate("pickOutfit()"); pg.wait_for_timeout(150)
     note = pg.inner_text("#outfit-note")
     assert "top" in note and "bottom" in note, note
     b.close()
-print("ok: occasion, rain-ready picks, accessories and the missing-pieces note")
+print("ok: occasion, rain, accessories, dress with a coat, single wear log, missing-pieces note")

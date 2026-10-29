@@ -588,7 +588,9 @@ function setupRecognition(){
     }
     transcript = finalTranscript + interim;
   };
-  r.onerror = (e)=>{ console.warn('speech err', e); };
+  r.onerror = (e)=>{ console.warn('speech err', e.error); };
+  // Chrome ends continuous recognition after a pause, so restart it while the take is still running.
+  r.onend = ()=>{ if(isRecording){ try{ r.start(); }catch(err){} } };
   return r;
 }
 
@@ -717,6 +719,9 @@ function detectPitch(buf, sr){
 // ============================================================================
 // ANALYZE
 // ============================================================================
+// Mean level below this is treated as silence, the same level the low-signal alert uses.
+const SILENT_LEVEL = 0.02;
+
 function analyze(){
   const durationSec = (recordEnd - recordStart) / 1000;
   const trimmedTranscript = transcript.trim().replace(/\s+/g,' ');
@@ -751,16 +756,18 @@ function analyze(){
   }
   const metrics = { wpm, fillerCount, fillerRate, volMean, volCV, wordCount, durationSec, pitchMedian, pitchCV, pitchCount };
   document.getElementById('scope-readout').textContent = '— dB';
+  // With sound but no words, recognition failed (or the browser has none), so word-based readouts are skipped.
+  metrics.noTranscript = wordCount === 0;
   const store = loadStore();
+  // A take this short or this quiet has nothing to measure.
+  if(durationSec < 8 || volMean < SILENT_LEVEL){
+    document.getElementById('status').textContent = volMean < SILENT_LEVEL
+      ? 'That take was nearly silent. Check the microphone and record again.'
+      : 'That take was under 8 seconds. Record again and keep talking.';
+    document.getElementById('mode-indicator').textContent = store.baseline ? 'not compared' : 'no baseline yet';
+    return;
+  }
   if(!store.baseline){
-    // A baseline needs real speech, or every later comparison is against nothing.
-    // Browsers without speech recognition get no words, so only the length counts there.
-    if(durationSec < 8 || (SpeechRec && wordCount < 10)){
-      document.getElementById('status').textContent =
-        'Not saved as a baseline: it needs at least 8 seconds and 10 words of normal speech. Record again.';
-      document.getElementById('mode-indicator').textContent = 'no baseline yet';
-      return;
-    }
     store.baseline = { ...metrics, savedAt: Date.now() };
     saveStore(store);
     renderBaselineSaved(metrics);
@@ -773,7 +780,9 @@ function analyze(){
 // RENDER
 // ============================================================================
 function renderBaselineSaved(m){
-  document.getElementById('status').textContent = 'Calm baseline saved. Record any time pre-call to compare.';
+  document.getElementById('status').textContent = m.noTranscript
+    ? 'Calm baseline saved from pitch and volume. Speech recognition returned no words, so words per minute and fillers will not be compared.'
+    : 'Calm baseline saved. Record any time pre-call to compare.';
   document.getElementById('mode-indicator').textContent = 'baseline locked';
   document.getElementById('results-mode').textContent = 'baseline reference';
   document.getElementById('results').classList.add('show');
@@ -812,12 +821,12 @@ function renderResults(m, base){
 
 function metricsHtml(m, base){
   const cards = [
-    { name:'Words / min', value:Math.round(m.wpm), baseline:base?Math.round(base.wpm):null, delta:base&&base.wpm>0?((m.wpm-base.wpm)/base.wpm)*100:null, unit:' wpm', flipDelta:false },
+    { name:'Words / min', value:m.noTranscript?'n/a':Math.round(m.wpm), baseline:base&&!base.noTranscript?Math.round(base.wpm):null, delta:base&&base.wpm>0&&!m.noTranscript?((m.wpm-base.wpm)/base.wpm)*100:null, unit:m.noTranscript?'':' wpm', flipDelta:false },
     { name:'Pitch (F0)', value:m.pitchCount>5?Math.round(m.pitchMedian)+' Hz':'n/a', baseline:base&&base.pitchMedian?Math.round(base.pitchMedian)+' Hz':null, delta:base&&base.pitchMedian&&m.pitchCount>5?((m.pitchMedian-base.pitchMedian)/base.pitchMedian)*100:null, unit:'', flipDelta:false },
     { name:'Filler count', value:m.fillerCount, baseline:base?base.fillerCount:null, delta:base?(m.fillerCount-base.fillerCount):null, unit:'', flipDelta:true, absoluteDelta:true },
     { name:'Volume CV', value:m.volCV.toFixed(2), baseline:base?base.volCV.toFixed(2):null, delta:base&&base.volCV>0?((m.volCV-base.volCV)/base.volCV)*100:null, unit:'', flipDelta:false },
     { name:'Pitch CV', value:m.pitchCount>5?m.pitchCV.toFixed(2):'n/a', baseline:base&&base.pitchCV?base.pitchCV.toFixed(2):null, delta:base&&base.pitchCV&&m.pitchCount>5?((m.pitchCV-base.pitchCV)/base.pitchCV)*100:null, unit:'', flipDelta:false },
-    { name:'Filler rate', value:m.fillerRate.toFixed(1)+'%', baseline:base?base.fillerRate.toFixed(1)+'%':null, delta:base?(m.fillerRate-base.fillerRate):null, unit:'pp', flipDelta:true, absoluteDelta:true },
+    { name:'Filler rate', value:m.noTranscript?'n/a':m.fillerRate.toFixed(1)+'%', baseline:base&&!base.noTranscript?base.fillerRate.toFixed(1)+'%':null, delta:base&&!base.noTranscript&&!m.noTranscript?(m.fillerRate-base.fillerRate):null, unit:'pp', flipDelta:true, absoluteDelta:true },
   ];
   return cards.map(c=>{
     let deltaStr = '', deltaClass = '';
@@ -862,7 +871,7 @@ function diagnosesHtml(m, base){
       issues.push({ type:'alert', title:'Pitch variance depressed · monotone delivery.', body:"Monotone reads as disengaged or rehearsed. Mark 2-3 key phrases in your opening and deliberately lift them. Even slight pitch variation on 'this is what I wanted to ask you' makes the question land." });
     }
   }
-  if(base && base.wpm > 0){
+  if(base && base.wpm > 0 && !m.noTranscript){
     const wpmDelta = ((m.wpm - base.wpm) / base.wpm) * 100;
     if(wpmDelta > 25){
       issues.push({ type:'alert', title:`Speaking rate ${Math.round(wpmDelta)}% above baseline.`, body:`Nervous system is in pace-up mode. Pre-call: 4-7-8 breath (in 4, hold 7, out 8) × 3 cycles. During: deliberately end every other sentence with a 1-beat pause. Slower talk slows your heart rate.` });
@@ -872,7 +881,7 @@ function diagnosesHtml(m, base){
   }
   if(m.fillerRate > 8){
     issues.push({ type:'alert', title:`Filler density ${m.fillerRate.toFixed(1)}% · target <5%.`, body:`Fillers are thinking-out-loud habit. Two fixes: (1) replace "um" with deliberate silent pause — listener fills it with respect, not anxiety. (2) Pre-call, write your one-sentence answer to "what is the point of this call?" Read twice. Fewer fillers when the spine is clear.` });
-  } else if(m.fillerRate > 4 && base && m.fillerRate > base.fillerRate * 1.5){
+  } else if(m.fillerRate > 4 && base && !base.noTranscript && m.fillerRate > base.fillerRate * 1.5){
     issues.push({ type:'alert', title:`Filler rate ${m.fillerRate.toFixed(1)}% · elevated vs. baseline ${base.fillerRate.toFixed(1)}%.`, body:`You're searching mid-sentence. Likely cause: you haven't decided what to say yet. Write your two opening sentences. Say them out loud once. Then re-test.` });
   }
   if(base && base.volCV > 0){
