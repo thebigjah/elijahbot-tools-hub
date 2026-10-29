@@ -602,7 +602,8 @@ async function toggleRecord(){
 
 async function startRecording(){
   try{
-    micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    // Chrome's noise suppression and auto gain flatten loudness changes, which is what Volume CV measures.
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
   } catch(e){
     document.getElementById('status').textContent = 'Mic permission denied. Reload to try again.';
     return;
@@ -749,8 +750,17 @@ function analyze(){
     pitchCV = pMean > 0 ? Math.sqrt(pVar / pitchCount) / pMean : 0;
   }
   const metrics = { wpm, fillerCount, fillerRate, volMean, volCV, wordCount, durationSec, pitchMedian, pitchCV, pitchCount };
+  document.getElementById('scope-readout').textContent = '— dB';
   const store = loadStore();
   if(!store.baseline){
+    // A baseline needs real speech, or every later comparison is against nothing.
+    // Browsers without speech recognition get no words, so only the length counts there.
+    if(durationSec < 8 || (SpeechRec && wordCount < 10)){
+      document.getElementById('status').textContent =
+        'Not saved as a baseline: it needs at least 8 seconds and 10 words of normal speech. Record again.';
+      document.getElementById('mode-indicator').textContent = 'no baseline yet';
+      return;
+    }
     store.baseline = { ...metrics, savedAt: Date.now() };
     saveStore(store);
     renderBaselineSaved(metrics);

@@ -177,6 +177,9 @@ footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
   <label class="lbl">Formality</label>
   <div class="tag-row" id="formal-row"></div>
 
+  <label class="lbl">Holds up in rain (for shoes and outer layers)</label>
+  <div class="tag-row" id="rain-row"></div>
+
   <button class="primary" id="save-btn" onclick="saveItem()">Save to closet</button>
 </section>
 
@@ -198,6 +201,7 @@ footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
 
     <div class="outfit-display" id="outfit-display">
       <div class="outfit-grid" id="outfit-grid"></div>
+      <p class="outfit-prompt" id="outfit-note" hidden></p>
       <div class="outfit-controls" style="margin-top:18px">
         <button class="btn-sm" onclick="pickOutfit()">↻ Roll again</button>
         <button class="btn-sm" onclick="logOutfit()">I'm wearing this today</button>
@@ -257,6 +261,10 @@ const FORMAL = [
   { id:'smart-casual', label:'Smart-casual' },
   { id:'business', label:'Business' },
   { id:'formal', label:'Formal' },
+];
+const RAIN_OK = [
+  { id:'yes', label:'Yes' },
+  { id:'no', label:'No' },
 ];
 const WEATHER = [
   { id:'cold', label:'Cold (<50°)' },
@@ -337,7 +345,7 @@ async function dbDelete(storeName, key){
 // STATE
 // ============================================================================
 const state = {
-  selected: { type:null, color:null, seasons:[], formal:null },
+  selected: { type:null, color:null, seasons:[], formal:null, rainOk:null },
   pick: { weather:'cool', formal:'casual' },
   uploadBlob: null,
   uploadDataUrl: null,
@@ -392,6 +400,7 @@ function renderAddTab(){
   renderTagRow('color-row', COLORS, 'color');
   renderTagRow('season-row', SEASONS, 'seasons', true);
   renderTagRow('formal-row', FORMAL, 'formal');
+  renderTagRow('rain-row', RAIN_OK, 'rainOk');
 }
 
 function renderPickTab(){
@@ -430,6 +439,7 @@ async function saveItem(){
     color: state.selected.color,
     seasons: [...state.selected.seasons],
     formal: state.selected.formal,
+    rainOk: state.selected.rainOk === 'yes',
     addedAt: Date.now(),
     lastWorn: null,
     wornCount: 0,
@@ -440,7 +450,7 @@ async function saveItem(){
   }
 
   // reset
-  state.selected = { type:null, color:null, seasons:[], formal:null };
+  state.selected = { type:null, color:null, seasons:[], formal:null, rainOk:null };
   state.uploadBlob = null;
   state.uploadDataUrl = null;
   document.getElementById('item-name').value = '';
@@ -571,8 +581,13 @@ async function pickOutfit(){
     return Math.min(60, days) + 1;
   };
 
+  // On rainy days, shoes and outer layers marked rain-ready win whenever any exist.
+  const rainy = state.pick.weather === 'rain';
   const pickByType = (type) => {
-    const candidates = items.filter(it => it.type === type && matchesContext(it));
+    let candidates = items.filter(it => it.type === type && matchesContext(it));
+    if(rainy && (type === 'shoes' || type === 'outer') && candidates.some(it => it.rainOk)){
+      candidates = candidates.filter(it => it.rainOk);
+    }
     if(candidates.length === 0) return null;
     const totalW = candidates.reduce((a, b) => a + weight(b), 0);
     let r = Math.random() * totalW;
@@ -588,7 +603,7 @@ async function pickOutfit(){
   if(wantDress){
     const dress = pickByType('dress');
     const shoes = pickByType('shoes');
-    outfit = { dress, shoes };
+    outfit = { dress, shoes, accessory: pickByType('accessory') };
   } else {
     const top = pickByType('top');
     const bottom = pickByType('bottom');
@@ -597,8 +612,24 @@ async function pickOutfit(){
     if(state.pick.weather === 'cold' || state.pick.weather === 'cool' || state.pick.weather === 'rain'){
       outer = pickByType('outer');
     }
-    outfit = { top, bottom, outer, shoes };
+    outfit = { top, bottom, outer, shoes, accessory: pickByType('accessory') };
   }
+
+  // Say what is missing instead of showing half an outfit with no explanation.
+  const needed = outfit.dress !== undefined ? ['dress','shoes'] : ['top','bottom','shoes'];
+  if(state.pick.weather === 'cold' || rainy) needed.push('outer');
+  const missing = needed.filter(role => !outfit[role]);
+  const notes = [];
+  if(missing.length){
+    notes.push('Nothing in your closet fits this weather and occasion for: ' + missing.join(', ') + '.');
+  }
+  if(rainy){
+    const dry = ['shoes','outer'].filter(role => outfit[role] && !outfit[role].rainOk);
+    if(dry.length) notes.push('None of your ' + dry.join(' or ') + ' are marked as holding up in rain.');
+  }
+  const note = document.getElementById('outfit-note');
+  note.textContent = notes.join(' ');
+  note.hidden = !notes.length;
   await renderOutfit(outfit);
   document.getElementById('outfit-display').classList.add('show');
   // store current outfit for "wearing this today"
@@ -607,8 +638,8 @@ async function pickOutfit(){
 
 async function renderOutfit(outfit){
   const grid = document.getElementById('outfit-grid');
-  const order = ['outer','top','dress','bottom','shoes'];
-  const labels = { outer:'Outer', top:'Top', dress:'Dress', bottom:'Bottom', shoes:'Shoes' };
+  const order = ['outer','top','dress','bottom','shoes','accessory'];
+  const labels = { outer:'Outer', top:'Top', dress:'Dress', bottom:'Bottom', shoes:'Shoes', accessory:'Accessory' };
   let html = '';
   for(const role of order){
     const it = outfit[role];
@@ -630,7 +661,7 @@ async function renderOutfit(outfit){
 
 async function logOutfit(){
   if(!state.currentOutfit) return;
-  for(const role of ['outer','top','dress','bottom','shoes']){
+  for(const role of ['outer','top','dress','bottom','shoes','accessory']){
     const it = state.currentOutfit[role];
     if(it) await markWorn(it.id);
   }

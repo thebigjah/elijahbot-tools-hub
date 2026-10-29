@@ -30,5 +30,29 @@ with sync_playwright() as p:
         names |= set(pg.locator("body").inner_text().split("\n"))
     picked = [n for n in names if n.strip() in ("formal top","formal bottom","formal shoes","casual top","casual bottom","casual shoes")]
     assert picked and all(n.startswith("formal") for n in picked), picked
+
+    # Rainy prefers rain-ready shoes and outer layers, and an accessory joins the outfit.
+    pg.evaluate("""async () => {
+      const base = { color:'black', seasons:['fall','spring'], formal:'casual', addedAt:Date.now(), lastWorn:null, wornCount:0 };
+      for (const [id, name, type, rainOk] of [['r1','boots','shoes',true],['r2','suede loafers','shoes',false],
+                                               ['r3','rain shell','outer',true],['r4','wool coat','outer',false],
+                                               ['r5','watch','accessory',false]])
+        await dbPut('items', { ...base, id, name, type, rainOk });
+    }""")
+    pg.locator("#pick-weather .tag-chip", has_text="Rainy").click()
+    pg.locator("#pick-formal .tag-chip", has_text="Casual").first.click()
+    seen = set()
+    for _ in range(15):
+        pg.evaluate("pickOutfit()"); pg.wait_for_timeout(120)
+        seen |= set(pg.inner_text("#outfit-grid").split("\n"))
+    assert "boots" in seen and "rain shell" in seen, seen
+    assert "suede loafers" not in seen and "wool coat" not in seen, seen
+    assert "watch" in seen, seen
+
+    # A closet with no bottoms for the occasion says so.
+    pg.locator("#pick-formal .tag-chip", has_text="Business").click()
+    pg.evaluate("pickOutfit()"); pg.wait_for_timeout(150)
+    note = pg.inner_text("#outfit-note")
+    assert "top" in note and "bottom" in note, note
     b.close()
-print("ok: Formal pick returns only formal items")
+print("ok: occasion, rain-ready picks, accessories and the missing-pieces note")
