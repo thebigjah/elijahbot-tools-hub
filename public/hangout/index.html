@@ -426,7 +426,7 @@ document.getElementById('share-list').addEventListener('click', async () => {
   }
   try {
     await navigator.clipboard.writeText(url);
-    alert(`Link copied. Paste it anywhere — they\'ll get all ${userIdeas.length} ideas when they open it.`);
+    alert(`Link copied. Paste it anywhere and they\'ll get all ${userIdeas.length} ideas when they open it.`);
   } catch {
     prompt('Copy this link:', url);
   }
