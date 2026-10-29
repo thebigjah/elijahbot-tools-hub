@@ -802,7 +802,7 @@ function renderResults(m, base){
 
 function metricsHtml(m, base){
   const cards = [
-    { name:'Words / min', value:Math.round(m.wpm), baseline:base?Math.round(base.wpm):null, delta:base?((m.wpm-base.wpm)/base.wpm)*100:null, unit:' wpm', flipDelta:false },
+    { name:'Words / min', value:Math.round(m.wpm), baseline:base?Math.round(base.wpm):null, delta:base&&base.wpm>0?((m.wpm-base.wpm)/base.wpm)*100:null, unit:' wpm', flipDelta:false },
     { name:'Pitch (F0)', value:m.pitchCount>5?Math.round(m.pitchMedian)+' Hz':'n/a', baseline:base&&base.pitchMedian?Math.round(base.pitchMedian)+' Hz':null, delta:base&&base.pitchMedian&&m.pitchCount>5?((m.pitchMedian-base.pitchMedian)/base.pitchMedian)*100:null, unit:'', flipDelta:false },
     { name:'Filler count', value:m.fillerCount, baseline:base?base.fillerCount:null, delta:base?(m.fillerCount-base.fillerCount):null, unit:'', flipDelta:true, absoluteDelta:true },
     { name:'Volume CV', value:m.volCV.toFixed(2), baseline:base?base.volCV.toFixed(2):null, delta:base&&base.volCV>0?((m.volCV-base.volCV)/base.volCV)*100:null, unit:'', flipDelta:false },

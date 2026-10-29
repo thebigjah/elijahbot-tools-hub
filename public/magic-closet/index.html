@@ -356,7 +356,9 @@ function setTab(tab){
   if(tab==='stats') renderStats();
 }
 
-function renderTagRow(rowId, items, kind, multi=false){
+function renderTagRow(rowId, items, kind, multi, scope){
+  // scope picks which state object the row writes to; Add and Pick both have a 'formal' row.
+  const bag = scope === 'pick' ? state.pick : state.selected;
   const row = document.getElementById(rowId);
   row.innerHTML = '';
   items.forEach(item => {
@@ -364,10 +366,8 @@ function renderTagRow(rowId, items, kind, multi=false){
     let active = false;
     if(kind === 'seasons'){
       active = state.selected.seasons.includes(item.id);
-    } else if(kind in state.selected){
-      active = state.selected[kind] === item.id;
-    } else if(kind in state.pick){
-      active = state.pick[kind] === item.id;
+    } else if(kind in bag){
+      active = bag[kind] === item.id;
     }
     el.className = 'tag-chip' + (active ? ' active' : '');
     el.textContent = item.label;
@@ -376,12 +376,12 @@ function renderTagRow(rowId, items, kind, multi=false){
         const i = state.selected.seasons.indexOf(item.id);
         if(i >= 0) state.selected.seasons.splice(i, 1);
         else state.selected.seasons.push(item.id);
-      } else if(kind in state.selected){
-        state.selected[kind] = state.selected[kind] === item.id ? null : item.id;
-      } else if(kind in state.pick){
-        state.pick[kind] = item.id;
+      } else if(scope === 'pick'){
+        bag[kind] = item.id;
+      } else if(kind in bag){
+        bag[kind] = bag[kind] === item.id ? null : item.id;
       }
-      renderTagRow(rowId, items, kind, multi);
+      renderTagRow(rowId, items, kind, multi, scope);
     };
     row.appendChild(el);
   });
@@ -395,8 +395,8 @@ function renderAddTab(){
 }
 
 function renderPickTab(){
-  renderTagRow('pick-weather', WEATHER, 'weather');
-  renderTagRow('pick-formal', FORMAL, 'formal');
+  renderTagRow('pick-weather', WEATHER, 'weather', false, 'pick');
+  renderTagRow('pick-formal', FORMAL, 'formal', false, 'pick');
 }
 
 function handlePhotoSelected(e){
