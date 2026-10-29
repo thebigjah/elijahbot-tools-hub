@@ -61,6 +61,7 @@ with sync_playwright() as p:
     capture(pg)  # the same steady tone again, still no words: should read as unchanged
     diag = pg.inner_text("#diagnoses")
     assert "Close to your calm take" in diag, diag
+    assert "Pace was not measured" in diag, "claimed pace was compared with no transcript"
     assert "n/a" in pg.inner_text("#metric-grid"), "word readouts should say n/a without a transcript"
     assert not errs, errs
     b.close()

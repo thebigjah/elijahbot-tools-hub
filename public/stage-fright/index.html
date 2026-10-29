@@ -900,7 +900,9 @@ function diagnosesHtml(m, base){
   }
   if(!issues.length){
     return '<div class="diagnosis calm"><div class="diagnosis-title">Close to your calm take.</div>' +
-      '<div class="diagnosis-body">Pitch, volume and pace are all near your baseline.</div></div>';
+      '<div class="diagnosis-body">' + (m.noTranscript || (base && base.noTranscript)
+        ? 'Pitch and volume are near your baseline. Pace was not measured, because speech recognition returned no words.'
+        : 'Pitch, volume and pace are all near your baseline.') + '</div></div>';
   }
   return issues.map(d => `<div class="diagnosis ${d.type}">
     <div class="diagnosis-title">${d.title}</div>
