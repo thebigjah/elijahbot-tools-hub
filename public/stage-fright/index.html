@@ -823,7 +823,7 @@ function metricsHtml(m, base){
     { name:'Pitch (F0)', value:m.pitchCount>5?Math.round(m.pitchMedian)+' Hz':'n/a', baseline:base&&base.pitchMedian?Math.round(base.pitchMedian)+' Hz':null, delta:base&&base.pitchMedian&&m.pitchCount>5?((m.pitchMedian-base.pitchMedian)/base.pitchMedian)*100:null, unit:'', flipDelta:false },
     { name:'Filler count', value:m.noTranscript?'n/a':m.fillerCount, baseline:base&&!base.noTranscript?base.fillerCount:null, delta:base&&!base.noTranscript&&!m.noTranscript?(m.fillerCount-base.fillerCount):null, unit:'', flipDelta:true, absoluteDelta:true },
     { name:'Volume CV', value:m.volCV.toFixed(2), baseline:base?base.volCV.toFixed(2):null, delta:base&&base.volCV>0?((m.volCV-base.volCV)/base.volCV)*100:null, unit:'', flipDelta:false },
-    { name:'Pitch spread', value:m.pitchCount>5?m.pitchCV.toFixed(2):'n/a', baseline:base&&base.pitchCV?base.pitchCV.toFixed(2):null, delta:base&&base.pitchCV&&m.pitchCount>5?((m.pitchCV-base.pitchCV)/base.pitchCV)*100:null, unit:'', flipDelta:false },
+    { name:'Pitch spread', value:m.pitchCount>5?m.pitchCV.toFixed(2):'n/a', baseline:base&&base.pitchCV?base.pitchCV.toFixed(2):null, delta:base&&base.pitchCV!=null&&m.pitchCount>5?((m.pitchCV-base.pitchCV)/(base.pitchCV+0.03))*100:null, unit:'', flipDelta:false }, // same 0.03 floor as the alert
     { name:'Filler rate', value:m.noTranscript?'n/a':m.fillerRate.toFixed(1)+'%', baseline:base&&!base.noTranscript?base.fillerRate.toFixed(1)+'%':null, delta:base&&!base.noTranscript&&!m.noTranscript?(m.fillerRate-base.fillerRate):null, unit:'pp', flipDelta:true, absoluteDelta:true },
   ];
   return cards.map(c=>{
