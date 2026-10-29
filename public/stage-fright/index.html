@@ -471,7 +471,7 @@ footer a:hover{color:var(--phosphor);border-bottom-color:var(--phosphor)}
 <section class="panel">
   <div class="panel-header">
     <span class="panel-num">CH/02</span>
-    <span class="panel-label">Analysis · biomarker readout</span>
+    <span class="panel-label">Analysis</span>
     <span class="panel-status" id="results-mode">awaiting capture</span>
   </div>
   <div class="panel-body">
@@ -743,16 +743,15 @@ function analyze(){
   for(const v of volumeSamples) volVar += (v - volMean)*(v - volMean);
   volVar = Math.sqrt(volVar / Math.max(1, volumeSamples.length));
   const volCV = volMean > 0 ? (volVar / volMean) : 0;
-  let pitchMedian = 0, pitchCV = 0, pitchCount = pitchSamples.length;
+  // Pitch spread is the interquartile range over the median, using only normal speaking pitch
+  // (70 to 400 Hz). Octave errors from the detector land outside that band or in the tails,
+  // so they no longer swamp the number the way a standard deviation let them.
+  const voiced = pitchSamples.filter(p => p >= 70 && p <= 400).sort((a,b)=>a-b);
+  let pitchMedian = 0, pitchCV = 0, pitchCount = voiced.length;
   if(pitchCount > 5){
-    const sorted = [...pitchSamples].sort((a,b)=>a-b);
-    pitchMedian = sorted[Math.floor(sorted.length / 2)];
-    let pMean = 0;
-    for(const p of pitchSamples) pMean += p;
-    pMean = pMean / pitchCount;
-    let pVar = 0;
-    for(const p of pitchSamples) pVar += (p - pMean)*(p - pMean);
-    pitchCV = pMean > 0 ? Math.sqrt(pVar / pitchCount) / pMean : 0;
+    const q = (f) => voiced[Math.min(voiced.length - 1, Math.floor(f * voiced.length))];
+    pitchMedian = q(0.5);
+    pitchCV = pitchMedian > 0 ? (q(0.75) - q(0.25)) / pitchMedian : 0;
   }
   const metrics = { wpm, fillerCount, fillerRate, volMean, volCV, wordCount, durationSec, pitchMedian, pitchCV, pitchCount };
   document.getElementById('scope-readout').textContent = '— dB';
@@ -790,7 +789,7 @@ function renderBaselineSaved(m){
   document.getElementById('metric-grid').innerHTML = metricsHtml(m, null);
   document.getElementById('diagnoses').innerHTML =
     '<div class="diagnosis calm"><div class="diagnosis-title">Baseline reference locked.</div>' +
-    '<div class="diagnosis-body">UV-7 will compare every future capture against this signal. Re-record the baseline whenever it feels off — ideally during a calm moment, not right after coffee or before bed.</div></div>';
+    '<div class="diagnosis-body">Later takes are compared against this one. Record a new baseline whenever it feels off, ideally at a calm moment.</div></div>';
   document.getElementById('transcript').textContent = transcript || '(no transcript captured)';
 }
 
@@ -803,8 +802,7 @@ function showBaselineCard(){
   if(b.pitchMedian && b.pitchMedian > 0) pitchPart = ' · F0 <strong>' + Math.round(b.pitchMedian) + ' Hz</strong>';
   document.getElementById('baseline-stats').innerHTML =
     'Saved <strong>' + new Date(b.savedAt).toLocaleDateString() + '</strong> · ' +
-    '<strong>' + Math.round(b.wpm) + '</strong> wpm · ' +
-    '<strong>' + b.fillerCount + '</strong> fillers · ' +
+    (b.noTranscript ? '' : '<strong>' + Math.round(b.wpm) + '</strong> wpm · <strong>' + b.fillerCount + '</strong> fillers · ') +
     'CV <strong>' + b.volCV.toFixed(2) + '</strong>' + pitchPart;
 }
 
@@ -823,9 +821,9 @@ function metricsHtml(m, base){
   const cards = [
     { name:'Words / min', value:m.noTranscript?'n/a':Math.round(m.wpm), baseline:base&&!base.noTranscript?Math.round(base.wpm):null, delta:base&&base.wpm>0&&!m.noTranscript?((m.wpm-base.wpm)/base.wpm)*100:null, unit:m.noTranscript?'':' wpm', flipDelta:false },
     { name:'Pitch (F0)', value:m.pitchCount>5?Math.round(m.pitchMedian)+' Hz':'n/a', baseline:base&&base.pitchMedian?Math.round(base.pitchMedian)+' Hz':null, delta:base&&base.pitchMedian&&m.pitchCount>5?((m.pitchMedian-base.pitchMedian)/base.pitchMedian)*100:null, unit:'', flipDelta:false },
-    { name:'Filler count', value:m.fillerCount, baseline:base?base.fillerCount:null, delta:base?(m.fillerCount-base.fillerCount):null, unit:'', flipDelta:true, absoluteDelta:true },
+    { name:'Filler count', value:m.noTranscript?'n/a':m.fillerCount, baseline:base&&!base.noTranscript?base.fillerCount:null, delta:base&&!base.noTranscript&&!m.noTranscript?(m.fillerCount-base.fillerCount):null, unit:'', flipDelta:true, absoluteDelta:true },
     { name:'Volume CV', value:m.volCV.toFixed(2), baseline:base?base.volCV.toFixed(2):null, delta:base&&base.volCV>0?((m.volCV-base.volCV)/base.volCV)*100:null, unit:'', flipDelta:false },
-    { name:'Pitch CV', value:m.pitchCount>5?m.pitchCV.toFixed(2):'n/a', baseline:base&&base.pitchCV?base.pitchCV.toFixed(2):null, delta:base&&base.pitchCV&&m.pitchCount>5?((m.pitchCV-base.pitchCV)/base.pitchCV)*100:null, unit:'', flipDelta:false },
+    { name:'Pitch spread', value:m.pitchCount>5?m.pitchCV.toFixed(2):'n/a', baseline:base&&base.pitchCV?base.pitchCV.toFixed(2):null, delta:base&&base.pitchCV&&m.pitchCount>5?((m.pitchCV-base.pitchCV)/base.pitchCV)*100:null, unit:'', flipDelta:false },
     { name:'Filler rate', value:m.noTranscript?'n/a':m.fillerRate.toFixed(1)+'%', baseline:base&&!base.noTranscript?base.fillerRate.toFixed(1)+'%':null, delta:base&&!base.noTranscript&&!m.noTranscript?(m.fillerRate-base.fillerRate):null, unit:'pp', flipDelta:true, absoluteDelta:true },
   ];
   return cards.map(c=>{
@@ -858,15 +856,17 @@ function diagnosesHtml(m, base){
   if(base && base.pitchMedian && base.pitchMedian > 0 && m.pitchCount > 5){
     const pitchDelta = ((m.pitchMedian - base.pitchMedian) / base.pitchMedian) * 100;
     if(pitchDelta > 8){
-      issues.push({ type:'alert', title:`F0 elevated ${pitchDelta.toFixed(1)}% above baseline.`, body:`Elevated F0 is the most reliable acoustic anxiety marker. Your vocal folds are tensing. Reset: yawn deeply 3× (resets larynx position) + hum 5 seconds at your lowest comfortable note before joining. Lowers pitch back to baseline almost instantly.` });
+      issues.push({ type:'alert', title:`F0 elevated ${pitchDelta.toFixed(1)}% above baseline.`, body:`Your pitch is higher than your calm take, which often happens under stress. Try a slow yawn or two and hum for a few seconds at a low, comfortable note, then record again.` });
     } else if(pitchDelta < -8){
       issues.push({ type:'alert', title:`F0 depressed ${Math.abs(pitchDelta).toFixed(1)}% below baseline.`, body:`Could be fatigue, post-meal grogginess, or projecting "calm" too hard. If genuinely tired: stand, drink cold water, read three sentences aloud at normal volume. If forcing calm: stop, just be normal-you.` });
     }
   }
   if(base && base.pitchCV && base.pitchCV > 0 && m.pitchCount > 5){
-    const pitchCVDelta = m.pitchCV / base.pitchCV;
+    // A small floor keeps a near-zero baseline spread from turning noise into a huge ratio.
+    const SPREAD_FLOOR = 0.03;
+    const pitchCVDelta = (m.pitchCV + SPREAD_FLOOR) / (base.pitchCV + SPREAD_FLOOR);
     if(pitchCVDelta > 1.6){
-      issues.push({ type:'alert', title:'Pitch variance elevated · over-emphasizing.', body:'Wide pitch swing signals anxiety-driven over-emphasis. Ration the "lift" — only on key words, not every other word. The listener picks up the important word more clearly when emphasis is restrained.' });
+      issues.push({ type:'alert', title:'Pitch variance elevated · over-emphasizing.', body:'Your pitch moves more than in your calm take. Save the rise for the words that matter, so listeners can tell which ones those are.' });
     } else if(pitchCVDelta < 0.55){
       issues.push({ type:'alert', title:'Pitch variance depressed · monotone delivery.', body:"Monotone reads as disengaged or rehearsed. Mark 2-3 key phrases in your opening and deliberately lift them. Even slight pitch variation on 'this is what I wanted to ask you' makes the question land." });
     }
@@ -874,33 +874,33 @@ function diagnosesHtml(m, base){
   if(base && base.wpm > 0 && !m.noTranscript){
     const wpmDelta = ((m.wpm - base.wpm) / base.wpm) * 100;
     if(wpmDelta > 25){
-      issues.push({ type:'alert', title:`Speaking rate ${Math.round(wpmDelta)}% above baseline.`, body:`Nervous system is in pace-up mode. Pre-call: 4-7-8 breath (in 4, hold 7, out 8) × 3 cycles. During: deliberately end every other sentence with a 1-beat pause. Slower talk slows your heart rate.` });
+      issues.push({ type:'alert', title:`Speaking rate ${Math.round(wpmDelta)}% above baseline.`, body:`You are talking faster than in your calm take. Before the call, take a few slow breaths. During it, pause for a beat at the end of every other sentence.` });
     } else if(wpmDelta < -20){
       issues.push({ type:'alert', title:`Speaking rate ${Math.abs(Math.round(wpmDelta))}% below baseline.`, body:`Could be fatigue, low energy, or pre-call dread. If dread: stand, 10 jumping jacks, water. Body wakes before voice does.` });
     }
   }
-  if(m.fillerRate > 8){
-    issues.push({ type:'alert', title:`Filler density ${m.fillerRate.toFixed(1)}% · target <5%.`, body:`Fillers are thinking-out-loud habit. Two fixes: (1) replace "um" with deliberate silent pause — listener fills it with respect, not anxiety. (2) Pre-call, write your one-sentence answer to "what is the point of this call?" Read twice. Fewer fillers when the spine is clear.` });
+  if(!m.noTranscript && m.fillerRate > 8){
+    issues.push({ type:'alert', title:`Filler density ${m.fillerRate.toFixed(1)}% · target <5%.`, body:`Two things help: pause silently where you would say "um", and before the call write one sentence on what the call is for, then read it aloud twice.` });
   } else if(m.fillerRate > 4 && base && !base.noTranscript && m.fillerRate > base.fillerRate * 1.5){
     issues.push({ type:'alert', title:`Filler rate ${m.fillerRate.toFixed(1)}% · elevated vs. baseline ${base.fillerRate.toFixed(1)}%.`, body:`You're searching mid-sentence. Likely cause: you haven't decided what to say yet. Write your two opening sentences. Say them out loud once. Then re-test.` });
   }
   if(base && base.volCV > 0){
     const cvDelta = m.volCV / base.volCV;
     if(cvDelta > 1.6){
-      issues.push({ type:'alert', title:'Volume CV elevated · level instability.', body:'Volume is swinging — likely nerves making you over-emphasize then trail off. Use newscaster level: pick a middle volume, stay within ±20% of it for the first minute. Steadiness reads as competence.' });
+      issues.push({ type:'alert', title:'Volume CV elevated · level instability.', body:'Your volume swings more than in your calm take. Pick a middle volume and hold near it for the first minute.' });
     } else if(cvDelta < 0.5){
       issues.push({ type:'alert', title:'Volume CV depressed · flat delivery.', body:"Monotone volume reads as disengaged. Quick fix: smile briefly before you speak (the voice picks it up). Or read three sentences aloud with deliberately varied pitch right before the call." });
     }
   }
   if(m.volMean < 0.02){
-    issues.push({ type:'alert', title:'Signal level critically low.', body:'Check mic position (4-6 inches from mouth) and that the right mic is selected in browser settings. If volume is right but you still sound quiet: you might be physically tight. Roll shoulders. Open mouth wider. Project from diaphragm.' });
+    issues.push({ type:'alert', title:'Signal level critically low.', body:'Check that the mic is 4 to 6 inches from your mouth and that the right mic is selected in your browser settings.' });
   }
-  if(m.wordCount < 15){
-    issues.push({ type:'alert', title:`Only ${m.wordCount} words captured · insufficient sample.`, body:'Either you held back, mic missed you, or speech recognition stalled. Try again — aim for steady speech across the full 20 seconds. More words = better analysis.' });
+  if(!m.noTranscript && m.wordCount < 15){
+    issues.push({ type:'alert', title:`Only ${m.wordCount} words captured · insufficient sample.`, body:'Speech recognition caught only a few words, so word rate and fillers are rough. Try again and talk steadily for the full 20 seconds.' });
   }
   if(!issues.length){
-    return '<div class="diagnosis calm"><div class="diagnosis-title">Signal nominal.</div>' +
-      '<div class="diagnosis-body">All biomarkers within baseline range. Nervous system reading green. Go.</div></div>';
+    return '<div class="diagnosis calm"><div class="diagnosis-title">Close to your calm take.</div>' +
+      '<div class="diagnosis-body">Pitch, volume and pace are all near your baseline.</div></div>';
   }
   return issues.map(d => `<div class="diagnosis ${d.type}">
     <div class="diagnosis-title">${d.title}</div>

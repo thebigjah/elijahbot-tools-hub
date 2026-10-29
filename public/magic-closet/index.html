@@ -503,7 +503,7 @@ async function renderCloset(){
         ${imgSrc ? `<img src="${imgSrc}" alt="${escapeHtml(it.name)}">` :
           `<div style="aspect-ratio:1/1;background:var(--bg-elev);display:flex;align-items:center;justify-content:center;color:var(--ink-faint);font-family:var(--mono);font-size:10px;border-radius:5px">no photo</div>`}
         <div class="item-name">${escapeHtml(it.name)}</div>
-        <div class="item-tags">${it.color} · ${it.formal}${it.lastWorn ? ' · '+daysAgo(it.lastWorn)+'d ago' : ''}</div>
+        <div class="item-tags">${COLORS.find(c => c.id === it.color)?.label || it.color}, ${FORMAL.find(x => x.id === it.formal)?.label || it.formal}${it.lastWorn ? ', worn '+daysAgo(it.lastWorn)+'d ago' : ''}</div>
       </div>`;
     }
     html += `</div>`;
@@ -606,7 +606,11 @@ async function pickOutfit(){
     return candidates[candidates.length - 1];
   };
 
-  const wantDress = items.some(it => it.type === 'dress' && matchesContext(it)) && Math.random() < 0.2;
+  // A dress when it is the only complete option; when separates also fit, a dress about a third of the time.
+  const fits = (type) => items.some(it => it.type === type && matchesContext(it));
+  const canDress = fits('dress');
+  const canSeparates = fits('top') && fits('bottom');
+  const wantDress = canDress && (!canSeparates || Math.random() < 0.35);
   let outfit;
   // Cold, cool and wet days get an outer layer, whether the base is a dress or a top and bottom.
   const wantsOuter = state.pick.weather === 'cold' || state.pick.weather === 'cool' || rainy;

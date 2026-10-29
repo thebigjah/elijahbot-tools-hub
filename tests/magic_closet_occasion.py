@@ -68,6 +68,20 @@ with sync_playwright() as p:
             assert "parka" in grid, grid
     assert dress_seen, "the dress never came up in 60 cold picks"
 
+    # A dress that is the only complete outfit gets picked every time.
+    pg.evaluate("""async () => { for (const it of await dbGetAll('items')) await dbDelete('items', it.id); }""")
+    pg.evaluate("""async () => {
+      const base = { color:'black', formal:'casual', seasons:['summer','spring'], addedAt:Date.now(), lastWorn:null, wornCount:0 };
+      await dbPut('items', { ...base, id:'s1', name:'sun dress', type:'dress' });
+      await dbPut('items', { ...base, id:'s2', name:'sandals', type:'shoes' });
+    }""")
+    pg.locator("#pick-weather .tag-chip", has_text="Warm").click()
+    pg.locator("#pick-rain .tag-chip", has_text="Dry").click()
+    pg.locator("#pick-formal .tag-chip", has_text="Casual").first.click()
+    for _ in range(20):
+        pg.evaluate("pickOutfit()"); pg.wait_for_timeout(60)
+        assert "sun dress" in pg.inner_text("#outfit-grid"), "a lone dress was skipped"
+
     # Logging twice for the same outfit counts once.
     pg.evaluate("pickOutfit()"); pg.wait_for_timeout(100)
     pg.evaluate("Promise.all([logOutfit(), logOutfit()])"); pg.wait_for_timeout(300)
