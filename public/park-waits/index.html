@@ -381,7 +381,7 @@ async function loadWaits(force){
   document.getElementById('results').innerHTML = '<div class="loading">Pulling the lever…</div>';
   document.getElementById('summary').style.display = 'none';
   try{
-    const res = await fetch(`https://queue-times.com/parks/${state.parkId}/queue_times.json`);
+    const res = await fetch(`https://park-waits.vercel.app/api/waits?park=${encodeURIComponent(state.parkId)}`);
     if(!res.ok) throw new Error('HTTP '+res.status);
     state.data = await res.json();
     state.lastFetch = now;
