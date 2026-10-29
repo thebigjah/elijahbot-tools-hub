@@ -193,7 +193,7 @@
 <script>
 const SEEDS = [
   { title: "Sunset at Kennesaw Mountain summit", desc: "Park at the visitor center, hike up the steep trail (~45 min), watch the sun set over Atlanta from the bench at the top. Bring water and snacks.", where: "Kennesaw Mountain NBP", category: "Outdoors", vibe: "1-4 people, date", cost: "free", lat: 33.9777, lng: -84.5803 },
-  { title: "All-night Waffle House run", desc: "Pick the Waffle House at I-75 and Barrett Pkwy at 1 AM. Order the hash brown trio (scattered, smothered, covered, peppered, capped). Have the conversation you can\\'t have during the day.", where: "Waffle House, Kennesaw (I-75 + Barrett)", category: "Late Night", vibe: "2-3 close friends", cost: "$", lat: 34.0150, lng: -84.6189 },
+  { title: "All-night Waffle House run", desc: "Pick the Waffle House at I-75 and Barrett Pkwy at 1 AM. Order the hash brown trio (scattered, smothered, covered, peppered, capped). Have the conversation you can\'t have during the day.", where: "Waffle House, Kennesaw (I-75 + Barrett)", category: "Late Night", vibe: "2-3 close friends", cost: "$", lat: 34.0150, lng: -84.6189 },
   { title: "Beltline + Ladybird Grove cocktails", desc: "Walk the eastside Beltline at dusk, end up at Ladybird Grove & Mess Hall for a drink on their patio. Plenty of dogs to pet.", where: "Atlanta Beltline (Eastside)", category: "Date", vibe: "date or 2 friends", cost: "$$", lat: 33.7787, lng: -84.3681 },
   { title: "Drive-in movie at Starlight 6", desc: "Six screens, bring chairs, tune your car radio to the audio. Concession is cheap. Hits 3 movies in a night for the price of 1.", where: "Starlight Six Drive-In, Atlanta", category: "Chill", vibe: "group, family, date", cost: "$$", lat: 33.7223, lng: -84.3146 },
   { title: "Get on the roof of the W parking garage", desc: "Park near the top of the W Atlanta Midtown garage (if open to public). Skyline view, free, takes 10 minutes from anywhere midtown.", where: "Midtown Atlanta", category: "Adventure", vibe: "2-4 friends", cost: "free", lat: 33.7838, lng: -84.3838 },
@@ -201,17 +201,17 @@ const SEEDS = [
   { title: "Stone Mountain laser show + walk", desc: "Bring a blanket, get there an hour before sunset, walk the easy paved trail around the lake, settle in for the laser show on the carving face after dark.", where: "Stone Mountain Park", category: "Outdoors", vibe: "family, group, date", cost: "$", lat: 33.8053, lng: -84.1453 },
   { title: "Cheap pottery date at JOY", desc: "Paint-your-own-pottery places. Pick the dumbest mug shape, paint it, fight about it, come back in a week to pick it up.", where: "Acworth / Marietta", category: "Date", vibe: "date, 2 friends", cost: "$$", lat: 34.0656, lng: -84.6788 },
   { title: "Hike Sope Creek ruins", desc: "Old paper mill ruins on a creek, free, easy 1-2 mile loop. Climb on the ruins, throw rocks, take photos.", where: "Sope Creek Trail, Marietta", category: "Outdoors", vibe: "any group size", cost: "free", lat: 33.9533, lng: -84.4406 },
-  { title: "Build a pillow fort + theological argument", desc: "Move all the couch cushions into one room. Pick a real question (Calvinism, free will, hell, whatever). Have the argument. No phones.", where: "Anyone\\'s living room", category: "Chill", vibe: "2-5 close friends", cost: "free" },
+  { title: "Build a pillow fort + theological argument", desc: "Move all the couch cushions into one room. Pick a real question (Calvinism, free will, hell, whatever). Have the argument. No phones.", where: "Anyone\'s living room", category: "Chill", vibe: "2-5 close friends", cost: "free" },
   { title: "Late-night Krispy Kreme HOT NOW", desc: "Drive past Krispy Kreme until the HOT NOW sign is lit. Buy a dozen. Eat the first one in the parking lot. Bring the rest home.", where: "Krispy Kreme, Marietta or wherever", category: "Late Night", vibe: "any", cost: "$", lat: 33.9526, lng: -84.5499 },
   { title: "Walmart 2 AM challenge", desc: "Go to Walmart with one rule: buy a meal under $5 that you can eat in the parking lot. Eat it in the parking lot.", where: "Any 24-hr Walmart", category: "Weird", vibe: "2-3 friends", cost: "$" },
-  { title: "Drive to a town you\\'ve never been to", desc: "Pick a town within 30 minutes you\\'ve never been to. Drive there. Walk one street. Buy one thing. Come home.", where: "Anywhere within reach", category: "Adventure", vibe: "solo or 2 friends", cost: "$" },
+  { title: "Drive to a town you\'ve never been to", desc: "Pick a town within 30 minutes you\'ve never been to. Drive there. Walk one street. Buy one thing. Come home.", where: "Anywhere within reach", category: "Adventure", vibe: "solo or 2 friends", cost: "$" },
   { title: "Bookstore browse + journal at coffee shop", desc: "Hour at Barnes & Noble (or used bookstore). Buy one book. Coffee shop next door. Read first chapter, journal what you noticed.", where: "Anywhere", category: "Chill", vibe: "solo or with 1 friend", cost: "$$" },
   { title: "Worship night at Stonebridge (Sun PM)", desc: "Stonebridge sometimes runs a Sunday evening worship + prayer night. Quieter than the morning service. Check the calendar.", where: "Stonebridge Church, Marietta", category: "Group", vibe: "anyone", cost: "free", lat: 33.9526, lng: -84.5499 },
   { title: "Disc golf at Cauble Park", desc: "Cauble Park in Acworth has a free 18-hole disc golf course on the lake. Bring 3 discs, expect to lose at least one to the water.", where: "Cauble Park, Acworth", category: "Outdoors", vibe: "2-4 friends", cost: "free", lat: 34.0734, lng: -84.6788 },
-  { title: "Late night McDonalds drive thru philosophy", desc: "Drive thru, McFlurries, park anywhere quiet, ask one big question (\\'what scares you about the future?\\' / \\'what\\'s your unspoken regret?\\') and don\\'t leave until both people have answered.", where: "Anywhere", category: "Late Night", vibe: "1 close friend, date", cost: "$" },
+  { title: "Late night McDonalds drive thru philosophy", desc: "Drive thru, McFlurries, park anywhere quiet, ask one big question (\'what scares you about the future?\' / \'what\'s your unspoken regret?\') and don\'t leave until both people have answered.", where: "Anywhere", category: "Late Night", vibe: "1 close friend, date", cost: "$" },
   { title: "Lake Allatoona kayak rental", desc: "Rent a tandem kayak from one of the marinas. Paddle to a quiet cove. Swim. Eat lunch on the boat.", where: "Lake Allatoona", category: "Adventure", vibe: "2-4 friends, date", cost: "$$$", lat: 34.1473, lng: -84.6938 },
-  { title: "Pick a stranger to bless", desc: "Go to a busy public place. Each person pays attention until someone catches their eye. Pay for their meal/coffee anonymously. Leave a note that says only \\'God sees you.\\'", where: "Anywhere", category: "Creative", vibe: "1-3 friends", cost: "$$" },
-  { title: "Backyard fire pit + Compline", desc: "Build a fire. At 10:00 PM open the Book of Common Prayer\\'s Compline service. Read it aloud. End in silence for 5 minutes. Talk after if you want.", where: "Backyard / patio", category: "Chill", vibe: "2-6 friends", cost: "free" },
+  { title: "Pick a stranger to bless", desc: "Go to a busy public place. Each person pays attention until someone catches their eye. Pay for their meal/coffee anonymously. Leave a note that says only \'God sees you.\'", where: "Anywhere", category: "Creative", vibe: "1-3 friends", cost: "$$" },
+  { title: "Backyard fire pit + Compline", desc: "Build a fire. At 10:00 PM open the Book of Common Prayer\'s Compline service. Read it aloud. End in silence for 5 minutes. Talk after if you want.", where: "Backyard / patio", category: "Chill", vibe: "2-6 friends", cost: "free" },
 ];
 
 const KEY = 'hangout.user.v1';
@@ -413,7 +413,7 @@ document.getElementById('view-map').addEventListener('click', () => {
 // Share my list — encodes userIdeas as base64 into the URL hash
 document.getElementById('share-list').addEventListener('click', async () => {
   if (userIdeas.length === 0) {
-    alert('You haven\\'t added any custom ideas yet. Use "+ Add your own" first.');
+    alert('You haven\'t added any custom ideas yet. Use "+ Add your own" first.');
     return;
   }
   // Only share the *content* — strip ids since recipient will re-id on import
@@ -426,7 +426,7 @@ document.getElementById('share-list').addEventListener('click', async () => {
   }
   try {
     await navigator.clipboard.writeText(url);
-    alert(`Link copied. Paste it anywhere — they\\'ll get all ${userIdeas.length} ideas when they open it.`);
+    alert(`Link copied. Paste it anywhere — they\'ll get all ${userIdeas.length} ideas when they open it.`);
   } catch {
     prompt('Copy this link:', url);
   }
